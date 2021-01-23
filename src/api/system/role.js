@@ -73,3 +73,11 @@ export function exportRole(query) {
     params: query
   })
 }
+
+// 查询角色列表
+export function listRoleKey() {
+  return request({
+    url: '/system/key/listRoleKey',
+    method: 'get'
+  })
+}

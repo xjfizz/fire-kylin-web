@@ -100,7 +100,14 @@
       <el-table-column label="服务分类名称" align="center" prop="pmsServerCategory.categoryName" />
       <el-table-column label="服务ID" align="center" prop="pkid" />
       <el-table-column label="服务名称" align="center" prop="serverName" />
-      <el-table-column label="服务图像" align="center" prop="serverImageUrl" />
+      <el-table-column prop="serverImageUrl" label="服务图像" header-align="center" align="center">
+        <template slot-scope="scope">
+          <el-popover placement="top-start" title="" trigger="hover">
+            <img :src="scope.row.serverImageUrl" alt="图片预览" style="width: 200px;height: 200px">
+            <img slot="reference" :src="scope.row.serverImageUrl" style="width: 50px;height: 50px" :onerror="errorimg">
+          </el-popover>
+        </template>
+      </el-table-column>
       <el-table-column label="服务金额" align="center" prop="serverAmount" />
       <el-table-column label="服务单位" align="center" prop="serverUnit" />
       <el-table-column label="服务顺序" align="center" prop="serverSort" />
@@ -177,9 +184,35 @@
           <el-form-item label="服务税率" prop="serverTaxRate">
             <el-input-number v-model="form.serverTaxRate" controls-position="right"  placeholder="请输入服务税率" :min="0" />（%）
           </el-form-item>
-          <el-form-item label="服务图像" prop="serverImageUrl">
-            <el-input v-model="form.serverImageUrl" placeholder="请输入服务图像地址" />
-          </el-form-item>
+          <el-row>
+            <el-form-item label="服务图像" :label-width="formLabelWidth" prop="serverImageUrl" style="margin-bottom:0px">
+              <el-upload
+                ref="upload"
+                :action="upload.url"
+                :headers="upload.headers"
+                :limit=upload.limitNum
+                accept="image/png,image/gif,image/jpg,image/jpeg"
+                list-type="picture-card"
+                :auto-upload="false"
+                :on-success="handleAvatarSuccess"
+                :on-exceed="handleExceed"
+                :before-upload="handleBeforeUpload"
+                :on-preview="handlePictureCardPreview"
+                :on-remove="handleRemove"
+                :file-list="fileListShow">
+                <i class="el-icon-plus"></i>
+              </el-upload>
+              <!--图片预览的dialog-->
+              <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="">
+              </el-dialog>
+              <p style="color: #999;">图片上传限制： 1.最多1张； 2.最大不超过2M</p>
+            </el-form-item>
+            <el-form-item>
+              <el-button size="small" type="primary" @click="uploadFile">立即上传</el-button>
+              <el-button size="small">取消</el-button>
+            </el-form-item>
+          </el-row>
           <el-form-item label="服务状态">
             <el-radio-group v-model="form.serverStatus">
               <el-radio
@@ -204,7 +237,7 @@
 
 <script>
 import { listServer, getServer, delServer, addServer, updateServer, exportServer, changeServerStatus, listServerCategory } from "@/api/module/production/pms/server/server";
-import {changeServerCategoryStatus} from "@/api/module/production/pms/category/category";
+import {getToken} from "@/utils/auth";
 
 export default {
   name: "Server",
@@ -234,6 +267,8 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      // 加载默认头像图片
+      errorimg:'this.src="'+require('../../../../../assets/images/user_profile.jpg')+'"',
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -272,7 +307,25 @@ export default {
         serverTaxRate: [
           { required: true, message: "服务税率不能为空", trigger: "blur" }
         ],
-      }
+      },
+      //图片上传判断是否有相同图片
+      isCommonName: true,
+      //修改时此属性用于接收数据库中图片存储list，图片才能正常显示
+      fileListShow: [],
+      //页面上存的暂时图片地址List
+      fileListPut: [],
+      dialogImageUrl: '',
+      dialogVisible: false,
+      formLabelWidth: '100px',
+      // 上传参数
+      upload: {
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken() },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/module/production/server/uploadServerImage",
+        // 上传图片数量限制
+        limitNum: 1,
+      },
     };
   },
   created() {
@@ -371,6 +424,22 @@ export default {
         this.form = response.data;
         this.open = true;
         this.title = "工场服务-修改";
+        let avatarUrl = this.form.serverImageUrl;
+        let pictureList = [avatarUrl];
+        if(pictureList.length > 0) {
+          this.fileListShow = pictureList.map(item => {
+            return {
+              name: item,
+              url: item
+            }
+          });
+          this.fileListPut = pictureList.map(item => {
+            return {
+              name: item,
+              url: item
+            }
+          });
+        }
       });
     },
     /** 提交按钮 */
@@ -419,6 +488,80 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
+    },
+    // 上传文件之前的钩子
+    handleBeforeUpload(file){
+      //每次进来初始化 isCommonName 为true
+      this.isCommonName = true;
+      const isJPG = file.type === 'image/png' || file.type === 'image/gif' || file.type === 'image/jpg' || file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      //判断是否有相同的图片，如何有即提示并添加失败
+      if(this.fileListPut.length > 0){
+        this.fileListPut.forEach((item,index)=>{
+          if(item.name === file.name){
+            this.$notify.warning({
+              title: '警告',
+              message: '已存在相同的图片！'
+            })
+            this.isCommonName = false;
+          }
+        })
+      }
+      if(!isJPG) {
+        this.$notify.warning({
+          title: '警告',
+          message: '请上传格式为image/png, image/gif, image/jpg, image/jpeg的图片！'
+        })
+      }
+      if(!isLt2M) {
+        this.$notify.warning({
+          title: '警告',
+          message: '图片大小必须小于2MB！'
+        })
+      }
+    },
+    // 文件超出个数限制时的钩子
+    handleExceed(files, fileList) {
+
+    },
+    // 文件列表移除文件时的钩子
+    handleRemove(file, fileList) {
+      //根据传进来删除的file里图片，同时删除保存在fileListPut的相同图片
+      if(this.fileListPut.length > 0){
+        this.fileListPut = this.fileListPut.filter((item, index)=>{
+          return item.name !== file.name;
+        })
+      }
+    },
+    // 点击文件列表中已上传的文件时的钩子
+    handlePictureCardPreview(file) {
+      console.log(file);
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    uploadFile() {
+      this.$refs.upload.submit()
+    },
+    // 上传成功后回调
+    handleAvatarSuccess (response, file) {
+      let self = this;
+      let resp = response.data;
+      if (resp.status==="done" && resp.response === "success") {
+        this.form.serverImageUrl = resp.name;
+        this.$notify.success({
+          title: '上传成功',
+          message: '服务图像上传成功！'
+        })
+        //往此数组中保存当前图片对象
+        this.fileListPut.push(resp.name);
+      } else {
+        //清空表单
+        self.$refs.upload.clearFiles()
+      }
+    },
+    // 关闭dialog 清除上传图片
+    handleClose(){
+      this.fileListShow=[];
     }
   }
 };

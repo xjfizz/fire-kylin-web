@@ -4,7 +4,7 @@
       <el-form-item label="订单状态" prop="orderStatus">
         <el-select
           v-model="queryParams.orderStatus"
-          placeholder="请选择运单状态"
+          placeholder="请选择订单状态"
           clearable
           size="small"
           style="width: 240px"
@@ -194,7 +194,7 @@
     />
 
     <!-- 添加或修改wxapp端订单对话框 -->
-    <el-dialog :title="title" :visible.sync="open" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body @closed="handleClose">
       <el-form ref="form" :model="form"  label-width="180px" v-loading="loading">
         <el-card>
           <div slot="header" style="padding-left:15px"><span>订单进度</span></div>
@@ -208,64 +208,176 @@
               </el-steps>
             </div>
           </div>
-<!--          <el-row  style="margin-top: 10px">-->
-<!--            <el-card>-->
-<!--              <div slot="header"><span>服务信息</span></div>-->
-<!--              <div class="el-table el-table&#45;&#45;enable-row-hover el-table&#45;&#45;medium">-->
-<!--                <table cellspacing="0" style="width: 100%;">-->
-<!--                  <tbody>-->
-<!--                  <tr>-->
-<!--                    <td><div class="cell">运单类型</div></td>-->
-<!--                    <td><div class="cell" v-if="form">{{ formatWaybillType(form.waybillType) }}</div></td>-->
-<!--                    <td><div class="cell">运单状态</div></td>-->
-<!--                    <td><div class="cell" v-if="form">{{ formatWaybillStatus(form.waybillStatus) }}</div></td>-->
-<!--                    <td><div class="cell">创建时间</div></td>-->
-<!--                    <td><div class="cell" v-if="form">{{ form.waybillCreateTime }}</div></td>-->
-<!--                  </tr>-->
-<!--                  <tr>-->
-<!--                    <td><div class="cell">运单编号</div></td>-->
-<!--                    <td><div class="cell" v-if="form">{{ form.waybillNo }}</div></td>-->
-<!--                    <td><div class="cell">关联订单</div></td>-->
-<!--                    <td colspan="3"><div class="cell" v-if="form">{{ form.orderNo }}</div></td>-->
-<!--                  </tr>-->
-<!--                  <tr>-->
-<!--                    <td><div class="cell">商品名称</div></td>-->
-<!--                    <td><div class="cell" v-if="form.pmsServer">{{ form.pmsServer.serverName }}</div></td>-->
-<!--                    <td><div class="cell">商品规格</div></td>-->
-<!--                    <td><div class="cell" v-if="form.omsOrder">{{ form.omsOrder.orderSpecification }}</div></td>-->
-<!--                    <td><div class="cell">商品数量</div></td>-->
-<!--                    <td><div class="cell" v-if="form.omsOrder">{{ form.omsOrder.orderQuantity }}</div></td>-->
-<!--                  </tr>-->
-<!--                  </tbody>-->
-<!--                </table>-->
-<!--              </div>-->
-<!--            </el-card>-->
-<!--          </el-row>-->
-<!--          <el-row style="margin-top: 5px">-->
-<!--            <el-card>-->
-<!--              <div slot="header"><span>取料/送货地址信息</span></div>-->
-<!--              <div class="el-table el-table&#45;&#45;enable-row-hover el-table&#45;&#45;medium">-->
-<!--                <table cellspacing="0" style="width: 100%;">-->
-<!--                  <tbody>-->
-<!--                  <tr>-->
-<!--                    <td><div class="cell">联系姓名</div></td>-->
-<!--                    <td><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}</div></td>-->
-<!--                    <td><div class="cell">联系电话</div></td>-->
-<!--                    <td><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receivePhone }}</div></td>-->
-<!--                  </tr>-->
-<!--                  <tr>-->
-<!--                    <td><div class="cell">详细地址</div></td>-->
-<!--                    <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.province}}{{ form.wmsUserReceiveAddress.city}}{{ form.wmsUserReceiveAddress.region}}{{ form.wmsUserReceiveAddress.detailAddress}}</div></td>-->
-<!--                  </tr>-->
-<!--                  </tbody>-->
-<!--                </table>-->
-<!--              </div>-->
-<!--            </el-card>-->
-<!--          </el-row>-->
+          <el-row style="margin-top: 10px">
+            <el-card>
+              <div slot="header"><el-tag type="danger" effect="plain">商品信息</el-tag></div>
+              <div class="el-table el-table--enable-row-hover el-table--medium">
+                <table cellspacing="0" style="width: 100%;">
+                  <tbody>
+                  <tr>
+                    <td rowspan="2"><div class="cell" v-if="form.pmsServer">
+                      <el-popover placement="top-start" title="" trigger="hover">
+                        <img :src="form.pmsServer.serverImageUrl" alt="图片预览" style="width: 200px;height: 200px">
+                        <img slot="reference" :src="form.pmsServer.serverImageUrl" style="width: 100px;height: 100px" :onerror="errorimg">
+                      </el-popover>
+                      </div>
+                    </td>
+                    <td><div class="cell">商品名称：</div></td>
+                    <td colspan="7"><div class="cell" v-if="form.pmsServer">{{ form.pmsServer.serverName }}</div></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell">商品规格：</div></td>
+                    <td><div class="cell" v-if="form">{{ form.orderSpecification }}</div></td>
+                    <td><div class="cell">商品价格：</div></td>
+                    <td><div class="cell" v-if="form">￥{{ form.orderPayAmount | money}}</div></td>
+                    <td><div class="cell">商品数量：</div></td>
+                    <td><div class="cell" v-if="form">{{ form.orderQuantity }}</div></td>
+                    <td><div class="cell">商品线数：</div></td>
+                    <td><div class="cell" v-if="form">{{ form.orderLineQuantity }}</div></td>
+                  </tr>
+                  <tr>
+                    <td><div class="cell">备注信息：</div></td>
+                    <td colspan="7"><div class="cell" v-if="form">{{ form.remark }}</div></td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </el-card>
+          </el-row>
+          <el-row style="margin-top: 10px">
+            <el-card>
+              <div slot="header"><el-tag type="danger" effect="plain">订单信息</el-tag></div>
+              <el-tabs v-model="activeName" @tab-click="">
+                <el-tab-pane label="订单信息" name="order">
+                  <div class="el-table el-table--enable-row-hover el-table--medium">
+                    <table cellspacing="0" style="width: 100%;">
+                      <tbody>
+                      <tr>
+                        <td><div class="cell">客户名称：</div></td>
+                        <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
+                      </tr>
+                      <tr>
+                        <td><div class="cell">订单编号：</div></td>
+                        <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
+                        <td><div class="cell">订单状态：</div></td>
+                        <td><div class="cell" v-if="form">{{ formatOrderStatus(form.orderStatus) }}</div></td>
+                      </tr>
+                      <tr>
+                        <td><div class="cell">订单备注：</div></td>
+                        <td colspan="3"><div class="cell" v-if="form">{{ form.remark }}</div></td>
+                      </tr>
+                      <tr>
+                        <td><div class="cell">加工费用：</div></td>
+                        <td><div class="cell" v-if="form">￥{{ form.orderProcessAmount | money }}</div></td>
+                        <td><div class="cell">加工税费：</div></td>
+                        <td><div class="cell" v-if="form.pmsServer">￥{{ form.orderTaxAmount | money }}（税率{{ form.pmsServer.serverTaxRate }}%）</div></td>
+                      </tr>
+                      <tr>
+                        <td><div class="cell">物流费用：</div></td>
+                        <td><div class="cell" v-if="form">￥{{ form.orderFreightAmount | money }}</div></td>
+                        <td><div class="cell">实付金额：</div></td>
+                        <td><div class="cell" v-if="form">￥{{ form.orderPayAmount | money }}</div></td>
+                      </tr>
+                      <tr>
+                        <td><div class="cell">支付方式：</div></td>
+                        <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
+                        <td><div class="cell">期望时间：</div></td>
+                        <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d}')  }}</div></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </el-tab-pane>
+                <el-tab-pane label="取送信息" name="pickup">
+                  <el-row style="margin-top: 10px">
+                    <el-card>
+                      <div slot="header"><el-tag effect="plain">取料</el-tag></div>
+                      <div class="el-table el-table--enable-row-hover el-table--medium">
+                        <table cellspacing="0" style="width: 100%;">
+                          <tbody>
+                          <tr>
+                            <td><div class="cell">运单编号：</div></td>
+                            <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
+                            <td><div class="cell">取料方式：</div></td>
+                            <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">客户名称：</div></td>
+                            <td><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
+                            <td><div class="cell">取料时间：</div></td>
+                            <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}')  }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">取料信息：</div></td>
+                            <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}，
+                              {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
+                              {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">取料人员：</div></td>
+                            <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div></td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </el-card>
+                  </el-row>
+                  <el-row style="margin-top: 10px">
+                    <el-card>
+                      <div slot="header"><el-tag type="success" effect="plain">配送</el-tag></div>
+                      <div class="el-table el-table--enable-row-hover el-table--medium">
+                        <table cellspacing="0" style="width: 100%;">
+                          <tbody>
+                          <tr>
+                            <td><div class="cell">运单编号：</div></td>
+                            <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
+                            <td><div class="cell">配送方式：</div></td>
+                            <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">客户名称：</div></td>
+                            <td><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
+                            <td><div class="cell">配送时间：</div></td>
+                            <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}')  }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">配送信息：</div></td>
+                            <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}，
+                              {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
+                              {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}</div></td>
+                          </tr>
+                          <tr>
+                            <td><div class="cell">配送人员：</div></td>
+                            <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div></td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </el-card>
+                  </el-row>
+                </el-tab-pane>
+                <el-tab-pane label="开票信息" name="Invoicing">
+                  <div class="el-table el-table--enable-row-hover el-table--medium">
+                    <table cellspacing="0" style="width: 100%;">
+                      <tbody>
+                      <tr>
+                        <td width="125"><div class="cell">开票抬头：</div></td>
+                        <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
+                      </tr>
+                      <tr>
+                        <td width="125"><div class="cell">开票税号：</div></td>
+                        <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d}')  }}</div></td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </el-tab-pane>
+              </el-tabs>
+            </el-card>
+          </el-row>
         </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -281,6 +393,8 @@ export default {
   },
   data() {
     return {
+      // 订单详细初始激活标签
+      activeName: 'order',
       // 遮罩层
       loading: true,
       // 选中数组
@@ -299,6 +413,8 @@ export default {
       orderStatusOptions: [],
       // 订单配送方式字典数据
       orderDeliveryOptions: [],
+      // 订单支付方式
+      orderPayTypeOptions: [],
       // 日期范围
       dateRange: [],
       // 弹出层标题
@@ -374,6 +490,9 @@ export default {
     this.getDicts("oms_delivery_type").then(response => {
       this.orderDeliveryOptions = response.data;
     });
+    this.getDicts("oms_pay_type").then(response => {
+      this.orderPayTypeOptions = response.data;
+    })
   },
   // 订单金额过滤器
   filters: {
@@ -410,6 +529,12 @@ export default {
     },
     // 取消按钮
     cancel() {
+      this.activeName =  'order';
+      this.open = false;
+      this.reset();
+    },
+    handleClose() {
+      this.activeName =  'order';
       this.open = false;
       this.reset();
     },
@@ -480,6 +605,14 @@ export default {
     orderStatusFormat(row, column) {
       return this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
     },
+    // 运单状态格式化
+    formatOrderStatus(value){
+      return this.selectDictLabel(this.orderStatusOptions, value);
+    },
+    // 订单支付类型格式化
+    formatOrderPayType(value){
+      return this.selectDictLabel(this.orderPayTypeOptions, value);
+    },
     // 订单配送方式字典翻译
     orderDeliveryTypeFormat(row, column) {
       return this.selectDictLabel(this.orderDeliveryOptions, row.orderDeliveryType);
@@ -514,7 +647,7 @@ export default {
       getOrder(pkid).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改wxapp端订单";
+        this.title = "【订单详情】";
       });
     },
     /** 提交按钮 */

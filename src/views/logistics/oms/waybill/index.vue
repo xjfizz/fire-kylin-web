@@ -258,13 +258,13 @@
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
                   <tr>
-                    <td><div class="cell">联系姓名</div></td>
+                    <td width="110"><div class="cell">联系姓名</div></td>
                     <td><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}</div></td>
-                    <td><div class="cell">联系电话</div></td>
+                    <td width="111"><div class="cell">联系电话</div></td>
                     <td><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receivePhone }}</div></td>
                   </tr>
                   <tr>
-                    <td><div class="cell">详细地址</div></td>
+                    <td width="110"><div class="cell">详细地址</div></td>
                     <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.province}}{{ form.wmsUserReceiveAddress.city}}{{ form.wmsUserReceiveAddress.region}}{{ form.wmsUserReceiveAddress.detailAddress}}</div></td>
                   </tr>
                   </tbody>

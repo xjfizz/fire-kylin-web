@@ -164,7 +164,14 @@
           <el-input v-model="form.roleName" placeholder="请输入角色名称" />
         </el-form-item>
         <el-form-item label="权限字符" prop="roleKey">
-          <el-input v-model="form.roleKey" placeholder="请输入权限字符" />
+          <el-select v-model="form.roleKey" placeholder="请选择权限字符">
+            <el-option
+              v-for="dict in roleKeyList"
+              :key="dict.pkid"
+              :label="dict.roleKeyName.concat('(').concat(dict.roleKeyCharacter).concat(')')"
+              :value="dict.roleKeyCharacter"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="角色顺序" prop="roleSort">
           <el-input-number v-model="form.roleSort" controls-position="right" :min="0" />
@@ -248,7 +255,7 @@
 </template>
 
 <script>
-import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus } from "@/api/system/role";
+import { listRole, getRole, delRole, addRole, updateRole, exportRole, dataScope, changeRoleStatus, listRoleKey } from "@/api/system/role";
 import { treeselect as menuTreeselect, roleMenuTreeselect } from "@/api/system/menu";
 import { treeselect as deptTreeselect, roleDeptTreeselect } from "@/api/system/dept";
 
@@ -270,6 +277,8 @@ export default {
       total: 0,
       // 角色表格数据
       roleList: [],
+      // 角色Key表格数据
+      roleKeyList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -340,12 +349,21 @@ export default {
     };
   },
   created() {
+    this.getRoleKeyList();
     this.getList();
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
   },
   methods: {
+    /** 查询角色Key列表 */
+    getRoleKeyList() {
+      listRoleKey().then(
+        response => {
+          this.roleKeyList = response.data;
+        }
+      );
+    },
     /** 查询角色列表 */
     getList() {
       this.loading = true;
