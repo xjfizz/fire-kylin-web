@@ -15,7 +15,7 @@
           class="search-btn"
           type="primary"
           
-          icon="el-icon-s-help"
+          icon="el-icon-search"
           size="medium"
           @click=""
         >查询</el-button>
@@ -86,9 +86,9 @@ export default {
   created() {},
   methods: {
     // 切换plan options 组件
-    changeRosterPlanShow() {
+    changeRosterPlanShow(e) {
       console.log('sss')
-      this.rosterPlanShow = false
+      this.rosterPlanShow = e
     }
   }
 };
