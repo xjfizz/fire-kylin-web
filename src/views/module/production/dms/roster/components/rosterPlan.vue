@@ -87,17 +87,21 @@
             </div>
           </div>
         </div>
-        <!-- <span slot="footer" class="dialog-footer">
-          <el-button @click="deviceDetailVisible = false">取 消</el-button>
-          <el-button type="primary" @click="deviceDetailVisible = false">确 定</el-button>
-        </span>-->
       </el-dialog>
+
+    <!-- 日期对话框 -->
+        <el-dialog title="插入排班计划" :visible.sync="calendarVisible" width="25%" center>
+            <calendar></calendar>
+      
+       </el-dialog>
+
     </div>
     <!-- 对话框-end -->
   </div>
 </template>
 
 <script>
+import calendar from "./common/calendar";
 export default {
   name: "rosterPlan",
   props: {
@@ -106,11 +110,15 @@ export default {
       default: ""
     }
   },
+  components:{
+    calendar
+  },
   data() {
     return {
       selectItemId: 1,
       deviceDetailVisible: false,
       deviceDetailForm: {},
+      calendarVisible:false,
       deviceList: [
         {
           id: 1,
@@ -5915,7 +5923,7 @@ export default {
     },
     // 插入排班计划
     insertPlan() {
-      
+      this.calendarVisible = true
     }
   }
 };
