@@ -1,14 +1,21 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="工场pkid" prop="workshopPkid">
-        <el-input
-          v-model="queryParams.workshopPkid"
-          placeholder="请输入工场pkid"
+      <el-form-item label="设备状态" prop="deviceStatus">
+        <el-select
+          v-model="queryParams.deviceStatus"
+          placeholder="请选择设备状态"
           clearable
           size="small"
-          @keyup.enter.native="handleQuery"
-        />
+          style="width: 215px"
+        >
+          <el-option
+            v-for="dict in statusOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="设备编号" prop="deviceCode">
         <el-input
@@ -16,6 +23,7 @@
           placeholder="请输入设备编号"
           clearable
           size="small"
+          style="width: 240px"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
@@ -37,54 +45,27 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="设备二维码" prop="deviceQrCode">
-        <el-input
-          v-model="queryParams.deviceQrCode"
-          placeholder="请输入设备二维码"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="设备状态" prop="deviceStatus">
-        <el-select v-model="queryParams.deviceStatus" placeholder="请选择设备状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="设备关联用户pkid" prop="relationUserPkid">
-        <el-input
-          v-model="queryParams.relationUserPkid"
-          placeholder="请输入设备关联用户pkid"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="关联用户工号" prop="relationUserJobNumber">
-        <el-input
-          v-model="queryParams.relationUserJobNumber"
-          placeholder="请输入关联用户工号"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="关联用户名称" prop="relationUserName">
+      <br>
+      <el-form-item label="用户名称" prop="relationUserName">
         <el-input
           v-model="queryParams.relationUserName"
-          placeholder="请输入关联用户名称"
+          placeholder="请输入用户名称"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="设备用户关联时间" prop="relationTime">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.relationTime"
-          type="date"
+      <el-form-item label="关联时间" prop="relationTime">
+        <el-date-picker
+          v-model="dateRange"
+          size="small"
+          style="width: 240px"
           value-format="yyyy-MM-dd"
-          placeholder="选择设备用户关联时间">
-        </el-date-picker>
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -100,7 +81,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:device:add']"
+          v-hasPermi="['dms:device:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -111,7 +92,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:device:edit']"
+          v-hasPermi="['dms:device:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -122,7 +103,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:device:remove']"
+          v-hasPermi="['dms:device:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -132,7 +113,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:device:export']"
+          v-hasPermi="['dms:device:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -140,22 +121,52 @@
 
     <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="设备pkid" align="center" prop="pkid" />
-      <el-table-column label="工场pkid" align="center" prop="workshopPkid" />
       <el-table-column label="设备编号" align="center" prop="deviceCode" />
       <el-table-column label="设备名称" align="center" prop="deviceName" />
       <el-table-column label="设备型号" align="center" prop="deviceModel" />
-      <el-table-column label="设备二维码" align="center" prop="deviceQrCode" />
-      <el-table-column label="设备状态" align="center" prop="deviceStatus" />
-      <el-table-column label="设备关联用户pkid" align="center" prop="relationUserPkid" />
-      <el-table-column label="关联用户工号" align="center" prop="relationUserJobNumber" />
-      <el-table-column label="关联用户名称" align="center" prop="relationUserName" />
-      <el-table-column label="设备用户关联时间" align="center" prop="relationTime" width="180">
+      <el-table-column label="设备二维码" align="center" prop="deviceQrCode" >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.relationTime, '{y}-{m}-{d}') }}</span>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-view"
+            @click="handleView(scope.row)"
+            v-hasPermi="['dms:device:edit']"
+          >查看</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-download"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['dms:device:edit']"
+          >下载</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="设备状态" align="center" prop="deviceStatus" :formatter="deviceStatusFormat" width="100" >
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.deviceStatus"
+            active-value="0"
+            inactive-value="1"
+            @change="handleDeviceStatusChange(scope.row)"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column label="关联人员" align="center" prop="relationUserJobNumber" >
+        <template slot-scope="scope">
+          <span v-if="scope.row.relationSysUser">{{ scope.row.relationSysUser.nickName }}-{{  scope.row.relationSysUser.userName }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="关联时间" align="center" prop="relationTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.relationTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="最后编辑时间" align="center" prop="updateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -163,14 +174,14 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:device:edit']"
+            v-hasPermi="['dms:device:edit']"
           >修改</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:device:remove']"
+            v-hasPermi="['dms:device:remove']"
           >删除</el-button>
         </template>
       </el-table-column>
@@ -187,60 +198,76 @@
     <!-- 添加或修改设备对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="工场pkid" prop="workshopPkid">
-          <el-input v-model="form.workshopPkid" placeholder="请输入工场pkid" />
-        </el-form-item>
-        <el-form-item label="设备编号" prop="deviceCode">
-          <el-input v-model="form.deviceCode" placeholder="请输入设备编号" />
-        </el-form-item>
-        <el-form-item label="设备名称" prop="deviceName">
-          <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
-        </el-form-item>
-        <el-form-item label="设备型号" prop="deviceModel">
-          <el-input v-model="form.deviceModel" placeholder="请输入设备型号" />
-        </el-form-item>
-        <el-form-item label="设备二维码" prop="deviceQrCode">
-          <el-input v-model="form.deviceQrCode" placeholder="请输入设备二维码" />
-        </el-form-item>
-        <el-form-item label="设备状态">
-          <el-radio-group v-model="form.deviceStatus">
-            <el-radio label="1">请选择字典生成</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="设备关联用户pkid" prop="relationUserPkid">
-          <el-input v-model="form.relationUserPkid" placeholder="请输入设备关联用户pkid" />
-        </el-form-item>
-        <el-form-item label="关联用户工号" prop="relationUserJobNumber">
-          <el-input v-model="form.relationUserJobNumber" placeholder="请输入关联用户工号" />
-        </el-form-item>
-        <el-form-item label="关联用户名称" prop="relationUserName">
-          <el-input v-model="form.relationUserName" placeholder="请输入关联用户名称" />
-        </el-form-item>
-        <el-form-item label="设备用户关联时间" prop="relationTime">
-          <el-date-picker clearable size="small"
-            v-model="form.relationTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择设备用户关联时间">
-          </el-date-picker>
-        </el-form-item>
-        <el-form-item label="删除标志" prop="delFlag">
-          <el-input v-model="form.delFlag" placeholder="请输入删除标志" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
+       <el-card>
+         <el-form-item label="设备编号" prop="deviceCode">
+           <el-input v-model="form.deviceCode" placeholder="请输入设备编号" />
+         </el-form-item>
+         <el-form-item label="设备名称" prop="deviceName">
+           <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
+         </el-form-item>
+         <el-form-item label="设备型号" prop="deviceModel">
+           <el-input v-model="form.deviceModel" placeholder="请输入设备型号" />
+         </el-form-item>
+         <el-form-item label="设备状态" prop="deviceStatus">
+           <el-radio-group v-model="form.deviceStatus">
+             <el-radio
+               v-for="dict in statusOptions"
+               :key="dict.dictValue"
+               :label="dict.dictValue"
+             >{{dict.dictLabel}}</el-radio>
+           </el-radio-group>
+         </el-form-item>
+         <el-form-item label="关联人员" prop="relationUserPkid">
+           <el-select v-model="form.relationUserPkid" placeholder="请选择" clearable>
+             <el-option
+               v-for="dict in workshopPwUserList"
+               :key="dict.userId"
+               :label="dict.nickName"
+               :value="dict.userId"
+             />
+           </el-select>
+         </el-form-item>
+         <el-form-item label="备注" prop="remark">
+           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+         </el-form-item>
+       </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 设备二维码对话框 -->
+    <el-dialog :title="viewTitle" :visible.sync="viewOpen" width="400px" append-to-body>
+      <el-form ref="viewForm" :model="viewForm" label-width="80px">
+        <el-card>
+          <div slot="header"><el-tag type="danger" effect="plain">【{{ viewForm.deviceCode }}】设备二维码</el-tag></div>
+          <el-form-item label="" prop="deviceQrCode" >
+            <template v-if="viewForm.deviceQrCode">
+              <el-popover placement="top-start" title="" trigger="hover">
+                <img  :src="viewForm.deviceQrCode" alt="图片预览" style="width: 200px;height: 200px">
+                <img  slot="reference" :src="viewForm.deviceQrCode" style="width: 150px;height: 150px">
+                <el-button type="primary" @click="downs()">下载图片</el-button>
+              </el-popover>
+            </template>
+            <template v-else>
+              <el-tag type="info" effect="plain">暂无设备二维码</el-tag>
+            </template>
+          </el-form-item>
+        </el-card>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="viewCancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listDevice, getDevice, delDevice, addDevice, updateDevice, exportDevice } from "@/api/module/production/dms/device/device";
+import { listDevice, getDevice, delDevice, addDevice, updateDevice, exportDevice, listWorkshopPwUser, changeDeviceStatus } from "@/api/module/production/dms/device/device";
+import {changeServerStatus} from "@/api/module/production/pms/server/server";
+import domtoimage from 'dom-to-image';
 
 export default {
   name: "Device",
@@ -262,10 +289,20 @@ export default {
       total: 0,
       // 设备表格数据
       deviceList: [],
+      // 设备表格数据
+      workshopPwUserList: [],
+      // 状态数据字典
+      statusOptions: [],
+      // 日期范围
+      dateRange: [],
       // 弹出层标题
       title: "",
+      // 工场设备二维码弹出层标题
+      viewTitle: "",
       // 是否显示弹出层
       open: false,
+      // 是否显示查看弹出层
+      viewOpen: false,
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -283,6 +320,8 @@ export default {
       },
       // 表单参数
       form: {},
+      // 查看表单参数
+      viewForm: {},
       // 表单校验
       rules: {
         workshopPkid: [
@@ -307,13 +346,22 @@ export default {
     };
   },
   created() {
+    this.listWorkshopPwUser();
     this.getList();
+    this.getDicts("sys_normal_disable").then(response => {
+      this.statusOptions = response.data;
+    });
   },
   methods: {
+    listWorkshopPwUser(){
+      listWorkshopPwUser().then(response => {
+        this.workshopPwUserList = response.data;
+      })
+    },
     /** 查询设备列表 */
     getList() {
       this.loading = true;
-      listDevice(this.queryParams).then(response => {
+      listDevice(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.deviceList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -323,6 +371,59 @@ export default {
     cancel() {
       this.open = false;
       this.reset();
+    },
+    // 取消按钮
+    viewCancel() {
+      this.viewOpen = false;
+      this.viewReset();
+    },
+    downloadIamge(imgsrc, name) {//下载图片地址和图片名
+      var image = new Image();
+      // 解决跨域 Canvas 污染问题
+      image.setAttribute("crossOrigin", "anonymous");
+      image.onload = function() {
+        var canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+        var context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0, image.width, image.height);
+        var url = canvas.toDataURL("image/png"); //得到图片的base64编码数据
+
+        var a = document.createElement("a"); // 生成一个a元素
+        var event = new MouseEvent("click"); // 创建一个单击事件
+        a.download = name || "photo"; // 设置图片名称
+        a.href = url; // 将生成的URL设置为a.href属性
+        a.dispatchEvent(event); // 触发a的单击事件
+      };
+      image.src = imgsrc;
+    },
+    downs(){
+      console.log(this.viewForm.deviceQrCode)
+      this.downloadIamge(this.viewForm.deviceQrCode, 'pic')
+      // domtoimage.toPng(document.getElementById('sss'))
+      //   .then(function (dataUrl) {
+      //     var img = new Image();
+      //     img.src = dataUrl;
+      //     document.body.appendChild(img);
+      //     var a=document.createElement('a')
+      //     a.setAttribute('href',dataUrl)
+      //     a.setAttribute('download',"1.png")
+      //     a.click()
+      //   })
+      //   .catch(function (error) {
+      //     console.error('转图片失败!', error);
+      //   });
+    },
+    handleDown(){
+      let link = document.createElement('a')
+      let url =  this.viewForm.img
+      // 这里是将url转成blob地址，
+      fetch(url).then(res => res.blob()).then(blob => { // 将链接地址字符内容转变成blob地址
+        link.href = URL.createObjectURL(blob)
+        link.download = 'pic'
+        document.body.appendChild(link)
+        link.click()
+      })
     },
     // 表单重置
     reset() {
@@ -347,6 +448,33 @@ export default {
       };
       this.resetForm("form");
     },
+    // 表单重置
+    viewReset() {
+      this.viewForm = {
+        pkid: null,
+        workshopPkid: null,
+        deviceCode: null,
+        deviceName: null,
+        deviceModel: null,
+        deviceQrCode: null,
+        deviceStatus: "0",
+        relationUserPkid: null,
+        relationUserJobNumber: null,
+        relationUserName: null,
+        relationTime: null,
+        delFlag: null,
+        createBy: null,
+        createTime: null,
+        updateBy: null,
+        updateTime: null,
+        remark: null
+      };
+      this.resetForm("viewForm");
+    },
+    // 订单状态字典翻译
+    deviceStatusFormat(row, column) {
+      return this.selectDictLabel(this.statusOptions, row.deviceStatus);
+    },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -367,7 +495,17 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加设备";
+      this.title = "工场设备-新增";
+    },
+    /** 查看按钮操作 */
+    handleView(row) {
+      this.viewReset();
+      const pkid = row.pkid || this.ids
+      getDevice(pkid).then(response => {
+        this.viewForm = response.data;
+        this.viewOpen = true;
+        this.viewTitle = "工场设备二维码";
+      });
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -376,7 +514,7 @@ export default {
       getDevice(pkid).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改设备";
+        this.title = "工场设备-修改";
       });
     },
     /** 提交按钮 */
@@ -385,13 +523,13 @@ export default {
         if (valid) {
           if (this.form.pkid != null) {
             updateDevice(this.form).then(response => {
-              this.msgSuccess("修改成功");
+              this.msgSuccess("工场设备修改成功");
               this.open = false;
               this.getList();
             });
           } else {
             addDevice(this.form).then(response => {
-              this.msgSuccess("新增成功");
+              this.msgSuccess("工场设备新增成功");
               this.open = false;
               this.getList();
             });
@@ -399,10 +537,26 @@ export default {
         }
       });
     },
+    // 服务分类状态修改
+    handleDeviceStatusChange(row) {
+      let text = row.deviceStatus === "0" ? "启用" : "停用";
+      this.$confirm('确认要【' + text + '】 #' + row.deviceName + '# 设备吗?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return changeDeviceStatus(row.pkid, row.deviceStatus);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess(text + "成功");
+      }).catch(function() {
+        row.deviceStatus = row.deviceStatus === "0" ? "1" : "0";
+      });
+    },
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除设备编号为"' + pkids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除工场设备编号为【' + pkids + '】的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -410,13 +564,13 @@ export default {
           return delDevice(pkids);
         }).then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.msgSuccess("工场设备删除成功");
         })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有设备数据项?', "警告", {
+      this.$confirm('是否确认导出所有工场设备数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"

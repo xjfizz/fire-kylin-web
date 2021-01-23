@@ -51,3 +51,24 @@ export function exportDevice(query) {
     params: query
   })
 }
+
+// 查询设备列表
+export function listWorkshopPwUser() {
+  return request({
+    url: '/system/user/listPwUser',
+    method: 'get'
+  })
+}
+
+// 服务状态修改
+export function changeDeviceStatus(pkid, deviceStatus) {
+  const data = {
+    pkid,
+    deviceStatus
+  }
+  return request({
+    url: '/dms/device/changeDeviceStatus',
+    method: 'put',
+    data: data
+  })
+}
