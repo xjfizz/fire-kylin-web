@@ -5924,6 +5924,10 @@ export default {
     // 插入排班计划
     insertPlan() {
       this.calendarVisible = true
+    },
+      // 取消插入排班计划
+    cancelPlanForm() {
+      this.calendarVisible = false
     }
   }
 };
@@ -6018,7 +6022,8 @@ export default {
     }
     .el-dialog--center .el-dialog__body {
       text-align: initial;
-      padding: 10px 25px 30px;
+      // padding: 10px 25px 30px;
+      padding: 10px 0;
     }
     .el-dialog {
       display: flex;
