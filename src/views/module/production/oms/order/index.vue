@@ -218,7 +218,7 @@
                     <td rowspan="2"><div class="cell" v-if="form.pmsServer">
                       <el-popover placement="top-start" title="" trigger="hover">
                         <img :src="form.pmsServer.serverImageUrl" alt="图片预览" style="width: 200px;height: 200px">
-                        <img slot="reference" :src="form.pmsServer.serverImageUrl" style="width: 100px;height: 100px" :onerror="errorimg">
+                        <img slot="reference" :src="form.pmsServer.serverImageUrl" style="width: 100px;height: 100px">
                       </el-popover>
                       </div>
                     </td>
