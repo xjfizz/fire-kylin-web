@@ -137,7 +137,7 @@
             size="mini"
             type="text"
             icon="el-icon-download"
-            @click="handleDelete(scope.row)"
+            @click="handleDownload(scope.row)"
             v-hasPermi="['dms:device:edit']"
           >下载</el-button>
         </template>
@@ -175,14 +175,14 @@
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['dms:device:edit']"
-          >修改</el-button>
+          >编辑</el-button>
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
             v-hasPermi="['dms:device:remove']"
-          >删除</el-button>
+          >移除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -200,7 +200,7 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
        <el-card>
          <el-form-item label="设备编号" prop="deviceCode">
-           <el-input v-model="form.deviceCode" placeholder="请输入设备编号" />
+           <el-input v-model="form.deviceCode" placeholder="请输入设备编号" :disabled="disabledFlag"/>
          </el-form-item>
          <el-form-item label="设备名称" prop="deviceName">
            <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
@@ -239,16 +239,15 @@
     </el-dialog>
 
     <!-- 设备二维码对话框 -->
-    <el-dialog :title="viewTitle" :visible.sync="viewOpen" width="400px" append-to-body>
-      <el-form ref="viewForm" :model="viewForm" label-width="80px">
+    <el-dialog :title="viewTitle" :visible.sync="viewOpen" width="500px" append-to-body>
+      <el-form ref="viewForm" :model="viewForm" label-width="130px">
         <el-card>
           <div slot="header"><el-tag type="danger" effect="plain">【{{ viewForm.deviceCode }}】设备二维码</el-tag></div>
-          <el-form-item label="" prop="deviceQrCode" >
+          <el-form-item label="" prop="deviceQrCode" STYLE="margin-top: 40px">
             <template v-if="viewForm.deviceQrCode">
               <el-popover placement="top-start" title="" trigger="hover">
                 <img  :src="viewForm.deviceQrCode" alt="图片预览" style="width: 200px;height: 200px">
                 <img  slot="reference" :src="viewForm.deviceQrCode" style="width: 150px;height: 150px">
-                <el-button type="primary" @click="downs()">下载图片</el-button>
               </el-popover>
             </template>
             <template v-else>
@@ -265,7 +264,7 @@
 </template>
 
 <script>
-import { listDevice, getDevice, delDevice, addDevice, updateDevice, exportDevice, listWorkshopPwUser, changeDeviceStatus } from "@/api/module/production/dms/device/device";
+import { listDevice, getDevice, delDevice, addDevice, updateDevice, exportDevice, listWorkshopPwUser, changeDeviceStatus, downloadImage } from "@/api/module/production/dms/device/device";
 import {changeServerStatus} from "@/api/module/production/pms/server/server";
 import domtoimage from 'dom-to-image';
 
@@ -285,6 +284,8 @@ export default {
       multiple: true,
       // 显示搜索条件
       showSearch: true,
+      // 设备编码是否编辑
+      disabledFlag: false,
       // 总条数
       total: 0,
       // 设备表格数据
@@ -377,54 +378,6 @@ export default {
       this.viewOpen = false;
       this.viewReset();
     },
-    downloadIamge(imgsrc, name) {//下载图片地址和图片名
-      var image = new Image();
-      // 解决跨域 Canvas 污染问题
-      image.setAttribute("crossOrigin", "anonymous");
-      image.onload = function() {
-        var canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        var context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0, image.width, image.height);
-        var url = canvas.toDataURL("image/png"); //得到图片的base64编码数据
-
-        var a = document.createElement("a"); // 生成一个a元素
-        var event = new MouseEvent("click"); // 创建一个单击事件
-        a.download = name || "photo"; // 设置图片名称
-        a.href = url; // 将生成的URL设置为a.href属性
-        a.dispatchEvent(event); // 触发a的单击事件
-      };
-      image.src = imgsrc;
-    },
-    downs(){
-      console.log(this.viewForm.deviceQrCode)
-      this.downloadIamge(this.viewForm.deviceQrCode, 'pic')
-      // domtoimage.toPng(document.getElementById('sss'))
-      //   .then(function (dataUrl) {
-      //     var img = new Image();
-      //     img.src = dataUrl;
-      //     document.body.appendChild(img);
-      //     var a=document.createElement('a')
-      //     a.setAttribute('href',dataUrl)
-      //     a.setAttribute('download',"1.png")
-      //     a.click()
-      //   })
-      //   .catch(function (error) {
-      //     console.error('转图片失败!', error);
-      //   });
-    },
-    handleDown(){
-      let link = document.createElement('a')
-      let url =  this.viewForm.img
-      // 这里是将url转成blob地址，
-      fetch(url).then(res => res.blob()).then(blob => { // 将链接地址字符内容转变成blob地址
-        link.href = URL.createObjectURL(blob)
-        link.download = 'pic'
-        document.body.appendChild(link)
-        link.click()
-      })
-    },
     // 表单重置
     reset() {
       this.form = {
@@ -495,6 +448,7 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
+      this.disabledFlag = false;
       this.title = "工场设备-新增";
     },
     /** 查看按钮操作 */
@@ -514,6 +468,7 @@ export default {
       getDevice(pkid).then(response => {
         this.form = response.data;
         this.open = true;
+        this.disabledFlag = true;
         this.title = "工场设备-修改";
       });
     },
@@ -553,6 +508,57 @@ export default {
         row.deviceStatus = row.deviceStatus === "0" ? "1" : "0";
       });
     },
+
+    /** 下载按钮操作 */
+    handleDownload(row) {
+      this.viewForm.deviceCode = row.deviceCode;
+      downloadImage(row).then(response => {
+        this.handleImageExport(response);
+      });
+    },
+
+    /** 下载文件的公共方法，参数就传blob文件流*/
+    handleImageExport(data) {
+      if (!data) {
+        return;
+      }
+      // 动态创建下载文件名称：设备唯一编码
+      let fileName = this.viewForm.deviceCode.toString().concat('.jpg');
+      // 创建Blob对象
+      let blob = new Blob([data]);
+      if ("download" in document.createElement("a")) {
+        // 不是IE浏览器
+        // 参考URL： https://www.cnblogs.com/mark5/p/13321460.html?utm_source=tuicool
+        // URL.createObjectURL()方法会根据传入的参数创建一个指向该参数对象的URL.
+        // 这个URL的生命仅存在于它被创建的这个文档里. 新的对象URL指向执行的File对象或者是Blob对象.
+        // 语法： objectURL = URL.createObjectURL(blob || file); 参数； File对象或者Blob对象
+        // File对象,就是一个文件,比如我用input type="file"标签来上传文件,那么里面的每个文件都是一个File对象
+        // Blob对象,就是二进制数据,比如通过new Blob()创建的对象就是Blob对象.又比如,在XMLHttpRequest里,如果指定responseType为blob,那么得到的返回值也是一个blob对象.
+        // 注意点： 每次调用createObjectURL的时候,一个新的URL对象就被创建了.即使你已经为同一个文件创建过一个URL.
+        // 如果你不再需要这个对象,要释放它,需要使用URL.revokeObjectURL()方法. 当页面被关闭,浏览器会自动释放它,但是为了最佳性能和内存使用,当确保不再用得到它的时候,就应该释放它
+        let url = window.URL.createObjectURL(blob);
+        let link = document.createElement("a");
+        link.style.display = "none";
+        link.href = url;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        // 下载完成移除元素
+        document.body.removeChild(link);
+        // 释放掉blob对象
+        // URL.revokeObjectURL()方法会释放一个通过URL.createObjectURL()创建的对象URL.
+        // 当你要已经用过了这个对象URL,然后要让浏览器知道这个URL已经不再需要指向对应的文件的时候,就需要调用这个方法
+        // 解释： 一个对象URL,使用这个url是可以访问到指定的文件的,但是我可能只需要访问一次,一旦已经访问到了,这个对象URL就不再需要了,
+        // 就被释放掉,被释放掉以后,这个对象URL就不再指向指定的文件了
+        // 举例： 比如一张图片,我创建了一个对象URL,然后通过这个对象URL,我页面里加载了这张图.既然已经被加载,并且不需要再次加载这张图,那我就把这个对象URL释放,然后这个URL就不再指向这张图了.
+        // 语法： window.URL.revokeObjectURL(objectURL); 参数： objectURL 是一个通过URL.createObjectURL()方法创建的对象URL.
+        window.URL.revokeObjectURL(url);
+      } else {
+        // IE 10+
+        window.navigator.msSaveBlob(blob, fileName);
+      }
+    },
+
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;

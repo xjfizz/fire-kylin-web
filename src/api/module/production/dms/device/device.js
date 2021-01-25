@@ -72,3 +72,13 @@ export function changeDeviceStatus(pkid, deviceStatus) {
     data: data
   })
 }
+
+// 新增设备
+export function downloadImage(data) {
+  return request({
+    url: '/dms/device/downloadQrCode',
+    method: 'post',
+    data: data,
+    responseType: "blob"
+  })
+}
