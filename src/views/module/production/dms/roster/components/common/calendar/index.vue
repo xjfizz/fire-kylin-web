@@ -6,7 +6,7 @@
       <el-button class="insert-btn"  size="mini" @click="downs()">插入</el-button>
     </div>
     <div class="mid">
-      <Calendar v-on:choseDay="clickDay" v-on:changeMonth="changeDate" v-on:isToday="clickToday"></Calendar>
+      <Calendar v-on:choseDay="clickDay" v-on:changeMonth="changeDate" v-on:isToday="clickToday" :markDate=arr ></Calendar>
     </div>
     <div class="bottom">
          <el-button class="opt-button" size="medium" @click="cancelPlan()">取消</el-button>
@@ -23,13 +23,16 @@ export default {
     value: {
       type: String,
       default: ""
-    }
+     }
   },
   components: {
     Calendar
   },
   data() {
-    return {};
+    return {
+          arr:['2021/1/24']
+   
+    };
   },
   computed: {},
   watch: {
@@ -129,7 +132,8 @@ export default {
     border-right: 2px solid #606266;
   }
   .wh_content_item > .wh_isMark {
-    background: blue;
+    background: #1890ff;
+    color: #ffffff;
   }
   .wh_content_item .wh_other_dayhide {
     color: #c0c4cc;
