@@ -41,7 +41,11 @@
           >
             <span
               slot="reference"
-            >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+            >
+             <span>{{item.dmsDeviceRelationRecord.userName}}</span>
+            <span v-if="item.dmsDeviceRelationRecord.userJobNumber">/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+            
+            </span>
           </el-popover>
 
           <div class="item-bottom" v-else>暂无关联</div>
@@ -115,7 +119,11 @@
                   :label="item.userId"
                   @change="selectProducer(item)"
                 >
-                  <span class="left-value">{{item.nickName}}/{{item.jobNumber}}</span>
+                  <span class="left-value">
+                    <span>{{item.nickName}}</span>
+                    <span v-if="item.jobNumber">/{{item.jobNumber}}</span>
+                    
+                  </span>
                 </el-radio>
               </div>
               <!-- <div class="right">

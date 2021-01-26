@@ -39,7 +39,12 @@
           >
             <span
               slot="reference"
-            >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+            >
+           
+            <span>{{item.dmsDeviceRelationRecord.userName}}</span>
+            <span v-if="item.dmsDeviceRelationRecord.userJobNumber">/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+           
+            </span>
           </el-popover>
           <div class="item-bottom" v-else>暂无关联</div>
         </div>
@@ -120,7 +125,11 @@
             <div class="right" v-if="deviceDetailForm.dmsDeviceRelationRecord && deviceDetailForm.dmsDeviceRelationRecord.userPkid">
               <div
                 class="right-top"
-              >{{deviceDetailForm.dmsDeviceRelationRecord.userName}}/{{deviceDetailForm.dmsDeviceRelationRecord.userJobNumber}}</div>
+              >
+              <span>{{deviceDetailForm.dmsDeviceRelationRecord.userName}}</span>
+              <span v-if="deviceDetailForm.dmsDeviceRelationRecord.userJobNumber">/{{deviceDetailForm.dmsDeviceRelationRecord.userJobNumber}}</span>
+
+              </div>
               <div class="right-bottom">始 {{deviceDetailForm.dmsDeviceRelationRecord.createTime}}</div>
             </div>
             <div class="right" v-else>
@@ -135,7 +144,16 @@
             >
               <div
                 class="right-top"
-              >{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userName}}/{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userJobNumber}}</div>
+              >
+              <!-- {{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userName}}/{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userJobNumber}} -->
+              
+               <span>{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userName}}</span>
+               <span v-if="deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userJobNumber">/{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userJobNumber}}</span>
+              
+              </div>
+              
+              
+              
               <div
                 class="right-bottom"
               >始 {{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].createTime}}</div>
@@ -288,6 +306,7 @@ export default {
     // 取消插入排班计划
     cancelPlanForm(date) {
       this.calendarVisible = false;
+      console.log('date', date)
       if (date) {
         this.$parent.changeRosterPlanShow(false, date);
       }

@@ -93,15 +93,16 @@ export default {
         });
       }
       let params = {
-        copyRosterDate: this.copyDate,
-        insertRosterDate: this.insertDate
+        copyRosterDate: this.insertDate,
+        insertRosterDate: this.copyDate
       };
       copyRoster(params).then(res => {
         if (res.code == 200) {
-          return this.$message({
+            this.$message({
             type: "success",
             message: "插入成功!"
           });
+           this.$parent.$parent.cancelPlanForm(this.copyDate);
         }
       });
     }

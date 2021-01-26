@@ -117,6 +117,7 @@ export default {
     // 点击查询日期按钮
     searchList() {
       this.rosterPlanShow = true;
+       this.copyDate = ''
       setTimeout(() => {
         this.getRosterPlan();
       }, 500);
@@ -149,6 +150,9 @@ export default {
     changeRosterPlanShow(e,date) {
       console.log("sss");
       this.rosterPlanShow = e;
+      if(date) {
+         this.searchDate = date
+      }
       if (e) {
         setTimeout(() => {
           console.log("sss", this.$refs.rosterOptions);
