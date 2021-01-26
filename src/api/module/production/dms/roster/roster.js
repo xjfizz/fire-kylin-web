@@ -46,3 +46,21 @@ export function getProducter(data) {
   })
 }
 
+// 启用/停止-设备
+export function stopOrStart(data) {
+  return request({
+    url: '/dms/device/stopOrRun',
+    method: 'put',
+    data: data
+  })
+}
+
+// 设备排班-复制插入
+export function copyRoster(data) {
+  return request({
+    url: '/dms/roster/copyInsertRosterUser',
+    method: 'post',
+    data: data
+  })
+}
+

@@ -3,7 +3,7 @@
     <div class="top">
       <div class="left">
         <el-date-picker
-          v-model="srarchDate"
+          v-model="searchDate"
           align="left"
           type="date"
           placeholder="选择日期"
@@ -27,12 +27,12 @@
           type="success"
           icon="el-icon-document-copy"
           size="medium "
-          @click
+          @click="copy"
         >复制</el-button>
       </div>
     </div>
     <div class="content">
-      <rosterPlan ref="rosterPlan" v-if="rosterPlanShow"></rosterPlan>
+      <rosterPlan :copyDate="copyDate" ref="rosterPlan" v-if="rosterPlanShow"></rosterPlan>
       <rosterOptions ref="rosterOptions" v-if="!rosterPlanShow"></rosterOptions>
     </div>
   </div>
@@ -75,7 +75,8 @@ export default {
           }
         ]
       },
-      srarchDate: new Date()
+      searchDate: new Date(),
+      copyDate:''
     };
   },
   components: {
@@ -92,7 +93,7 @@ export default {
   methods: {
     // 初始化
     init() {
-      this.srarchDate = this.dataFormat(new Date());
+      this.searchDate = this.dataFormat(new Date());
       this.getRosterPlan();
     },
     dataFormat(d) {
@@ -111,7 +112,7 @@ export default {
     },
     // 选择日期
     search(e) {
-      console.log(e, this.srarchDate);
+      console.log(e, this.searchDate);
     },
     // 点击查询日期按钮
     searchList() {
@@ -122,8 +123,9 @@ export default {
     },
     // 刷新
     refresh() {
-      this.srarchDate = this.dataFormat(new Date());
+      this.searchDate = this.dataFormat(new Date());
       this.rosterPlanShow = true;
+      this.copyDate = ''
       setTimeout(() => {
         this.getRosterPlan();
       }, 500);
@@ -131,7 +133,16 @@ export default {
     //查询排班计划
     getRosterPlan() {
       console.log("sss", this.$refs.rosterPlan);
-      this.$refs.rosterPlan.getRosterList(this.srarchDate);
+      this.$refs.rosterPlan.getRosterList(this.searchDate);
+    },
+    // 复制
+    copy() {
+      console.log('this.searchDate', this.searchDate)
+      this.copyDate = this.searchDate
+      this.$message({
+        type:'success',
+        message: `已复制${this.copyDate}的排班计划!`
+      })
     },
 
     // 切换plan options 组件
@@ -141,7 +152,7 @@ export default {
       if (e) {
         setTimeout(() => {
           console.log("sss", this.$refs.rosterOptions);
-          this.$refs.rosterPlan.getRosterList(this.srarchDate);
+          this.$refs.rosterPlan.getRosterList(this.searchDate);
         }, 500);
       } else {
         setTimeout(() => {

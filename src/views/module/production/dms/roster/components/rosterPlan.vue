@@ -1,8 +1,18 @@
 <template>
-  <div class="main" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"  v-loading="loading">
+  <div
+    class="main"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+    v-loading="loading"
+  >
     <div class="content-item" v-if="this.rosterList.length > 0">
       <!--  :class="[(item.deviceStatus == 0 ? 'item-stop' : ''), (item.id == selectItemId ? 'item-select' : '')]" -->
+      <div class="item-time">排班日期:{{searchDate}}</div>
       <div class="item-f">
+        <!-- <el-tooltip class="item" effect="dark" content="Top Left 提示文字" placement="top-start">
+      <el-button>上左</el-button>
+        </el-tooltip>-->
+
         <div
           class="item"
           :class="item.deviceStatus == 1 ? 'item-stop' : '' "
@@ -12,8 +22,26 @@
         >
           <div class="item-top">{{item.deviceCode}}</div>
           <div class="item-mid">{{item.deviceName}}</div>
-          <div class="item-bottom" v-if="item.dmsDeviceRelationRecord" >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</div>
-          <div class="item-bottom" v-else >暂未关联</div>
+          <!-- <div
+            class="item-bottom"
+            v-if="item.dmsDeviceRelationRecord"
+          >
+          {{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}
+          </div>-->
+          <el-popover
+            class="item-bottom"
+            v-if="item.dmsDeviceRelationRecord && item.dmsDeviceRelationRecord.userPkid"
+            placement="bottom"
+            title="关联人员"
+            width="200"
+            trigger="hover"
+            :content="item.dmsDeviceRelationRecord.userName + '/' + item.dmsDeviceRelationRecord.userJobNumber"
+          >
+            <span
+              slot="reference"
+            >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+          </el-popover>
+          <div class="item-bottom" v-else>暂无关联</div>
         </div>
       </div>
     </div>
@@ -44,7 +72,7 @@
 
     <!-- 对话框-start -->
     <div class="dialog">
-      <el-dialog title="设备信息" :visible.sync="deviceDetailVisible" width="20%" center>
+      <el-dialog title="设备信息" :visible.sync="deviceDetailVisible" width="25%" center>
         <div class="deviceDialogMain">
           <div class="item">
             <div class="item-title">设备编号</div>
@@ -66,7 +94,7 @@
                 type="danger"
                 effect="dark"
                 size="medium"
-              >异常</el-tag>
+              >停止</el-tag>
               <el-tag
                 v-if="deviceDetailForm.deviceStatus == 0"
                 type="success"
@@ -75,7 +103,7 @@
               >正常</el-tag>
             </div>
           </div>
-          <div
+          <!-- <div
             class="item-history-people"
             v-for="(item,index) in (deviceDetailForm.deviceRelationRecords)"
             :key="index"
@@ -86,13 +114,42 @@
               <div class="right-top">{{item.userName}}/{{item.userJobNumber}}</div>
               <div class="right-bottom">始 {{item.createTime}}</div>
             </div>
+          </div>-->
+          <div class="item-history-people">
+            <div class="left">关联人员</div>
+            <div class="right" v-if="deviceDetailForm.dmsDeviceRelationRecord && deviceDetailForm.dmsDeviceRelationRecord.userPkid">
+              <div
+                class="right-top"
+              >{{deviceDetailForm.dmsDeviceRelationRecord.userName}}/{{deviceDetailForm.dmsDeviceRelationRecord.userJobNumber}}</div>
+              <div class="right-bottom">始 {{deviceDetailForm.dmsDeviceRelationRecord.createTime}}</div>
+            </div>
+            <div class="right" v-else>
+              <div class="right-top">暂无关联人员</div>
+            </div>
+          </div>
+          <div class="item-history-people item-history-people-history">
+            <div class="left">历史关联</div>
+            <div
+              class="right"
+              v-if=" deviceDetailForm.deviceRelationRecords && deviceDetailForm.deviceRelationRecords.length > 2"
+            >
+              <div
+                class="right-top"
+              >{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userName}}/{{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].userJobNumber}}</div>
+              <div
+                class="right-bottom"
+              >始 {{deviceDetailForm.deviceRelationRecords[deviceDetailForm.deviceRelationRecords.length - 2].createTime}}</div>
+            </div>
+            <div class="right" v-else>
+              <div class="right-top">暂无历史关联人员</div>
+            </div>
           </div>
         </div>
       </el-dialog>
 
       <!-- 日期对话框 -->
       <el-dialog title="插入排班计划" :visible.sync="calendarVisible" width="25%" center>
-        <calendar></calendar>
+        <calendar :copyDate="copyDate"></calendar>
       </el-dialog>
     </div>
     <!-- 对话框-end -->
@@ -110,6 +167,10 @@ export default {
   name: "rosterPlan",
   props: {
     value: {
+      type: String,
+      default: ""
+    },
+    copyDate: {
       type: String,
       default: ""
     }
@@ -166,11 +227,11 @@ export default {
     /** 查询排班计划列表 */
     getRosterList(e) {
       // this.loading = true;
-      if(!e) {
+      if (!e) {
         return this.$message({
-            type:'warning',
-            message:'未选择查询日期'
-          })
+          type: "warning",
+          message: "未选择查询日期"
+        });
       }
       this.loading = true;
       this.searchDate = e;
@@ -198,10 +259,14 @@ export default {
       listDevice(params).then(res => {
         if (res.code == 200) {
           this.deviceList = res.data;
-          if(this.deviceList.deviceRelationRecords) {
-            this.deviceList.deviceRelationRecords =  this.deviceList.deviceRelationRecords.reverse()
-          }
-         this.loading = false;
+          // if (this.deviceList.deviceRelationRecords) {
+          //   this.deviceList.deviceRelationRecords = this.deviceList.deviceRelationRecords.reverse();
+          // }
+          this.loading = false;
+          this.$message({
+            type: "success",
+            message: "查询成功!"
+          });
         }
       });
     },
@@ -214,15 +279,18 @@ export default {
     },
     // 打开操作组件
     openOptions() {
-      this.$parent.changeRosterPlanShow(false, this.searchDate );
+      this.$parent.changeRosterPlanShow(false, this.searchDate);
     },
     // 插入排班计划
     insertPlan() {
       this.calendarVisible = true;
     },
     // 取消插入排班计划
-    cancelPlanForm() {
+    cancelPlanForm(date) {
       this.calendarVisible = false;
+      if (date) {
+        this.$parent.changeRosterPlanShow(false, date);
+      }
     }
   }
 };
@@ -248,6 +316,17 @@ export default {
     // min-height: 500px;
     height: 60vh;
     overflow: auto;
+    .item-time {
+      width: 100%;
+      font-size: 15px;
+      color: #999999;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border-top: 1px solid #e5e5e5;
+      padding-top: 10px;
+      padding-right: 10px;
+    }
     .item-f {
       display: grid;
       justify-content: space-between;
@@ -255,7 +334,7 @@ export default {
       grid-gap: 10px;
       padding-top: 10px;
       padding-right: 20px;
-      border-top: 1px solid #e5e5e5;
+      // border-top: 1px solid #e5e5e5;
       .item {
         cursor: pointer;
         min-width: 70px;
@@ -325,7 +404,7 @@ export default {
     .el-dialog--center .el-dialog__body {
       text-align: initial;
       // padding: 10px 25px 30px;
-      padding: 10px 0;
+      padding: 20px 0;
     }
     .el-dialog {
       display: flex;
@@ -345,8 +424,8 @@ export default {
     }
     .deviceDialogMain {
       //  border-top: 1px solid #e5e5e5;
-      padding-left:20px;
-      padding-right:20px;
+      padding-left: 20px;
+      padding-right: 20px;
       .item {
         display: flex;
         align-items: center;
@@ -372,7 +451,7 @@ export default {
           }
         }
       }
-      .item-history-people:last-child {
+      .item-history-people-history {
         color: #c0c1bf;
       }
     }

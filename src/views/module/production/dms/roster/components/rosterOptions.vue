@@ -7,6 +7,7 @@
   >
     <div class="content-item">
       <!--  :class="[(item.deviceStatus == 0 ? 'item-stop' : ''), (item.id == selectItemId ? 'item-select' : '')]" -->
+      <div class="item-time">排班日期:{{searchDate}}</div>
       <div class="item-f">
         <div
           class="item"
@@ -24,8 +25,26 @@
           />
           <div class="item-top">{{item.deviceCode}}</div>
           <div class="item-mid">{{item.deviceName}}</div>
-            <div class="item-bottom" v-if="item.dmsDeviceRelationRecord" >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</div>
-          <div class="item-bottom" v-else >暂未关联</div>
+          <!-- <div
+            class="item-bottom"
+            v-if="item.dmsDeviceRelationRecord"
+          >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</div>-->
+
+          <el-popover
+            class="item-bottom"
+            v-if="item.dmsDeviceRelationRecord && item.dmsDeviceRelationRecord.userPkid"
+            placement="bottom"
+            title="关联人员"
+            width="200"
+            trigger="hover"
+            :content="item.dmsDeviceRelationRecord.userName + '/' + item.dmsDeviceRelationRecord.userJobNumber"
+          >
+            <span
+              slot="reference"
+            >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</span>
+          </el-popover>
+
+          <div class="item-bottom" v-else>暂无关联</div>
         </div>
       </div>
     </div>
@@ -125,7 +144,8 @@ import {
   listDevice,
   relationDevice,
   removeDevicePeople,
-  getProducter
+  getProducter,
+  stopOrStart
 } from "@/api/module/production/dms/roster/roster";
 export default {
   name: "rosterOptions",
@@ -143,11 +163,11 @@ export default {
       allSelected: false,
       selectList: [],
       relationSearchKey: "",
-      producerList: [ ],
+      producerList: [],
       selelctProducerId: "",
       deviceList: [],
       loading: false,
-      searchDate:""
+      searchDate: ""
     };
   },
   computed: {},
@@ -163,27 +183,31 @@ export default {
     /** 查询设备列表 */
     getDeviceList(date) {
       this.loading = true;
-      this.searchDate = date
-       let params = {
+      this.searchDate = date;
+      let params = {
         rosterDate: date
       };
       listDevice(params).then(res => {
         if (res.code == 200) {
           this.deviceList = res.data;
           this.loading = false;
+           this.$message({
+            type: "success",
+            message: "查询成功!"
+          });
         }
       });
     },
 
-     /** 获取生产职工*/
+    /** 获取生产职工*/
     getProducterList() {
       // this.loading = true;
-       let params = {
-        userKey: this.relationSearchKey || ''
+      let params = {
+        userKey: this.relationSearchKey || ""
       };
       getProducter(params).then(res => {
         if (res.code == 200) {
-         this.producerList = res.data
+          this.producerList = res.data;
         }
       });
     },
@@ -238,7 +262,7 @@ export default {
       if (this.selectList.length == 0) {
         return this.$message({ type: "warning", message: "请先选择设备!" });
       }
-      this.getProducterList()
+      this.getProducterList();
       this.relationVisible = true;
     },
     // 关联人员-对话框-选择人员
@@ -249,43 +273,54 @@ export default {
     cancelRelation() {
       this.selelctProducerId = "";
       this.relationVisible = false;
-    },
+       this.relationSearchKey = ''
+   },
     //关联人员-对话框-选择人员-确定
     confirmRelation() {
       if (!this.selelctProducerId) {
         return this.$message({ type: "warning", message: "请选择关联人员!" });
       }
-      this.confirmRelationApi()
-     
+      this.confirmRelationApi();
     },
     confirmRelationApi() {
-       let params = {
+      let params = {
         relationDevicePkids: this.selectList,
-        relationUserPkid:this.selelctProducerId || '',
-        rosterDate:this.searchDate
+        relationUserPkid: this.selelctProducerId || "",
+        rosterDate: this.searchDate
       };
       relationDevice(params).then(res => {
         if (res.code == 200) {
-           this.getDeviceList(this.searchDate)
-            this.selelctProducerId = "";
-            this.selectList = []
-            this.relationVisible = false;
+          this.$message({ type: "success", message: "操作成功!" });
+          this.getDeviceList(this.searchDate);
+          this.selelctProducerId = "";
+          this.relationSearchKey = ''
+          this.selectList = [];
+          this.allSelected = false
+          this.relationVisible = false;
         }
       });
     },
-     removeRelationApi() {
-       let params = {
+    removeRelationApi() {
+      let params = {
         relationDevicePkids: this.selectList,
-        rosterDate:this.searchDate
+        rosterDate: this.searchDate
       };
       removeDevicePeople(params).then(res => {
         if (res.code == 200) {
-          this.getDeviceList(this.searchDate)
-           this.selectList = []
-           this.$message({
-              type: "success",
-              message: "操作成功!"
-            });
+          this.getDeviceList(this.searchDate);
+          this.selectList = [];
+           this.allSelected = false
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        } else {
+          this.getDeviceList(this.searchDate);
+          // this.selectList = [];
+          this.$message({
+            type: "warning",
+            message: "当前设备并未关联人员!"
+          });
         }
       });
     },
@@ -300,8 +335,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.removeRelationApi()
-          
+          this.removeRelationApi();
         })
         .catch(() => {
           this.$message({
@@ -321,10 +355,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "操作成功!"
-          });
+          this.stopOrStartDeviceApi(1);
         })
         .catch(() => {
           this.$message({
@@ -333,7 +364,27 @@ export default {
           });
         });
     },
-    // 停止所选设备
+
+    // 停止-开启设备-Api
+    stopOrStartDeviceApi(status) {
+      let params = {
+        devicePkids: this.selectList,
+        deviceStatus: status // 0正常 1停止
+      };
+      stopOrStart(params).then(res => {
+        if (res.code == 200) {
+          this.getDeviceList(this.searchDate);
+          this.selectList = [];
+           this.allSelected = false
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        }
+      });
+    },
+
+    // 开启所选设备
     startDevice() {
       if (this.selectList.length == 0) {
         return this.$message({ type: "warning", message: "请先选择设备!" });
@@ -344,10 +395,7 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "操作成功!"
-          });
+          this.stopOrStartDeviceApi(0);
         })
         .catch(() => {
           this.$message({
@@ -369,13 +417,24 @@ export default {
   .content-item {
     height: 60vh;
     overflow: auto;
+    .item-time {
+      width: 100%;
+      font-size: 15px;
+      color: #999999;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border-top: 1px solid #e5e5e5;
+      padding-top: 10px;
+      padding-right: 10px;
+    }
     .item-f {
       display: grid;
       justify-content: space-between;
       grid-template-columns: repeat(auto-fill, 100px);
       grid-gap: 10px;
       padding-top: 10px;
-      border-top: 1px solid #e5e5e5;
+      // border-top: 1px solid #e5e5e5;
       .item {
         cursor: pointer;
         min-width: 70px;
@@ -401,7 +460,7 @@ export default {
         .item-mid {
         }
         .item-bottom {
-           padding: 0 10px;
+          padding: 0 10px;
           width: 100%;
           text-align: center;
           overflow: hidden;
