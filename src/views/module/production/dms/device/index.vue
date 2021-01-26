@@ -500,7 +500,7 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(function() {
-        return changeDeviceStatus(row.pkid, row.deviceStatus);
+        return changeDeviceStatus(row);
       }).then(() => {
         this.getList();
         this.msgSuccess(text + "成功");
