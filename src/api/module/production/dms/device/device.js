@@ -61,11 +61,7 @@ export function listWorkshopPwUser() {
 }
 
 // 服务状态修改
-export function changeDeviceStatus(pkid, deviceStatus) {
-  const data = {
-    pkid,
-    deviceStatus
-  }
+export function changeDeviceStatus(data) {
   return request({
     url: '/dms/device/changeDeviceStatus',
     method: 'put',
