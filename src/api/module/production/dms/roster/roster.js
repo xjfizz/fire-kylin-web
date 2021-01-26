@@ -3,51 +3,46 @@ import request from '@/utils/request'
 // 查询设备排班列表
 export function listRoster(query) {
   return request({
-    url: '/dms/roster/list',
+    url: '/dms/roster/listDeviceRoster',
     method: 'get',
     params: query
   })
 }
 
-// 查询设备排班详细
-export function getRoster(pkid) {
+
+// 查询设备列表
+export function listDevice(query) {
   return request({
-    url: '/dms/roster/' + pkid,
-    method: 'get'
+    url: '/dms/device/listDevice',
+    method: 'get',
+    params: query
   })
 }
 
-// 新增设备排班
-export function addRoster(data) {
+// 关联人员-设备
+export function relationDevice(data) {
   return request({
-    url: '/dms/roster',
-    method: 'post',
-    data: data
-  })
-}
-
-// 修改设备排班
-export function updateRoster(data) {
-  return request({
-    url: '/dms/roster',
+    url: '/dms/roster/relationRosterUser',
     method: 'put',
     data: data
   })
 }
 
-// 删除设备排班
-export function delRoster(pkid) {
+// 移除关联人员-设备
+export function removeDevicePeople(data) {
   return request({
-    url: '/dms/roster/' + pkid,
-    method: 'delete'
+    url: '/dms/roster/removeRosterUser',
+    method: 'put',
+    data: data
   })
 }
 
-// 导出设备排班
-export function exportRoster(query) {
+// 获取生产职工
+export function getProducter(data) {
   return request({
-    url: '/dms/roster/export',
+    url: `/system/user/queryListPwUser?userKey=${data.userKey}`,
     method: 'get',
-    params: query
+    query: data
   })
 }
+

@@ -1,11 +1,16 @@
 <template>
-  <div class="main-options">
+  <div
+    class="main-options"
+    v-loading="loading"
+    element-loading-text="拼命加载中"
+    element-loading-spinner="el-icon-loading"
+  >
     <div class="content-item">
       <!--  :class="[(item.deviceStatus == 0 ? 'item-stop' : ''), (item.id == selectItemId ? 'item-select' : '')]" -->
       <div class="item-f">
         <div
           class="item"
-          :class="item.deviceStatus == 0 ? 'item-stop' : '' "
+          :class="item.deviceStatus == 1 ? 'item-stop' : '' "
           v-for="(item,index) in deviceList"
           :key="index"
           @click="selectItem(item)"
@@ -19,9 +24,8 @@
           />
           <div class="item-top">{{item.deviceCode}}</div>
           <div class="item-mid">{{item.deviceName}}</div>
-          <div
-            class="item-bottom"
-          >{{item.productInfo[0].producer}}/{{item.productInfo[0].productCode}}</div>
+            <div class="item-bottom" v-if="item.dmsDeviceRelationRecord" >{{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}</div>
+          <div class="item-bottom" v-else >暂未关联</div>
         </div>
       </div>
     </div>
@@ -49,7 +53,7 @@
           size="medium"
           @click="stopDevice()"
         >停止设备</el-button>
-         <el-button
+        <el-button
           class="opt-button"
           type="primary"
           icon="el-icon-folder-checked"
@@ -57,7 +61,7 @@
           @click="startDevice()"
         >启用设备</el-button>
       </div>
-      
+
       <div class="right">
         <el-button
           class="opt-button"
@@ -81,7 +85,7 @@
               type="primary"
               icon="el-icon-search"
               size="medium"
-              @click
+              @click="getProducterList()"
             >查询</el-button>
           </div>
           <div class="mid">
@@ -89,10 +93,10 @@
               <div class="left">
                 <el-radio
                   v-model="selelctProducerId"
-                  :label="item.id"
+                  :label="item.userId"
                   @change="selectProducer(item)"
                 >
-                  <span class="left-value">{{item.name}}/{{item.code}}</span>
+                  <span class="left-value">{{item.nickName}}/{{item.jobNumber}}</span>
                 </el-radio>
               </div>
               <!-- <div class="right">
@@ -116,6 +120,13 @@
 </template>
 
 <script>
+import {
+  listRoster,
+  listDevice,
+  relationDevice,
+  removeDevicePeople,
+  getProducter
+} from "@/api/module/production/dms/roster/roster";
 export default {
   name: "rosterOptions",
   props: {
@@ -132,113 +143,11 @@ export default {
       allSelected: false,
       selectList: [],
       relationSearchKey: "",
-      producerList: [
-        { id: 1, name: "张三", code: "02" },
-        { id: 2, name: "李四", code: "03" },
-        { id: 3, name: "王青", code: "04" },
-        { id: 4, name: "张三1", code: "05" },
-        { id: 5, name: "张三2", code: "06" },
-        { id: 6, name: "张三3", code: "07" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" },
-        { id: 7, name: "张三4", code: "08" }
-      ],
+      producerList: [ ],
       selelctProducerId: "",
-      deviceList: [
-        {
-          id: 1,
-          deviceCode: "A001",
-          deviceName: "板带机",
-          deviceModel: "UH890",
-          deviceStatus: 1,
-          productInfo: [
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "李四",
-              productCode: "03",
-              createTime: "2021-01-22 10:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            }
-          ]
-        },
-        {
-          id: 2,
-          deviceCode: "A002",
-          deviceName: "板带机",
-          deviceModel: "UH890",
-          deviceStatus: 1,
-          productInfo: [
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "李四",
-              productCode: "03",
-              createTime: "2021-01-22 10:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            }
-          ]
-        },
-        {
-          id: 3,
-          deviceCode: "A003",
-          deviceName: "板带机",
-          deviceModel: "UH890",
-          deviceStatus: 1,
-          productInfo: [
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "李四",
-              productCode: "03",
-              createTime: "2021-01-22 10:15:32"
-            },
-            {
-              productId: "123456",
-              producer: "张三",
-              productCode: "02",
-              createTime: "2021-01-22 08:15:32"
-            }
-          ]
-        },
-      ]
+      deviceList: [],
+      loading: false,
+      searchDate:""
     };
   },
   computed: {},
@@ -251,25 +160,53 @@ export default {
   mounted() {},
 
   methods: {
+    /** 查询设备列表 */
+    getDeviceList(date) {
+      this.loading = true;
+      this.searchDate = date
+       let params = {
+        rosterDate: date
+      };
+      listDevice(params).then(res => {
+        if (res.code == 200) {
+          this.deviceList = res.data;
+          this.loading = false;
+        }
+      });
+    },
+
+     /** 获取生产职工*/
+    getProducterList() {
+      // this.loading = true;
+       let params = {
+        userKey: this.relationSearchKey || ''
+      };
+      getProducter(params).then(res => {
+        if (res.code == 200) {
+         this.producerList = res.data
+        }
+      });
+    },
+
     // 选择设备
     selectItem(item) {
-      this.selectItemId = item.id;
+      this.selectItemId = item.pkid;
       item.isSelected = !item.isSelected;
       this.$forceUpdate();
       if (item.isSelected) {
-        this.selectList.push(item.id);
+        this.selectList.push(item.pkid);
       } else {
         this.selectList.map((res, index) => {
-          if (res == item.id) {
+          if (res == item.pkid) {
             this.selectList.splice(index, 1);
           }
         });
       }
       // 检测是否全选
-      if(this.selectList.length == this.deviceList.length) {
-        this.allSelected = true
+      if (this.selectList.length == this.deviceList.length) {
+        this.allSelected = true;
       } else {
-        this.allSelected = false
+        this.allSelected = false;
       }
       this.$forceUpdate();
       console.log("item", item, this.selectList);
@@ -283,7 +220,7 @@ export default {
         this.deviceList.map(item => {
           item.isSelected = true;
           this.$forceUpdate();
-          this.selectList.push(item.id);
+          this.selectList.push(item.pkid);
         });
       } else {
         this.deviceList.map(item => {
@@ -301,6 +238,7 @@ export default {
       if (this.selectList.length == 0) {
         return this.$message({ type: "warning", message: "请先选择设备!" });
       }
+      this.getProducterList()
       this.relationVisible = true;
     },
     // 关联人员-对话框-选择人员
@@ -317,8 +255,39 @@ export default {
       if (!this.selelctProducerId) {
         return this.$message({ type: "warning", message: "请选择关联人员!" });
       }
-      this.selelctProducerId = "";
-      this.relationVisible = false;
+      this.confirmRelationApi()
+     
+    },
+    confirmRelationApi() {
+       let params = {
+        relationDevicePkids: this.selectList,
+        relationUserPkid:this.selelctProducerId || '',
+        rosterDate:this.searchDate
+      };
+      relationDevice(params).then(res => {
+        if (res.code == 200) {
+           this.getDeviceList(this.searchDate)
+            this.selelctProducerId = "";
+            this.selectList = []
+            this.relationVisible = false;
+        }
+      });
+    },
+     removeRelationApi() {
+       let params = {
+        relationDevicePkids: this.selectList,
+        rosterDate:this.searchDate
+      };
+      removeDevicePeople(params).then(res => {
+        if (res.code == 200) {
+          this.getDeviceList(this.searchDate)
+           this.selectList = []
+           this.$message({
+              type: "success",
+              message: "操作成功!"
+            });
+        }
+      });
     },
     // 移除关联人员
     removePeople() {
@@ -331,10 +300,8 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$message({
-            type: "success",
-            message: "操作成功!"
-          });
+          this.removeRelationApi()
+          
         })
         .catch(() => {
           this.$message({
@@ -366,7 +333,7 @@ export default {
           });
         });
     },
-        // 停止所选设备
+    // 停止所选设备
     startDevice() {
       if (this.selectList.length == 0) {
         return this.$message({ type: "warning", message: "请先选择设备!" });
@@ -434,6 +401,13 @@ export default {
         .item-mid {
         }
         .item-bottom {
+           padding: 0 10px;
+          width: 100%;
+          text-align: center;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          //规定段落中的文本不进行换行
+          white-space: nowrap;
         }
         .item-selected-img {
           width: 15px;
@@ -452,8 +426,8 @@ export default {
         transform: scale(1.2);
       }
       .item-stop {
-       // background: #f56c6c;
-          background: #ffba00;
+        // background: #f56c6c;
+        background: #ffba00;
         color: #ffffff;
       }
     }
