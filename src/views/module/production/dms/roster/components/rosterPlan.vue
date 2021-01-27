@@ -6,14 +6,9 @@
     v-loading="loading"
   >
     <div class="content-item" v-if="this.rosterList.length > 0">
-      <!--  :class="[(item.deviceStatus == 0 ? 'item-stop' : ''), (item.id == selectItemId ? 'item-select' : '')]" -->
       <div class="item-time">排班日期:{{searchDate}}</div>
       <div class="item-f">
-        <!-- <el-tooltip class="item" effect="dark" content="Top Left 提示文字" placement="top-start">
-      <el-button>上左</el-button>
-        </el-tooltip>-->
-
-        <div
+       <div
           class="item"
           :class="item.deviceStatus == 1 ? 'item-stop' : '' "
           v-for="(item,index) in deviceList"
@@ -22,12 +17,7 @@
         >
           <div class="item-top">{{item.deviceCode}}</div>
           <div class="item-mid">{{item.deviceName}}</div>
-          <!-- <div
-            class="item-bottom"
-            v-if="item.dmsDeviceRelationRecord"
-          >
-          {{item.dmsDeviceRelationRecord.userName}}/{{item.dmsDeviceRelationRecord.userJobNumber}}
-          </div>-->
+         
           <el-popover
             class="item-bottom"
             v-if="item.dmsDeviceRelationRecord && item.dmsDeviceRelationRecord.userPkid"
