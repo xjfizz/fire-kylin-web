@@ -150,6 +150,12 @@
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="180">
         <template slot-scope="scope">
+           <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-printer"
+            @click="handleUpdate(scope.row)"
+          >打印</el-button>
           <el-button
             size="mini"
             type="text"
@@ -188,9 +194,8 @@
             type="text"
             style="color: #f8ac59"
             icon="el-icon-s-operation"
-            @click="handleDelete(scope.row)"
+            @click="rosterOrder(scope.row)"
             v-show="scope.row.orderStatus === '5'"
-            v-hasPermi="['oms:order:remove']"
           >排班</el-button>
           <el-button
             size="mini"
@@ -633,11 +638,58 @@
         </div>
       </el-dialog>
 
+      <!-- 生产员分配-dialog -->
+      <el-dialog title="选择生产员" :visible.sync="producterVisible" width="400px" center>
+        <div class="relationVisibleMain">
+          <div class="relationVisibleMain-top">
+            <el-input placeholder="请输入工号/姓名" v-model="producterSearchKey" clearable></el-input>
 
-      
+            <el-button
+              class="search-button"
+              type="primary"
+              icon="el-icon-search"
+              size="medium"
+              @click="getProducterList()"
+            >查询</el-button>
+          </div>
+          <div class="mid" v-if="producterList.length > 0">
+            <div class="item" v-for="(item,index) in producterList" :key="index">
+              <div class="left">
+                <el-radio
+                  v-model="selelctProducterId"
+                  :label="item.userId"
+                  @change="selectProducter(item)"
+                >
+                  <span class="left-value">
+                    <span>{{item.nickName}}</span>
+                    <span v-if="item.jobNumber">/{{item.jobNumber}}</span>
+                  </span>
+                </el-radio>
+              </div>
+            </div>
+          </div>
+          <div class="mid mid-no" v-else>
+            <span>暂无数据</span>
+          </div>
+          <div slot="footer" class="dialog-footer bottom">
+            <el-button class="opt-button" size="medium" @click="cancelProducter()">取消</el-button>
+            <el-button
+              class="opt-button"
+              type="primary"
+              size="medium"
+              @click="confirmProducter()"
+            >确认</el-button>
+          </div>
+        </div>
+      </el-dialog>
 
       <!-- 订单是否取料检测组件 -->
-      <isPickDialog ref="isPickDialogRef" :title="dialogTitle" :visible="isPickVisible" :isPickList="isPickList"></isPickDialog>
+      <isPickDialog
+        ref="isPickDialogRef"
+        :title="dialogTitle"
+        :visible="isPickVisible"
+        :isPickList="isPickList"
+      ></isPickDialog>
     </div>
     <!-- 对话框-end -->
   </div>
@@ -653,7 +705,10 @@ import {
   exportOrder,
   getPickers,
   mergeOrder,
-  confirmOrder
+  confirmOrder,
+  getProducters,
+  listRoster,
+  orderRosterProduct
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 export default {
@@ -663,12 +718,16 @@ export default {
   },
   data() {
     return {
-      dialogTitle:'',
+      dialogTitle: "",
       isSingle: false, // 是否单选
       pickerVisible: false, // 取料对话框
+      producterVisible: false, // 生产员对话框
       pickerList: [], // 取料员list
       pickerSearchKey: "", //取料查询关键字
+      producterSearchKey: "", // 生产员关键字查询
+      producterList: [], // 生产员list
       selelctPickerId: "", // 选择的配送员ID
+      selelctProducterId: "", // 选择生产员ID
       isPickVisible: false, // 检测是否已取料
       isPickList: [
         {
@@ -787,10 +846,10 @@ export default {
     };
   },
   mounted() {
-    console.log('mounted')
+    console.log("mounted");
   },
   created() {
-    console.log('created')
+    console.log("created");
 
     this.getList();
     this.getDicts("oms_order_status").then(response => {
@@ -828,6 +887,20 @@ export default {
     }
   },
   methods: {
+    dataFormat(d) {
+      console.log("d", d);
+      let str =
+        d.getFullYear() +
+        "-" +
+        this.p(d.getMonth() + 1) +
+        "-" +
+        this.p(d.getDate());
+      return str;
+    },
+    //创建补0函数
+    p(s) {
+      return s < 10 ? "0" + s : s;
+    },
     /** 查询wxapp端订单列表 */
     getList() {
       this.loading = true;
@@ -1050,6 +1123,18 @@ export default {
         }
       });
     },
+    /** 获取生产员*/
+    getProducterList() {
+      // this.loading = true;
+      let params = {
+        userKey: this.producterSearchKey || ""
+      };
+      getProducters(params).then(res => {
+        if (res.code == 200) {
+          this.producterList = res.data;
+        }
+      });
+    },
     // 取料
     pickOrder(e) {
       this.selectOrderList = [e];
@@ -1060,9 +1145,9 @@ export default {
     // 合并取料
     mergeOrders() {
       this.isSingle = false;
-      console.log('this.queryParams.orderStatus', this.queryParams.orderStatus)
-      if(this.queryParams.orderStatus != 2) {
-         return this.$message({
+      console.log("this.queryParams.orderStatus", this.queryParams.orderStatus);
+      if (this.queryParams.orderStatus != 2) {
+        return this.$message({
           type: "warning",
           message: "请先筛选出待取料订单!"
         });
@@ -1134,9 +1219,9 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-           this.handleQuery();
+          this.handleQuery();
         } else if (res.code == 422) {
-          this.dialogTitle = '已取料订单'
+          this.dialogTitle = "已取料订单";
           let orderList = res.msg.split(",");
           this.isPickList = orderList.map(res => {
             return {
@@ -1157,9 +1242,17 @@ export default {
     selectPicker(item) {
       this.selelctPickerId = item.userId;
     },
+    // 选择生产员
+    selectProducter(item) {
+      this.selelctProducterId = item.userId;
+    },
     // 取消配送弹框
     cancelPicker() {
       this.pickerVisible = false;
+    },
+    // 取消生产员对话框
+    cancelProducter() {
+      this.producterVisible = false;
     },
     // 确认配送弹框
     confirmPicker() {
@@ -1187,6 +1280,48 @@ export default {
         this.mergeOrderApi();
       }
     },
+    // 确认配送弹框
+    confirmProducter() {
+      // this.pickerVisible = false
+
+      // if (this.selectOrderList.length == 0) {
+      //   return this.$message({
+      //     type: "warning",
+      //     message: "请先选择订单!"
+      //   });
+      // }
+      if (!this.selelctProducterId) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择生产员!"
+        });
+      }
+
+      this.rosterOrderApi();
+    },
+    // 单个排班api
+    rosterOrderApi() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        orderPkids,
+        produceUserPkid: this.selelctProducterId,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      console.log("params", params, this.$store);
+      orderRosterProduct(params).then(res => {
+        if (res.code == 200) {
+          this.producterVisible = false;
+          this.selelctProducterId = "";
+          this.selectOrderList = [];
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        }
+      });
+    },
+
     // 确认接单
     confirmOrderApi(e) {
       let orderPkids = e.map(item => item.pkid);
@@ -1202,8 +1337,8 @@ export default {
             message: "操作成功!"
           });
           this.handleQuery();
-        } else if(res.code == 422) {
-           this.dialogTitle = '已确认订单'
+        } else if (res.code == 422) {
+          this.dialogTitle = "已确认订单";
           let orderList = res.msg.split(",");
           this.isPickList = orderList.map(res => {
             return {
@@ -1252,8 +1387,8 @@ export default {
     },
     // 批量确认订单按钮
     confirmOrders() {
-        if(this.queryParams.orderStatus != 4) {
-         return this.$message({
+      if (this.queryParams.orderStatus != 4) {
+        return this.$message({
           type: "warning",
           message: "请先筛选出待确认订单!"
         });
@@ -1265,13 +1400,13 @@ export default {
         });
       }
 
-       this.$confirm(`是否确认订单?`, "提示", {
+      this.$confirm(`是否确认订单?`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
-           this.confirmOrderApi(this.selectOrderList);
+          this.confirmOrderApi(this.selectOrderList);
         })
         .catch(() => {
           this.$message({
@@ -1279,8 +1414,34 @@ export default {
             message: "已取消操作"
           });
         });
+    },
+    // 排班弹框
+    rosterOrder(e) {
+      this.selectOrderList = [e];
+      this.getRosterList();
+    },
 
-    
+    /** 查询排班计划列表 */
+    getRosterList() {
+      // this.loading = true;
+      let date = this.dataFormat(new Date());
+      let params = {
+        rosterDate: date
+      };
+      listRoster(params).then(res => {
+        if (res.code == 200) {
+          // this.rosterList = res.data;
+          if (res.data.length > 0) {
+            this.producterVisible = true;
+            this.getProducterList();
+          } else {
+            this.$message({
+              type: "warning",
+              message: "当天并无排班计划"
+            });
+          }
+        }
+      });
     }
   }
 };

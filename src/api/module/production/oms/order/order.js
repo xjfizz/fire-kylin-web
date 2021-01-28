@@ -61,6 +61,16 @@ export function getPickers(query) {
   })
 }
 
+// 获取当天生产员
+export function getProducters(query) {
+  return request({
+    url: '/dms/roster/listPwUser',
+    method: 'get',
+    params: query
+  })
+}
+
+
 // 合并取料
 export function mergeOrder(data) {
   return request({
@@ -75,6 +85,24 @@ export function confirmOrder(data) {
   return request({
     url: '/oms/web/order/combinedConfirmOrder',
     method: 'put',
+    data: data
+  })
+}
+
+// 查询设备排班列表
+export function listRoster(query) {
+  return request({
+    url: '/dms/roster/listDeviceRoster',
+    method: 'get',
+    params: query
+  })
+}
+
+// 查询设备排班列表
+export function orderRosterProduct(data) {
+  return request({
+    url: '/oms/web/order/assignOrder',
+    method: 'post',
     data: data
   })
 }
