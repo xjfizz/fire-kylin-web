@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form
+      :model="queryParams"
+      ref="queryForm"
+      :inline="true"
+      v-show="showSearch"
+      label-width="68px"
+    >
       <el-form-item label="订单状态" prop="orderStatus">
         <el-select
           v-model="queryParams.orderStatus"
@@ -69,8 +75,7 @@
           plain
           icon="el-icon-s-help"
           size="mini"
-          @click=""
-          v-hasPermi="['oms:order:export']"
+          @click="mergeOrders()"
         >合并取料</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -79,7 +84,7 @@
           plain
           icon="el-icon-s-goods"
           size="mini"
-          @click=""
+          @click
           v-hasPermi="['oms:order:export']"
         >合并配送</el-button>
       </el-col>
@@ -89,8 +94,7 @@
           plain
           icon="el-icon-s-check"
           size="mini"
-          @click=""
-          v-hasPermi="['oms:order:export']"
+          @click="confirmOrders"
         >确认接单</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -106,21 +110,38 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="orderList" @selection-change="handleSelectionChange">
+    <el-table
+      ref="dataTable"
+      v-loading="loading"
+      :data="orderList"
+      @selection-change="handleSelectionChange"
+    >
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="订单编号" align="center" prop="orderNo" width="230"/>
+      <el-table-column label="订单编号" align="center" prop="orderNo" width="230" />
       <el-table-column label="用户名称" align="center" prop="wmsUser.userName" />
       <el-table-column label="手机号码" align="center" prop="wmsUser.wxappPhone" />
       <el-table-column label="商品名称" align="center" prop="pmsServer.serverName" />
       <el-table-column label="商品数量" align="center" prop="orderQuantity" />
       <el-table-column label="商品规格" align="center" prop="orderSpecification" />
-      <el-table-column label="订单价格" align="center" prop="orderAmount" >
+      <el-table-column label="订单价格" align="center" prop="orderAmount">
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="配送方式" align="center" prop="orderDeliveryType" :formatter="orderDeliveryTypeFormat" width="100"/>
-      <el-table-column label="订单状态" align="center" prop="orderStatus" :formatter="orderStatusFormat" width="100" />
+      <el-table-column
+        label="配送方式"
+        align="center"
+        prop="orderDeliveryType"
+        :formatter="orderDeliveryTypeFormat"
+        width="100"
+      />
+      <el-table-column
+        label="订单状态"
+        align="center"
+        prop="orderStatus"
+        :formatter="orderStatusFormat"
+        width="100"
+      />
       <el-table-column label="订单创建时间" align="center" prop="orderCreateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -141,7 +162,7 @@
             type="text"
             style="color: #008489"
             icon="el-icon-s-help"
-            @click="handleDelete(scope.row)"
+            @click="pickOrder(scope.row)"
             v-show="scope.row.orderStatus === '2'"
             v-hasPermi="['oms:order:remove']"
           >取料</el-button>
@@ -150,9 +171,8 @@
             type="text"
             style="color: #787be8"
             icon="el-icon-s-check"
-            @click="handleDelete(scope.row)"
+            @click="confirmOrderSingle(scope.row)"
             v-show="scope.row.orderStatus === '4'"
-            v-hasPermi="['oms:order:remove']"
           >确认</el-button>
           <el-button
             size="mini"
@@ -195,12 +215,18 @@
 
     <!-- 添加或修改wxapp端订单对话框 -->
     <el-dialog :title="title" :visible.sync="open" append-to-body @closed="handleClose">
-      <el-form ref="form" :model="form"  label-width="180px" v-loading="loading">
+      <el-form ref="form" :model="form" label-width="180px" v-loading="loading">
         <el-card>
-          <div slot="header" style="padding-left:15px"><span>订单进度</span></div>
+          <div slot="header" style="padding-left:15px">
+            <span>订单进度</span>
+          </div>
           <div class="detail-container">
-            <div class="step-style" >
-              <el-steps :active="formatStepStatus(form.orderStatus)" finish-status="success" align-center>
+            <div class="step-style">
+              <el-steps
+                :active="formatStepStatus(form.orderStatus)"
+                finish-status="success"
+                align-center
+              >
                 <el-step title="创建时间" :description="form.orderCreateTime"></el-step>
                 <el-step title="支付时间" :description="form.orderPayTime"></el-step>
                 <el-step title="加工时间" :description="form.productionStartTime"></el-step>
@@ -210,35 +236,70 @@
           </div>
           <el-row style="margin-top: 10px">
             <el-card>
-              <div slot="header"><el-tag type="danger" effect="plain">商品信息</el-tag></div>
+              <div slot="header">
+                <el-tag type="danger" effect="plain">商品信息</el-tag>
+              </div>
               <div class="el-table el-table--enable-row-hover el-table--medium">
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
-                  <tr>
-                    <td rowspan="2"><div class="cell" v-if="form.pmsServer">
-                      <el-popover placement="top-start" title="" trigger="hover">
-                        <img :src="form.pmsServer.serverImageUrl" alt="图片预览" style="width: 200px;height: 200px">
-                        <img slot="reference" :src="form.pmsServer.serverImageUrl" style="width: 100px;height: 100px">
-                      </el-popover>
-                      </div>
-                    </td>
-                    <td><div class="cell">商品名称：</div></td>
-                    <td colspan="7"><div class="cell" v-if="form.pmsServer">{{ form.pmsServer.serverName }}</div></td>
-                  </tr>
-                  <tr>
-                    <td><div class="cell">商品规格：</div></td>
-                    <td><div class="cell" v-if="form">{{ form.orderSpecification }}</div></td>
-                    <td><div class="cell">商品价格：</div></td>
-                    <td><div class="cell" v-if="form">￥{{ form.orderPayAmount | money}}</div></td>
-                    <td><div class="cell">商品数量：</div></td>
-                    <td><div class="cell" v-if="form">{{ form.orderQuantity }}</div></td>
-                    <td><div class="cell">商品线数：</div></td>
-                    <td><div class="cell" v-if="form">{{ form.orderLineQuantity }}</div></td>
-                  </tr>
-                  <tr>
-                    <td><div class="cell">备注信息：</div></td>
-                    <td colspan="7"><div class="cell" v-if="form">{{ form.remark }}</div></td>
-                  </tr>
+                    <tr>
+                      <td rowspan="2">
+                        <div class="cell" v-if="form.pmsServer">
+                          <el-popover placement="top-start" title trigger="hover">
+                            <img
+                              :src="form.pmsServer.serverImageUrl"
+                              alt="图片预览"
+                              style="width: 200px;height: 200px"
+                            />
+                            <img
+                              slot="reference"
+                              :src="form.pmsServer.serverImageUrl"
+                              style="width: 100px;height: 100px"
+                            />
+                          </el-popover>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="cell">商品名称：</div>
+                      </td>
+                      <td colspan="7">
+                        <div class="cell" v-if="form.pmsServer">{{ form.pmsServer.serverName }}</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="cell">商品规格：</div>
+                      </td>
+                      <td>
+                        <div class="cell" v-if="form">{{ form.orderSpecification }}</div>
+                      </td>
+                      <td>
+                        <div class="cell">商品价格：</div>
+                      </td>
+                      <td>
+                        <div class="cell" v-if="form">￥{{ form.orderPayAmount | money}}</div>
+                      </td>
+                      <td>
+                        <div class="cell">商品数量：</div>
+                      </td>
+                      <td>
+                        <div class="cell" v-if="form">{{ form.orderQuantity }}</div>
+                      </td>
+                      <td>
+                        <div class="cell">商品线数：</div>
+                      </td>
+                      <td>
+                        <div class="cell" v-if="form">{{ form.orderLineQuantity }}</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="cell">备注信息：</div>
+                      </td>
+                      <td colspan="7">
+                        <div class="cell" v-if="form">{{ form.remark }}</div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -246,44 +307,98 @@
           </el-row>
           <el-row style="margin-top: 10px">
             <el-card>
-              <div slot="header"><el-tag type="danger" effect="plain">订单信息</el-tag></div>
-              <el-tabs v-model="activeName" @tab-click="">
+              <div slot="header">
+                <el-tag type="danger" effect="plain">订单信息</el-tag>
+              </div>
+              <el-tabs v-model="activeName" @tab-click>
                 <el-tab-pane label="订单信息" name="order">
                   <div class="el-table el-table--enable-row-hover el-table--medium">
                     <table cellspacing="0" style="width: 100%;">
                       <tbody>
-                      <tr>
-                        <td><div class="cell">客户名称：</div></td>
-                        <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
-                      </tr>
-                      <tr>
-                        <td><div class="cell">订单编号：</div></td>
-                        <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
-                        <td><div class="cell">订单状态：</div></td>
-                        <td><div class="cell" v-if="form">{{ formatOrderStatus(form.orderStatus) }}</div></td>
-                      </tr>
-                      <tr>
-                        <td><div class="cell">订单备注：</div></td>
-                        <td colspan="3"><div class="cell" v-if="form">{{ form.remark }}</div></td>
-                      </tr>
-                      <tr>
-                        <td><div class="cell">加工费用：</div></td>
-                        <td><div class="cell" v-if="form">￥{{ form.orderProcessAmount | money }}</div></td>
-                        <td><div class="cell">加工税费：</div></td>
-                        <td><div class="cell" v-if="form.pmsServer">￥{{ form.orderTaxAmount | money }}（税率{{ form.pmsServer.serverTaxRate }}%）</div></td>
-                      </tr>
-                      <tr>
-                        <td><div class="cell">物流费用：</div></td>
-                        <td><div class="cell" v-if="form">￥{{ form.orderFreightAmount | money }}</div></td>
-                        <td><div class="cell">实付金额：</div></td>
-                        <td><div class="cell" v-if="form">￥{{ form.orderPayAmount | money }}</div></td>
-                      </tr>
-                      <tr>
-                        <td><div class="cell">支付方式：</div></td>
-                        <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
-                        <td><div class="cell">期望时间：</div></td>
-                        <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d}')  }}</div></td>
-                      </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">客户名称：</div>
+                          </td>
+                          <td colspan="3">
+                            <div
+                              class="cell"
+                              v-if="form.wmsUser"
+                            >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">订单编号：</div>
+                          </td>
+                          <td>
+                            <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">订单状态：</div>
+                          </td>
+                          <td>
+                            <div class="cell" v-if="form">{{ formatOrderStatus(form.orderStatus) }}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">订单备注：</div>
+                          </td>
+                          <td colspan="3">
+                            <div class="cell" v-if="form">{{ form.remark }}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">加工费用：</div>
+                          </td>
+                          <td>
+                            <div class="cell" v-if="form">￥{{ form.orderProcessAmount | money }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">加工税费：</div>
+                          </td>
+                          <td>
+                            <div
+                              class="cell"
+                              v-if="form.pmsServer"
+                            >￥{{ form.orderTaxAmount | money }}（税率{{ form.pmsServer.serverTaxRate }}%）</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">物流费用：</div>
+                          </td>
+                          <td>
+                            <div class="cell" v-if="form">￥{{ form.orderFreightAmount | money }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">实付金额：</div>
+                          </td>
+                          <td>
+                            <div class="cell" v-if="form">￥{{ form.orderPayAmount | money }}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="cell">支付方式：</div>
+                          </td>
+                          <td>
+                            <div
+                              class="cell"
+                              v-if="form"
+                            >{{ formatOrderPayType(form.orderPayType) }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">期望时间：</div>
+                          </td>
+                          <td>
+                            <div
+                              class="cell"
+                              v-if="form"
+                            >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -291,32 +406,72 @@
                 <el-tab-pane label="取送信息" name="pickup">
                   <el-row style="margin-top: 10px">
                     <el-card>
-                      <div slot="header"><el-tag effect="plain">取料</el-tag></div>
+                      <div slot="header">
+                        <el-tag effect="plain">取料</el-tag>
+                      </div>
                       <div class="el-table el-table--enable-row-hover el-table--medium">
                         <table cellspacing="0" style="width: 100%;">
                           <tbody>
-                          <tr>
-                            <td><div class="cell">运单编号：</div></td>
-                            <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
-                            <td><div class="cell">取料方式：</div></td>
-                            <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">客户名称：</div></td>
-                            <td><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
-                            <td><div class="cell">取料时间：</div></td>
-                            <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}')  }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">取料信息：</div></td>
-                            <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}，
-                              {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
-                              {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">取料人员：</div></td>
-                            <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div></td>
-                          </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">运单编号：</div>
+                              </td>
+                              <td>
+                                <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                              </td>
+                              <td>
+                                <div class="cell">取料方式：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form"
+                                >{{ formatOrderPayType(form.orderPayType) }}</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">客户名称：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form.wmsUser"
+                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                              </td>
+                              <td>
+                                <div class="cell">取料时间：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form"
+                                >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">取料信息：</div>
+                              </td>
+                              <td colspan="3">
+                                <div class="cell" v-if="form.wmsUserReceiveAddress">
+                                  {{ form.wmsUserReceiveAddress.receiveName }}，
+                                  {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
+                                  {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">取料人员：</div>
+                              </td>
+                              <td colspan="3">
+                                <div
+                                  class="cell"
+                                  v-if="form.wmsUser"
+                                >{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -324,32 +479,72 @@
                   </el-row>
                   <el-row style="margin-top: 10px">
                     <el-card>
-                      <div slot="header"><el-tag type="success" effect="plain">配送</el-tag></div>
+                      <div slot="header">
+                        <el-tag type="success" effect="plain">配送</el-tag>
+                      </div>
                       <div class="el-table el-table--enable-row-hover el-table--medium">
                         <table cellspacing="0" style="width: 100%;">
                           <tbody>
-                          <tr>
-                            <td><div class="cell">运单编号：</div></td>
-                            <td><div class="cell" v-if="form">{{ form.orderNo }}</div></td>
-                            <td><div class="cell">配送方式：</div></td>
-                            <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">客户名称：</div></td>
-                            <td><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div></td>
-                            <td><div class="cell">配送时间：</div></td>
-                            <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}')  }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">配送信息：</div></td>
-                            <td colspan="3"><div class="cell" v-if="form.wmsUserReceiveAddress">{{ form.wmsUserReceiveAddress.receiveName }}，
-                              {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
-                              {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}</div></td>
-                          </tr>
-                          <tr>
-                            <td><div class="cell">配送人员：</div></td>
-                            <td colspan="3"><div class="cell" v-if="form.wmsUser">{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div></td>
-                          </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">运单编号：</div>
+                              </td>
+                              <td>
+                                <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                              </td>
+                              <td>
+                                <div class="cell">配送方式：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form"
+                                >{{ formatOrderPayType(form.orderPayType) }}</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">客户名称：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form.wmsUser"
+                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                              </td>
+                              <td>
+                                <div class="cell">配送时间：</div>
+                              </td>
+                              <td>
+                                <div
+                                  class="cell"
+                                  v-if="form"
+                                >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">配送信息：</div>
+                              </td>
+                              <td colspan="3">
+                                <div class="cell" v-if="form.wmsUserReceiveAddress">
+                                  {{ form.wmsUserReceiveAddress.receiveName }}，
+                                  {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
+                                  {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <div class="cell">配送人员：</div>
+                              </td>
+                              <td colspan="3">
+                                <div
+                                  class="cell"
+                                  v-if="form.wmsUser"
+                                >{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div>
+                              </td>
+                            </tr>
                           </tbody>
                         </table>
                       </div>
@@ -360,14 +555,28 @@
                   <div class="el-table el-table--enable-row-hover el-table--medium">
                     <table cellspacing="0" style="width: 100%;">
                       <tbody>
-                      <tr>
-                        <td width="125"><div class="cell">开票抬头：</div></td>
-                        <td><div class="cell" v-if="form">{{ formatOrderPayType(form.orderPayType) }}</div></td>
-                      </tr>
-                      <tr>
-                        <td width="125"><div class="cell">开票税号：</div></td>
-                        <td><div class="cell" v-if="form">{{  parseTime(form.orderExpectTime, '{y}-{m}-{d}')  }}</div></td>
-                      </tr>
+                        <tr>
+                          <td width="125">
+                            <div class="cell">开票抬头：</div>
+                          </td>
+                          <td>
+                            <div
+                              class="cell"
+                              v-if="form"
+                            >{{ formatOrderPayType(form.orderPayType) }}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td width="125">
+                            <div class="cell">开票税号：</div>
+                          </td>
+                          <td>
+                            <div
+                              class="cell"
+                              v-if="form"
+                            >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -381,24 +590,115 @@
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
+
+    <!-- 对话框-start -->
+    <div class="order-dialog">
+      <!-- 取料分配配送员-dialog -->
+      <el-dialog title="选择配送员" :visible.sync="pickerVisible" width="400px" center>
+        <div class="relationVisibleMain">
+          <div class="relationVisibleMain-top">
+            <el-input placeholder="请输入工号/姓名" v-model="pickerSearchKey" clearable></el-input>
+
+            <el-button
+              class="search-button"
+              type="primary"
+              icon="el-icon-search"
+              size="medium"
+              @click="getPickerList()"
+            >查询</el-button>
+          </div>
+          <div class="mid" v-if="pickerList.length > 0">
+            <div class="item" v-for="(item,index) in pickerList" :key="index">
+              <div class="left">
+                <el-radio
+                  v-model="selelctPickerId"
+                  :label="item.userId"
+                  @change="selectPicker(item)"
+                >
+                  <span class="left-value">
+                    <span>{{item.nickName}}</span>
+                    <span v-if="item.jobNumber">/{{item.jobNumber}}</span>
+                  </span>
+                </el-radio>
+              </div>
+            </div>
+          </div>
+          <div class="mid mid-no" v-else>
+            <span>暂无数据</span>
+          </div>
+          <div slot="footer" class="dialog-footer bottom">
+            <el-button class="opt-button" size="medium" @click="cancelPicker()">取消</el-button>
+            <el-button class="opt-button" type="primary" size="medium" @click="confirmPicker()">确认</el-button>
+          </div>
+        </div>
+      </el-dialog>
+
+
+      
+
+      <!-- 订单是否取料检测组件 -->
+      <isPickDialog ref="isPickDialogRef" :title="dialogTitle" :visible="isPickVisible" :isPickList="isPickList"></isPickDialog>
+    </div>
+    <!-- 对话框-end -->
   </div>
 </template>
 
 <script>
-import { listOrder, getOrder, delOrder, addOrder, updateOrder, exportOrder } from "@/api/module/production/oms/order/order";
-
+import {
+  listOrder,
+  getOrder,
+  delOrder,
+  addOrder,
+  updateOrder,
+  exportOrder,
+  getPickers,
+  mergeOrder,
+  confirmOrder
+} from "@/api/module/production/oms/order/order";
+import isPickDialog from "./components/isPickDialog";
 export default {
   name: "Order",
   components: {
+    isPickDialog
   },
   data() {
     return {
+      dialogTitle:'',
+      isSingle: false, // 是否单选
+      pickerVisible: false, // 取料对话框
+      pickerList: [], // 取料员list
+      pickerSearchKey: "", //取料查询关键字
+      selelctPickerId: "", // 选择的配送员ID
+      isPickVisible: false, // 检测是否已取料
+      isPickList: [
+        {
+          date: "123",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          date: "234",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          date: "567",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          date: "2345",
+          name: "王小虎",
+          address: "上海市普陀区金沙江路 1518 弄"
+        }
+      ],
       // 订单详细初始激活标签
-      activeName: 'order',
+      activeName: "order",
       // 遮罩层
       loading: true,
       // 选中数组
       ids: [],
+      selectOrderList: [], // 选中的订单数组
       // 非单个禁用
       single: true,
       // 非多个禁用
@@ -425,13 +725,13 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        orderByColumn: 'orderCreateTime',
-        isAsc: 'desc',
+        orderByColumn: "orderCreateTime",
+        isAsc: "desc",
         orderStatus: null,
         orderNo: null,
         userName: null,
         wxappPhone: null,
-        orderCreateTime: null,
+        orderCreateTime: null
       },
       // 表单参数
       form: {},
@@ -462,7 +762,11 @@ export default {
           { required: true, message: "订单数量不能为空", trigger: "blur" }
         ],
         orderDeliveryType: [
-          { required: true, message: "订单配送方式：1->自送自取；2->上门取料不能为空", trigger: "change" }
+          {
+            required: true,
+            message: "订单配送方式：1->自送自取；2->上门取料不能为空",
+            trigger: "change"
+          }
         ],
         orderExpectTime: [
           { required: true, message: "订单期望时间不能为空", trigger: "blur" }
@@ -478,11 +782,16 @@ export default {
         ],
         orderFreightAmount: [
           { required: true, message: "运费金额不能为空", trigger: "blur" }
-        ],
+        ]
       }
     };
   },
+  mounted() {
+    console.log('mounted')
+  },
   created() {
+    console.log('created')
+
     this.getList();
     this.getDicts("oms_order_status").then(response => {
       this.orderStatusOptions = response.data;
@@ -492,14 +801,15 @@ export default {
     });
     this.getDicts("oms_pay_type").then(response => {
       this.orderPayTypeOptions = response.data;
-    })
+    });
   },
   // 订单金额过滤器
   filters: {
     money(value) {
       if (!value) return "0.00";
       const intPart = Number(value).toFixed(0); //获取整数部分
-      const intPartFormat = intPart.toString()
+      const intPartFormat = intPart
+        .toString()
         .replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"); //将整数部分逢三一断
       let floatPart = ".00"; //预定义小数部分
       const value2Array = value.toString().split(".");
@@ -521,20 +831,22 @@ export default {
     /** 查询wxapp端订单列表 */
     getList() {
       this.loading = true;
-      listOrder(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-        this.orderList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+      listOrder(this.addDateRange(this.queryParams, this.dateRange)).then(
+        response => {
+          this.orderList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        }
+      );
     },
     // 取消按钮
     cancel() {
-      this.activeName =  'order';
+      this.activeName = "order";
       this.open = false;
       this.reset();
     },
     handleClose() {
-      this.activeName =  'order';
+      this.activeName = "order";
       this.open = false;
       this.reset();
     },
@@ -587,13 +899,13 @@ export default {
     },
     // 步骤条状态激活
     formatStepStatus(value) {
-      if (value === '2') {
+      if (value === "2") {
         // 运单待开始
         return 2;
-      }else if (value === '3') {
+      } else if (value === "3") {
         // 运单工作中
         return 3;
-      } else if (value === '4') {
+      } else if (value === "4") {
         // 运单已完成
         return 4;
       } else {
@@ -606,16 +918,19 @@ export default {
       return this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
     },
     // 运单状态格式化
-    formatOrderStatus(value){
+    formatOrderStatus(value) {
       return this.selectDictLabel(this.orderStatusOptions, value);
     },
     // 订单支付类型格式化
-    formatOrderPayType(value){
+    formatOrderPayType(value) {
       return this.selectDictLabel(this.orderPayTypeOptions, value);
     },
     // 订单配送方式字典翻译
     orderDeliveryTypeFormat(row, column) {
-      return this.selectDictLabel(this.orderDeliveryOptions, row.orderDeliveryType);
+      return this.selectDictLabel(
+        this.orderDeliveryOptions,
+        row.orderDeliveryType
+      );
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -630,9 +945,27 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.pkid)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
+      // this.ids = selection.map(item => item.pkid)
+      // this.single = selection.length!==1
+      // this.multiple = !selection.length
+      // this.selectOrderList = selection.map(item => item.pkid);
+      this.selectOrderList = selection;
+      console.log(this.selectOrderList);
+    },
+    // 取消已取料的订单
+    cancelSelected(e) {
+      console.log("e", e);
+      // this.$refs.dataTable.clearSelection;
+      this.selectOrderList = this.selectOrderList.filter(item => {
+        this.$refs.dataTable.toggleRowSelection(item, false);
+        return e.indexOf(item.orderNo) < 0;
+      });
+      this.selectOrderList.map(item => {
+        this.$nextTick(() => {
+          this.$refs.dataTable.toggleRowSelection(item, true);
+        });
+      });
+      console.log(this.selectOrderList);
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -643,7 +976,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const pkid = row.pkid || this.ids
+      const pkid = row.pkid || this.ids;
       getOrder(pkid).then(response => {
         this.form = response.data;
         this.open = true;
@@ -673,30 +1006,284 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除wxapp端订单编号为"' + pkids + '"的数据项?', "警告", {
+      this.$confirm(
+        '是否确认删除wxapp端订单编号为"' + pkids + '"的数据项?',
+        "警告",
+        {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
-        }).then(function() {
+        }
+      )
+        .then(function() {
           return delOrder(pkids);
-        }).then(() => {
+        })
+        .then(() => {
           this.getList();
           this.msgSuccess("删除成功");
-        })
+        });
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有wxapp端订单数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
+      this.$confirm("是否确认导出所有wxapp端订单数据项?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(function() {
           return exportOrder(queryParams);
-        }).then(response => {
-          this.download(response.msg);
         })
+        .then(response => {
+          this.download(response.msg);
+        });
+    },
+    /** 获取配送员*/
+    getPickerList() {
+      // this.loading = true;
+      let params = {
+        userKey: this.pickerSearchKey || ""
+      };
+      getPickers(params).then(res => {
+        if (res.code == 200) {
+          this.pickerList = res.data;
+        }
+      });
+    },
+    // 取料
+    pickOrder(e) {
+      this.selectOrderList = [e];
+      this.pickerVisible = true;
+      this.isSingle = true;
+      this.getPickerList();
+    },
+    // 合并取料
+    mergeOrders() {
+      this.isSingle = false;
+      console.log('this.queryParams.orderStatus', this.queryParams.orderStatus)
+      if(this.queryParams.orderStatus != 2) {
+         return this.$message({
+          type: "warning",
+          message: "请先筛选出待取料订单!"
+        });
+      }
+      if (this.selectOrderList.length == 0) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择订单!"
+        });
+      }
+      this.pickerVisible = true;
+      this.getPickerList();
+      // this.getPickerList()
+      // this.isPickVisible = true
+      // this.$refs.isPickDialogRef.open()
+      // this.mergeOrderApi()
+    },
+
+    // 取料单选
+    mergeOrderApiSingle() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        deliveryUserPkid: this.selelctPickerId,
+        orderPkids: orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+
+      mergeOrder(params).then(res => {
+        if (res.code == 200) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        } else if (res.code == 422) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.$message({
+            type: "warning",
+            message: `此订单${res.msg}已经取过料!`
+          });
+        } else {
+          this.$message({
+            type: "fail",
+            message: "操作失败!"
+          });
+        }
+      });
+    },
+    // 合并取料-api
+    mergeOrderApi() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        deliveryUserPkid: this.selelctPickerId,
+        orderPkids: orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+
+      mergeOrder(params).then(res => {
+        if (res.code == 200) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+           this.handleQuery();
+        } else if (res.code == 422) {
+          this.dialogTitle = '已取料订单'
+          let orderList = res.msg.split(",");
+          this.isPickList = orderList.map(res => {
+            return {
+              id: res,
+              statusText: "已取料"
+            };
+          });
+          this.$refs.isPickDialogRef.open();
+        } else {
+          this.$message({
+            type: "fail",
+            message: "操作失败!"
+          });
+        }
+      });
+    },
+    // 选择配送员
+    selectPicker(item) {
+      this.selelctPickerId = item.userId;
+    },
+    // 取消配送弹框
+    cancelPicker() {
+      this.pickerVisible = false;
+    },
+    // 确认配送弹框
+    confirmPicker() {
+      // this.pickerVisible = false
+
+      if (this.selectOrderList.length == 0) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择订单!"
+        });
+      }
+      if (!this.selelctPickerId) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择配送员!"
+        });
+      }
+
+      if (this.isSingle) {
+        this.isSingle = false;
+        this.mergeOrderApiSingle();
+      } else {
+        this.isSingle = false;
+
+        this.mergeOrderApi();
+      }
+    },
+    // 确认接单
+    confirmOrderApi(e) {
+      let orderPkids = e.map(item => item.pkid);
+      let params = {
+        orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      console.log("params", params, this.$store);
+      confirmOrder(params).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+          this.handleQuery();
+        } else if(res.code == 422) {
+           this.dialogTitle = '已确认订单'
+          let orderList = res.msg.split(",");
+          this.isPickList = orderList.map(res => {
+            return {
+              id: res,
+              statusText: "已确认"
+            };
+          });
+          this.$refs.isPickDialogRef.open();
+        }
+      });
+    },
+    // 单个确认接单
+    confirmOrderApiSingle(e) {
+      let orderPkids = e.map(item => item.pkid);
+      let params = {
+        orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      console.log("params", params, this.$store);
+      confirmOrder(params).then(res => {
+        if (res.code == 200) {
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+          this.handleQuery();
+        }
+      });
+    },
+    // 单个确认订单按钮
+    confirmOrderSingle(e) {
+      this.$confirm(`是否确认此订单${e.orderNo}?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.confirmOrderApiSingle([e]);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+    // 批量确认订单按钮
+    confirmOrders() {
+        if(this.queryParams.orderStatus != 4) {
+         return this.$message({
+          type: "warning",
+          message: "请先筛选出待确认订单!"
+        });
+      }
+      if (this.selectOrderList.length == 0) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择订单!"
+        });
+      }
+
+       this.$confirm(`是否确认订单?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+           this.confirmOrderApi(this.selectOrderList);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+
+    
     }
   }
 };
 </script>
+<style rel="stylesheet/scss" lang="scss">
+</style>

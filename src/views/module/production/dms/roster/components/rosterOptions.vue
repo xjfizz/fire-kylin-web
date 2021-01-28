@@ -111,7 +111,7 @@
               @click="getProducterList()"
             >查询</el-button>
           </div>
-          <div class="mid">
+          <div class="mid" v-if="producerList.length > 0">
             <div class="item" v-for="(item,index) in producerList" :key="index">
               <div class="left">
                 <el-radio
@@ -130,6 +130,9 @@
                 <span>阿丹/01</span>
               </div>-->
             </div>
+          </div>
+           <div class="mid mid-no" v-else>
+            <span>暂无数据</span>
           </div>
           <div slot="footer" class="dialog-footer bottom">
             <el-button class="opt-button" size="medium" @click="cancelRelation()">取消</el-button>
@@ -562,6 +565,13 @@ export default {
         .search-button {
           margin-left: 10px;
         }
+      }
+       .mid-no{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 15px;
+        color: #999999;
       }
       .mid {
         margin-top: 10px;

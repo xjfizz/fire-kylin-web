@@ -51,3 +51,30 @@ export function exportOrder(query) {
     params: query
   })
 }
+
+// 获取配送员
+export function getPickers(query) {
+  return request({
+    url: '/system/user/queryListDpUser',
+    method: 'get',
+    params: query
+  })
+}
+
+// 合并取料
+export function mergeOrder(data) {
+  return request({
+    url: '/oms/web/order/combinedReclaim',
+    method: 'post',
+    data: data
+  })
+}
+
+// 确认接单
+export function confirmOrder(data) {
+  return request({
+    url: '/oms/web/order/combinedConfirmOrder',
+    method: 'put',
+    data: data
+  })
+}
