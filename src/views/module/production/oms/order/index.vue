@@ -7,7 +7,7 @@
       v-show="showSearch"
       label-width="68px"
     >
-      <el-form-item label="订单状态" prop="orderStatus">
+    <el-form-item label="订单状态" prop="orderStatus">
         <el-select
           v-model="queryParams.orderStatus"
           placeholder="请选择订单状态"
@@ -18,7 +18,7 @@
           <el-option
             v-for="dict in orderStatusOptions"
             :key="dict.dictValue"
-            :label="dict.dictLabel"
+            :label="dict.dictValue == 10 ? (queryParams.orderDeliveryType == 1 ? '待取货' : '待配送') : dict.dictLabel"
             :value="dict.dictValue"
           />
         </el-select>
@@ -28,7 +28,6 @@
         <el-select
           v-model="queryParams.orderDeliveryType"
           placeholder="请选择配送方式"
-          clearable
           size="small"
           style="width: 240px"
         >
