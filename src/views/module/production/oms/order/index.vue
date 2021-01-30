@@ -23,6 +23,23 @@
           />
         </el-select>
       </el-form-item>
+      
+      <el-form-item label="配送方式" prop="orderDeliveryType">
+        <el-select
+          v-model="queryParams.orderDeliveryType"
+          placeholder="请选择配送方式"
+          clearable
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderDeliveryOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="订单编号" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
@@ -84,8 +101,7 @@
           plain
           icon="el-icon-s-goods"
           size="mini"
-          @click
-          v-hasPermi="['oms:order:export']"
+          @click="sendOrders()"
         >合并配送</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -148,13 +164,13 @@
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="180">
+      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
-           <el-button
+          <el-button
             size="mini"
             type="text"
             icon="el-icon-printer"
-            @click="handleUpdate(scope.row)"
+            @click="printOrder(scope.row)"
           >打印</el-button>
           <el-button
             size="mini"
@@ -200,11 +216,26 @@
           <el-button
             size="mini"
             type="text"
+            style="color: #f8ac59"
+            icon="el-icon-search"
+            @click="checkOrder(scope.row)"
+            v-show="scope.row.orderStatus === '8'"
+          >检测</el-button>
+           <el-button
+            size="mini"
+            type="text"
+            style="color: #f8ac59"
+            icon="el-icon-truck"
+            @click="pickedGoods(scope.row)"
+            v-show="scope.row.orderStatus === '10' && scope.row.orderDeliveryType == 1"
+          >已取货</el-button>
+          <el-button
+            size="mini"
+            type="text"
             style="color: indianred"
             icon="el-icon-s-promotion"
-            @click="handleDelete(scope.row)"
-            v-show="scope.row.orderStatus === '9'"
-            v-hasPermi="['oms:order:remove']"
+            @click="sendOrder(scope.row)"
+            v-show="scope.row.orderStatus === '10' && scope.row.orderDeliveryType == 2"
           >配送</el-button>
         </template>
       </el-table-column>
@@ -683,6 +714,52 @@
         </div>
       </el-dialog>
 
+
+        <!-- 检测员分配-dialog -->
+      <el-dialog title="选择检测员" :visible.sync="checkerVisible" width="400px" center>
+        <div class="relationVisibleMain">
+          <div class="relationVisibleMain-top">
+            <el-input placeholder="请输入工号/姓名" v-model="checkerSearchKey" clearable></el-input>
+
+            <el-button
+              class="search-button"
+              type="primary"
+              icon="el-icon-search"
+              size="medium"
+              @click="getCheckerList()"
+            >查询</el-button>
+          </div>
+          <div class="mid" v-if="checkerList.length > 0">
+            <div class="item" v-for="(item,index) in checkerList" :key="index">
+              <div class="left">
+                <el-radio
+                  v-model="selelctCheckerId"
+                  :label="item.userId"
+                  @change="selectChecker(item)"
+                >
+                  <span class="left-value">
+                    <span>{{item.nickName}}</span>
+                    <span v-if="item.jobNumber">/{{item.jobNumber}}</span>
+                  </span>
+                </el-radio>
+              </div>
+            </div>
+          </div>
+          <div class="mid mid-no" v-else>
+            <span>暂无数据</span>
+          </div>
+          <div slot="footer" class="dialog-footer bottom">
+            <el-button class="opt-button" size="medium" @click="cancelChecker()">取消</el-button>
+            <el-button
+              class="opt-button"
+              type="primary"
+              size="medium"
+              @click="confirmChecker()"
+            >确认</el-button>
+          </div>
+        </div>
+      </el-dialog>
+
       <!-- 订单是否取料检测组件 -->
       <isPickDialog
         ref="isPickDialogRef"
@@ -690,6 +767,9 @@
         :visible="isPickVisible"
         :isPickList="isPickList"
       ></isPickDialog>
+
+      <!-- 打印组件 -->
+      <orderPrint ref="orderPrintRef" :title="printDialogTitle"></orderPrint>
     </div>
     <!-- 对话框-end -->
   </div>
@@ -708,26 +788,37 @@ import {
   confirmOrder,
   getProducters,
   listRoster,
-  orderRosterProduct
+  orderRosterProduct,
+  getCheckerListApi,
+  orderAssignChecker,
+  orderAssignSender
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
+import orderPrint from "@/components/Print/order-print";
 export default {
   name: "Order",
   components: {
-    isPickDialog
+    isPickDialog,
+    orderPrint
   },
   data() {
     return {
       dialogTitle: "",
+      printDialogTitle: "订单打印", //订单打印
       isSingle: false, // 是否单选
       pickerVisible: false, // 取料对话框
       producterVisible: false, // 生产员对话框
+      checkerVisible: false, // 检测员对话框
+      orderPrintVisible: false, // 打印弹框
       pickerList: [], // 取料员list
+      checkerList: [], // 检测员list
       pickerSearchKey: "", //取料查询关键字
+      checkerSearchKey: "", //检测查询关键字
       producterSearchKey: "", // 生产员关键字查询
       producterList: [], // 生产员list
       selelctPickerId: "", // 选择的配送员ID
       selelctProducterId: "", // 选择生产员ID
+      selelctCheckerId: "", // 选择检测员ID
       isPickVisible: false, // 检测是否已取料
       isPickList: [
         {
@@ -787,6 +878,7 @@ export default {
         orderByColumn: "orderCreateTime",
         isAsc: "desc",
         orderStatus: null,
+        orderDeliveryType:'2',
         orderNo: null,
         userName: null,
         wxappPhone: null,
@@ -988,7 +1080,7 @@ export default {
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
-      return this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
+      return row.orderDeliveryType == 1 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
     },
     // 运单状态格式化
     formatOrderStatus(value) {
@@ -1142,6 +1234,13 @@ export default {
       this.isSingle = true;
       this.getPickerList();
     },
+     // 配送
+    sendOrder(e) {
+      this.selectOrderList = [e];
+      this.pickerVisible = true;
+      this.isSingle = true;
+      this.getPickerList();
+    },
     // 合并取料
     mergeOrders() {
       this.isSingle = false;
@@ -1160,10 +1259,24 @@ export default {
       }
       this.pickerVisible = true;
       this.getPickerList();
-      // this.getPickerList()
-      // this.isPickVisible = true
-      // this.$refs.isPickDialogRef.open()
-      // this.mergeOrderApi()
+    },
+       // 合并配送
+    sendOrders() {
+      this.isSingle = false;
+      if (this.queryParams.orderStatus != 10) {
+        return this.$message({
+          type: "warning",
+          message: "请先筛选出待配送订单!"
+        });
+      }
+      if (this.selectOrderList.length == 0) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择订单!"
+        });
+      }
+      this.pickerVisible = true;
+      this.getPickerList();
     },
 
     // 取料单选
@@ -1192,6 +1305,42 @@ export default {
           this.$message({
             type: "warning",
             message: `此订单${res.msg}已经取过料!`
+          });
+        } else {
+          this.$message({
+            type: "fail",
+            message: "操作失败!"
+          });
+        }
+      });
+    },
+
+     // 配送单选
+    sendOrderApiSingle() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        deliveryUserPkid: this.selelctPickerId,
+        orderPkids: orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+
+      orderAssignSender(params).then(res => {
+        if (res.code == 200) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        } else if (res.code == 422) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.$message({
+            type: "warning",
+            message: `此订单${res.msg}已分配配送员!`
           });
         } else {
           this.$message({
@@ -1238,6 +1387,45 @@ export default {
         }
       });
     },
+
+     // 合并配送-api
+    sendOrderApi() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        deliveryUserPkid: this.selelctPickerId,
+        orderPkids: orderPkids,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+
+      orderAssignSender(params).then(res => {
+        if (res.code == 200) {
+          this.selelctPickerId = "";
+          this.selectOrderList = [];
+          this.pickerVisible = false;
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+          this.handleQuery();
+        } else if (res.code == 422) {
+          this.dialogTitle = "已配送订单";
+          let orderList = res.msg.split(",");
+          this.isPickList = orderList.map(res => {
+            return {
+              id: res,
+              statusText: "已配送"
+            };
+          });
+          this.$refs.isPickDialogRef.open();
+        } else {
+          this.$message({
+            type: "fail",
+            message: "操作失败!"
+          });
+        }
+      });
+    },
+
     // 选择配送员
     selectPicker(item) {
       this.selelctPickerId = item.userId;
@@ -1246,6 +1434,10 @@ export default {
     selectProducter(item) {
       this.selelctProducterId = item.userId;
     },
+    // 选择检测员
+    selectChecker(item) {
+      this.selelctCheckerId = item.userId;
+    },
     // 取消配送弹框
     cancelPicker() {
       this.pickerVisible = false;
@@ -1253,6 +1445,10 @@ export default {
     // 取消生产员对话框
     cancelProducter() {
       this.producterVisible = false;
+    },
+       // 取消检测员对话框
+    cancelChecker() {
+      this.checkerVisible = false;
     },
     // 确认配送弹框
     confirmPicker() {
@@ -1273,24 +1469,24 @@ export default {
 
       if (this.isSingle) {
         this.isSingle = false;
-        this.mergeOrderApiSingle();
+        if(this.selectOrderList[0].orderStatus == 2){  // 待取料
+           this.mergeOrderApiSingle();
+        } else if(this.selectOrderList[0].orderStatus == 10) { // 待配送
+           this.sendOrderApiSingle();
+        }
+       
       } else {
-        this.isSingle = false;
-
-        this.mergeOrderApi();
-      }
+         this.isSingle = false;
+         if(this.selectOrderList[0].orderStatus == 2){  // 待取料
+             this.mergeOrderApi();
+        } else if(this.selectOrderList[0].orderStatus == 10) { // 待配送
+           this.sendOrderApi();
+        }
+     }
     },
     // 确认配送弹框
     confirmProducter() {
-      // this.pickerVisible = false
-
-      // if (this.selectOrderList.length == 0) {
-      //   return this.$message({
-      //     type: "warning",
-      //     message: "请先选择订单!"
-      //   });
-      // }
-      if (!this.selelctProducterId) {
+     if (!this.selelctProducterId) {
         return this.$message({
           type: "warning",
           message: "请先选择生产员!"
@@ -1298,6 +1494,17 @@ export default {
       }
 
       this.rosterOrderApi();
+    },
+     // 确认配送弹框
+    confirmChecker() {
+     if (!this.selelctCheckerId) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择检测员!"
+        });
+      }
+
+      this.confirmCheckerApi();
     },
     // 单个排班api
     rosterOrderApi() {
@@ -1317,6 +1524,36 @@ export default {
           this.$message({
             type: "success",
             message: "操作成功!"
+          });
+        }
+      });
+    },
+
+     // 单个排班api
+    confirmCheckerApi() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        orderPkids,
+        inspectionUserPkid: this.selelctCheckerId,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      orderAssignChecker(params).then(res => {
+        if (res.code == 200) {
+          this.checkerVisible = false;
+          this.selelctCheckerId = "";
+          this.selectOrderList = [];
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        } else if(res.code == 422) {
+          this.checkerVisible = false;
+          this.selelctCheckerId = "";
+          this.selectOrderList = [];
+          this.$message({
+            type: "warning",
+            message: `此订单${res.msg}已经分配检测员!`
           });
         }
       });
@@ -1442,7 +1679,30 @@ export default {
           }
         }
       });
-    }
+    },
+    // 点击打印
+    printOrder(e) {
+      this.$refs.orderPrintRef.open(e);
+    },
+    // 分配检测员
+    checkOrder(e) {
+      this.selectOrderList = [e];
+      this.checkerVisible = true
+      this.getCheckerList();
+    },
+
+    /** 获取检测员 */
+     getCheckerList() {
+      // this.loading = true;
+      let params = {
+        userKey: this.checkerSearchKey || ""
+      };
+      getCheckerListApi(params).then(res => {
+        if (res.code == 200) {
+          this.checkerList = res.data;
+        }
+      });
+    },
   }
 };
 </script>

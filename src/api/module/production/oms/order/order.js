@@ -70,6 +70,15 @@ export function getProducters(query) {
   })
 }
 
+// 获取检测员
+export function getCheckerListApi(query) {
+  return request({
+    url: '/system/user/queryListIpUser',
+    method: 'get',
+    params: query
+  })
+}
+
 
 // 合并取料
 export function mergeOrder(data) {
@@ -102,6 +111,36 @@ export function listRoster(query) {
 export function orderRosterProduct(data) {
   return request({
     url: '/oms/web/order/assignOrder',
+    method: 'post',
+    data: data
+  })
+}
+
+
+// 查询设备排班列表
+export function orderPrint(data) {
+  return request({
+    url: '/oms/web/order/orderPrint',
+    method: 'get',
+    params: data
+  })
+}
+
+
+// 分配检测员
+export function orderAssignChecker(data) {
+  return request({
+    url: '/oms/web/order/assignOrderInspectors',
+    method: 'post',
+    data: data
+  })
+}
+
+
+// 分配配送员
+export function orderAssignSender(data) {
+  return request({
+    url: '/oms/web/order/assignOrderDelivery',
     method: 'post',
     data: data
   })

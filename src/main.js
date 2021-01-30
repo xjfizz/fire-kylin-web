@@ -20,6 +20,8 @@ import { parseTime, resetForm, addDateRange, selectDictLabel, selectDictLabels, 
 import Pagination from "@/components/Pagination";
 // 自定义表格工具扩展
 import RightToolbar from "@/components/RightToolbar"
+// 打印插件
+import Print from 'vue-print-nb'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -49,6 +51,7 @@ Vue.component('Pagination', Pagination)
 Vue.component('RightToolbar', RightToolbar)
 
 Vue.use(permission)
+Vue.use(Print);
 
 /**
  * If you don't want to use mock-server
