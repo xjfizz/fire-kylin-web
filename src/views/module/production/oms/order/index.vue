@@ -7,7 +7,7 @@
       v-show="showSearch"
       label-width="68px"
     >
-    <el-form-item label="订单状态" prop="orderStatus">
+      <el-form-item label="订单状态" prop="orderStatus">
         <el-select
           v-model="queryParams.orderStatus"
           placeholder="请选择订单状态"
@@ -23,7 +23,7 @@
           />
         </el-select>
       </el-form-item>
-      
+
       <el-form-item label="配送方式" prop="orderDeliveryType">
         <el-select
           v-model="queryParams.orderDeliveryType"
@@ -220,7 +220,7 @@
             @click="checkOrder(scope.row)"
             v-show="scope.row.orderStatus === '8'"
           >检测</el-button>
-           <el-button
+          <el-button
             size="mini"
             type="text"
             style="color: #f8ac59"
@@ -713,8 +713,7 @@
         </div>
       </el-dialog>
 
-
-        <!-- 检测员分配-dialog -->
+      <!-- 检测员分配-dialog -->
       <el-dialog title="选择检测员" :visible.sync="checkerVisible" width="400px" center>
         <div class="relationVisibleMain">
           <div class="relationVisibleMain-top">
@@ -749,12 +748,7 @@
           </div>
           <div slot="footer" class="dialog-footer bottom">
             <el-button class="opt-button" size="medium" @click="cancelChecker()">取消</el-button>
-            <el-button
-              class="opt-button"
-              type="primary"
-              size="medium"
-              @click="confirmChecker()"
-            >确认</el-button>
+            <el-button class="opt-button" type="primary" size="medium" @click="confirmChecker()">确认</el-button>
           </div>
         </div>
       </el-dialog>
@@ -790,7 +784,8 @@ import {
   orderRosterProduct,
   getCheckerListApi,
   orderAssignChecker,
-  orderAssignSender
+  orderAssignSender,
+  orderPicked
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
@@ -877,7 +872,7 @@ export default {
         orderByColumn: "orderCreateTime",
         isAsc: "desc",
         orderStatus: null,
-        orderDeliveryType:'2',
+        orderDeliveryType: "2",
         orderNo: null,
         userName: null,
         wxappPhone: null,
@@ -1079,7 +1074,8 @@ export default {
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
-      return row.orderDeliveryType == 1 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
+      return  row.orderStatus == 10 ? (row.orderDeliveryType == 1 ? '待取货' : '待配送') : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
+   
     },
     // 运单状态格式化
     formatOrderStatus(value) {
@@ -1233,7 +1229,7 @@ export default {
       this.isSingle = true;
       this.getPickerList();
     },
-     // 配送
+    // 配送
     sendOrder(e) {
       this.selectOrderList = [e];
       this.pickerVisible = true;
@@ -1259,7 +1255,7 @@ export default {
       this.pickerVisible = true;
       this.getPickerList();
     },
-       // 合并配送
+    // 合并配送
     sendOrders() {
       this.isSingle = false;
       if (this.queryParams.orderStatus != 10) {
@@ -1314,7 +1310,7 @@ export default {
       });
     },
 
-     // 配送单选
+    // 配送单选
     sendOrderApiSingle() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
@@ -1387,7 +1383,7 @@ export default {
       });
     },
 
-     // 合并配送-api
+    // 合并配送-api
     sendOrderApi() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
@@ -1445,7 +1441,7 @@ export default {
     cancelProducter() {
       this.producterVisible = false;
     },
-       // 取消检测员对话框
+    // 取消检测员对话框
     cancelChecker() {
       this.checkerVisible = false;
     },
@@ -1468,24 +1464,27 @@ export default {
 
       if (this.isSingle) {
         this.isSingle = false;
-        if(this.selectOrderList[0].orderStatus == 2){  // 待取料
-           this.mergeOrderApiSingle();
-        } else if(this.selectOrderList[0].orderStatus == 10) { // 待配送
-           this.sendOrderApiSingle();
+        if (this.selectOrderList[0].orderStatus == 2) {
+          // 待取料
+          this.mergeOrderApiSingle();
+        } else if (this.selectOrderList[0].orderStatus == 10) {
+          // 待配送
+          this.sendOrderApiSingle();
         }
-       
       } else {
-         this.isSingle = false;
-         if(this.selectOrderList[0].orderStatus == 2){  // 待取料
-             this.mergeOrderApi();
-        } else if(this.selectOrderList[0].orderStatus == 10) { // 待配送
-           this.sendOrderApi();
+        this.isSingle = false;
+        if (this.selectOrderList[0].orderStatus == 2) {
+          // 待取料
+          this.mergeOrderApi();
+        } else if (this.selectOrderList[0].orderStatus == 10) {
+          // 待配送
+          this.sendOrderApi();
         }
-     }
+      }
     },
     // 确认配送弹框
     confirmProducter() {
-     if (!this.selelctProducterId) {
+      if (!this.selelctProducterId) {
         return this.$message({
           type: "warning",
           message: "请先选择生产员!"
@@ -1494,9 +1493,9 @@ export default {
 
       this.rosterOrderApi();
     },
-     // 确认配送弹框
+    // 确认配送弹框
     confirmChecker() {
-     if (!this.selelctCheckerId) {
+      if (!this.selelctCheckerId) {
         return this.$message({
           type: "warning",
           message: "请先选择检测员!"
@@ -1528,7 +1527,7 @@ export default {
       });
     },
 
-     // 单个排班api
+    // 单个排班api
     confirmCheckerApi() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
@@ -1546,7 +1545,7 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-        } else if(res.code == 422) {
+        } else if (res.code == 422) {
           this.checkerVisible = false;
           this.selelctCheckerId = "";
           this.selectOrderList = [];
@@ -1686,12 +1685,12 @@ export default {
     // 分配检测员
     checkOrder(e) {
       this.selectOrderList = [e];
-      this.checkerVisible = true
+      this.checkerVisible = true;
       this.getCheckerList();
     },
 
     /** 获取检测员 */
-     getCheckerList() {
+    getCheckerList() {
       // this.loading = true;
       let params = {
         userKey: this.checkerSearchKey || ""
@@ -1702,6 +1701,39 @@ export default {
         }
       });
     },
+    // 已取货
+    pickedGoods(e) {
+      this.$confirm(`确认订单${e.orderNo}已取货?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.pickedGoodsApi(e);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+    // 已取货-api
+    pickedGoodsApi(e) {
+      let params = {
+        orderPkid: e.pkid,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      orderPicked(params).then(res => {
+        if (res.code == 200) {
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        }
+      });
+    }
   }
 };
 </script>

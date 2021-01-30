@@ -145,3 +145,12 @@ export function orderAssignSender(data) {
     data: data
   })
 }
+
+// 已取货
+export function orderPicked(data) {
+  return request({
+    url: '/oms/web/order/pickedUp',
+    method: 'put',
+    data: data
+  })
+}
