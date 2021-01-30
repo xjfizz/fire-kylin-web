@@ -18,7 +18,7 @@
           <el-option
             v-for="dict in orderStatusOptions"
             :key="dict.dictValue"
-            :label="dict.dictValue == 10 ? (queryParams.orderDeliveryType == 1 ? '待取货' : '待配送') : dict.dictLabel"
+            :label="queryParams.orderDeliveryType == 1 ? (dict.dictValue == 12 ? '待取货' : dict.dictLabel) : dict.dictLabel"
             :value="dict.dictValue"
           />
         </el-select>
@@ -137,7 +137,11 @@
       <el-table-column label="手机号码" align="center" prop="wmsUser.wxappPhone" />
       <el-table-column label="商品名称" align="center" prop="pmsServer.serverName" />
       <el-table-column label="商品数量" align="center" prop="orderQuantity" />
-      <el-table-column label="商品规格" align="center" prop="orderSpecification" />
+      <el-table-column label="商品规格" align="center" prop="orderSpecification" >
+         <template slot-scope="{row}">
+                {{ row.orderSpecification || '暂无' }}
+            </template>
+      </el-table-column>
       <el-table-column label="订单价格" align="center" prop="orderAmount">
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
@@ -162,7 +166,7 @@
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="备注" align="center" prop="orderNote"  show-overflow-tooltip />
       <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="200">
         <template slot-scope="scope">
           <el-button
@@ -312,7 +316,7 @@
                         <div class="cell">商品价格：</div>
                       </td>
                       <td>
-                        <div class="cell" v-if="form">￥{{ form.orderPayAmount | money}}</div>
+                        <div class="cell" v-if="form">￥{{ form.orderAmount | money}}</div>
                       </td>
                       <td>
                         <div class="cell">商品数量：</div>
@@ -380,7 +384,7 @@
                             <div class="cell">订单备注：</div>
                           </td>
                           <td colspan="3">
-                            <div class="cell" v-if="form">{{ form.remark }}</div>
+                            <div class="cell" v-if="form">{{ form.orderNote }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -438,7 +442,7 @@
                     </table>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane label="取送信息" name="pickup">
+                <el-tab-pane v-if="this.form.orderDeliveryType == 2" label="取送信息" name="pickup">
                   <el-row style="margin-top: 10px">
                     <el-card>
                       <div slot="header">
@@ -452,7 +456,7 @@
                                 <div class="cell">运单编号：</div>
                               </td>
                               <td>
-                                <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                                <div class="cell" v-if="form">{{ form.reclaimerOmsWaybill.waybillNo }}</div>
                               </td>
                               <td>
                                 <div class="cell">取料方式：</div>
@@ -461,7 +465,7 @@
                                 <div
                                   class="cell"
                                   v-if="form"
-                                >{{ formatOrderPayType(form.orderPayType) }}</div>
+                                >上门取料</div>
                               </td>
                             </tr>
                             <tr>
@@ -472,7 +476,7 @@
                                 <div
                                   class="cell"
                                   v-if="form.wmsUser"
-                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }})</div>
                               </td>
                               <td>
                                 <div class="cell">取料时间：</div>
@@ -481,7 +485,7 @@
                                 <div
                                   class="cell"
                                   v-if="form"
-                                >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+                                >{{ parseTime(form.reclaimerOmsWaybill.waybillCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
                               </td>
                             </tr>
                             <tr>
@@ -503,8 +507,8 @@
                               <td colspan="3">
                                 <div
                                   class="cell"
-                                  v-if="form.wmsUser"
-                                >{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div>
+                                  v-if="form.reclaimerUserInfo"
+                                >{{ form.reclaimerUserInfo.nickName }}，{{ form.reclaimerUserInfo.phonenumber || '暂无手机号' }}</div>
                               </td>
                             </tr>
                           </tbody>
@@ -512,7 +516,7 @@
                       </div>
                     </el-card>
                   </el-row>
-                  <el-row style="margin-top: 10px">
+                  <el-row style="margin-top: 10px" v-if="form.deliveryOmsWaybill">
                     <el-card>
                       <div slot="header">
                         <el-tag type="success" effect="plain">配送</el-tag>
@@ -525,7 +529,7 @@
                                 <div class="cell">运单编号：</div>
                               </td>
                               <td>
-                                <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                                <div class="cell" v-if="form">{{ form.deliveryOmsWaybill.waybillNo}}</div>
                               </td>
                               <td>
                                 <div class="cell">配送方式：</div>
@@ -534,7 +538,7 @@
                                 <div
                                   class="cell"
                                   v-if="form"
-                                >{{ formatOrderPayType(form.orderPayType) }}</div>
+                                >配送上门</div>
                               </td>
                             </tr>
                             <tr>
@@ -554,7 +558,7 @@
                                 <div
                                   class="cell"
                                   v-if="form"
-                                >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+                                >{{ parseTime(form.deliveryOmsWaybill.waybillCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
                               </td>
                             </tr>
                             <tr>
@@ -577,7 +581,7 @@
                                 <div
                                   class="cell"
                                   v-if="form.wmsUser"
-                                >{{ form.wmsUser.userName }}，{{ form.wmsUser.wxappPhone }}</div>
+                                >{{ form.deliveryUserInfo.userName }}，{{ form.deliveryUserInfo.phonenumber || '暂无手机号'}}</div>
                               </td>
                             </tr>
                           </tbody>
@@ -872,7 +876,7 @@ export default {
         orderByColumn: "orderCreateTime",
         isAsc: "desc",
         orderStatus: null,
-        orderDeliveryType: "2",
+        orderDeliveryType: "1", // 自送自取 1  上门取料2
         orderNo: null,
         userName: null,
         wxappPhone: null,
@@ -1058,28 +1062,48 @@ export default {
     },
     // 步骤条状态激活
     formatStepStatus(value) {
-      if (value === "2") {
-        // 运单待开始
-        return 2;
-      } else if (value === "3") {
-        // 运单工作中
-        return 3;
-      } else if (value === "4") {
-        // 运单已完成
-        return 4;
+       value = Number(value)
+      if(this.form.orderDeliveryType == 1) {
+         if (value >= 4 && value < 7) {
+            // 订单已支付
+            return 2;
+          } else if (value >= 7 && value <13) {
+            // 订单加工中
+            return 3;
+          } else if (value >= 13) {
+            // 订单已完成
+            return 4;
+          } else {
+            // 其他
+            return 1;
+          }
       } else {
-        // 其他
-        return 1;
+           if (value >= 2 && value < 7) {
+            // 订单已支付
+            return 2;
+          } else if (value >= 7 && value <13) {
+            // 订单加工中
+            return 3;
+          } else if (value >= 13) {
+            // 订单已完成
+            return 4;
+          } else {
+            // 其他
+            return 1;
+          }
       }
+      
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
-      return  row.orderStatus == 10 ? (row.orderDeliveryType == 1 ? '待取货' : '待配送') : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
-   
+      return  row.orderDeliveryType == 1 ? (row.orderStatus == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)) : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
+     
     },
     // 运单状态格式化
     formatOrderStatus(value) {
-      return this.selectDictLabel(this.orderStatusOptions, value);
+      
+      return  this.form.orderDeliveryType == 1 ? (value == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, value)) : this.selectDictLabel(this.orderStatusOptions, value)
+      
     },
     // 订单支付类型格式化
     formatOrderPayType(value) {
