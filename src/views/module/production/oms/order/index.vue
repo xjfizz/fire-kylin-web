@@ -549,7 +549,7 @@
                                 <div
                                   class="cell"
                                   v-if="form.wmsUser"
-                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                                >{{ form.wmsUser.nickName }}（{{ form.wmsUser.wxappPhone }}）</div>
                               </td>
                               <td>
                                 <div class="cell">配送时间：</div>
@@ -581,7 +581,7 @@
                                 <div
                                   class="cell"
                                   v-if="form.wmsUser"
-                                >{{ form.deliveryUserInfo.userName }}，{{ form.deliveryUserInfo.phonenumber || '暂无手机号'}}</div>
+                                >{{ form.deliveryUserInfo.nickName }}，{{ form.deliveryUserInfo.phonenumber || '暂无手机号'}}</div>
                               </td>
                             </tr>
                           </tbody>
