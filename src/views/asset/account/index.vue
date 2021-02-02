@@ -1,6 +1,48 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="80px">
+    <div class="account-top">
+      <div class="account-top-top">
+        <div class="left">
+          <div class="left-title">可提现余额:</div>
+          <div class="left-value">8000元</div>
+          <div class="left-btn">
+            <el-button size="mini" type="primary">提现</el-button>
+          </div>
+        </div>
+        <div class="right">
+          <div class="right-title">提现账户:</div>
+          <div class="right-value">【交通银行】 62231554444145511</div>
+          <div class="right-btn">
+            <el-button size="mini" type="success">管理</el-button>
+          </div>
+        </div>
+      </div>
+      <div class="account-top-bottom">
+        <div class="left">
+          <div class="left-title">未入账:</div>
+          <div class="left-value">8000.00元</div>
+        </div>
+        <div class="mid">
+          <div class="mid-title">提现中:</div>
+          <div class="mid-value">80000元</div>
+          <div class="mid-btn" @click="goWithdrawList">
+            提现明细
+            <!-- <el-button  type="text">提现明细</el-button> -->
+          </div>
+        </div>
+        <div class="right">
+          <div class="right-title">已提现</div>
+          <div class="right-value">30元</div>
+        </div>
+      </div>
+    </div>
+    <el-form
+      :model="queryParams"
+      ref="queryForm"
+      :inline="true"
+      v-show="showSearch"
+      label-width="80px"
+    >
       <el-form-item label="订单编号" prop="relationOrderNo">
         <el-input
           v-model="queryParams.relationOrderNo"
@@ -74,8 +116,18 @@
       </el-table-column>
       <el-table-column label="关联订单号" align="center" prop="relationOrderNo" />
       <el-table-column label="交易流水号" align="center" prop="transactionNo" />
-      <el-table-column label="交易类型" align="center" prop="transactionType" :formatter="transactionTypeFormat" />
-      <el-table-column label="支付方式" align="center" prop="transactionPayType"  :formatter="transactionPayTypeFormat" />
+      <el-table-column
+        label="交易类型"
+        align="center"
+        prop="transactionType"
+        :formatter="transactionTypeFormat"
+      />
+      <el-table-column
+        label="支付方式"
+        align="center"
+        prop="transactionPayType"
+        :formatter="transactionPayTypeFormat"
+      />
       <el-table-column label="交易金额" align="center" prop="transactionAmount" />
       <el-table-column label="完成交易时间" align="center" prop="transactionCompleteTime" width="180">
         <template slot-scope="scope">
@@ -114,20 +166,24 @@
           <el-input v-model="form.workshopAccountPkid" placeholder="请输入工场账户pkid" />
         </el-form-item>
         <el-form-item label="交易创建时间" prop="transactionCreateTime">
-          <el-date-picker clearable size="small"
-                          v-model="form.transactionCreateTime"
-                          type="date"
-                          value-format="yyyy-MM-dd"
-                          placeholder="选择交易创建时间">
-          </el-date-picker>
+          <el-date-picker
+            clearable
+            size="small"
+            v-model="form.transactionCreateTime"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择交易创建时间"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label="交易完成时间" prop="transactionCompleteTime">
-          <el-date-picker clearable size="small"
-                          v-model="form.transactionCompleteTime"
-                          type="date"
-                          value-format="yyyy-MM-dd"
-                          placeholder="选择交易完成时间">
-          </el-date-picker>
+          <el-date-picker
+            clearable
+            size="small"
+            v-model="form.transactionCompleteTime"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择交易完成时间"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item label="关联订单pkid" prop="relationOrderPkid">
           <el-input v-model="form.relationOrderPkid" placeholder="请输入关联订单pkid" />
@@ -140,12 +196,12 @@
         </el-form-item>
         <el-form-item label="交易类型" prop="transactionType">
           <el-select v-model="form.transactionType" placeholder="请选择交易类型">
-            <el-option label="请选择字典生成" value="" />
+            <el-option label="请选择字典生成" value />
           </el-select>
         </el-form-item>
         <el-form-item label="交易支付类型" prop="transactionPayType">
           <el-select v-model="form.transactionPayType" placeholder="请选择交易支付类型">
-            <el-option label="请选择字典生成" value="" />
+            <el-option label="请选择字典生成" value />
           </el-select>
         </el-form-item>
         <el-form-item label="交易金额" prop="transactionAmount">
@@ -164,12 +220,18 @@
 </template>
 
 <script>
-import { listRecord, getRecord, delRecord, addRecord, updateRecord, exportRecord } from "@/api/asset/account/record/record";
+import {
+  listRecord,
+  getRecord,
+  delRecord,
+  addRecord,
+  updateRecord,
+  exportRecord
+} from "@/api/asset/account/record/record";
 
 export default {
   name: "Record",
-  components: {
-  },
+  components: {},
   data() {
     return {
       // 遮罩层
@@ -209,7 +271,7 @@ export default {
         transactionNo: null,
         transactionType: null,
         transactionPayType: null,
-        transactionAmount: null,
+        transactionAmount: null
       },
       // 表单参数
       form: {},
@@ -235,7 +297,7 @@ export default {
         ],
         transactionAmount: [
           { required: true, message: "交易金额不能为空", trigger: "blur" }
-        ],
+        ]
       }
     };
   },
@@ -254,11 +316,13 @@ export default {
     /** 查询工场账户记录列表 */
     getList() {
       this.loading = true;
-      listRecord(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
-        this.recordList = response.rows;
-        this.total = response.total;
-        this.loading = false;
-      });
+      listRecord(this.addDateRange(this.queryParams, this.dateRange)).then(
+        response => {
+          this.recordList = response.rows;
+          this.total = response.total;
+          this.loading = false;
+        }
+      );
     },
     // 取消按钮
     cancel() {
@@ -315,9 +379,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.pkid)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
+      this.ids = selection.map(item => item.pkid);
+      this.single = selection.length !== 1;
+      this.multiple = !selection.length;
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -328,7 +392,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const pkid = row.pkid || this.ids
+      const pkid = row.pkid || this.ids;
       getRecord(pkid).then(response => {
         this.form = response.data;
         this.open = true;
@@ -358,30 +422,140 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除工场账户记录编号为"' + pkids + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function() {
-        return delRecord(pkids);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("删除成功");
-      })
+      this.$confirm(
+        '是否确认删除工场账户记录编号为"' + pkids + '"的数据项?',
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(function() {
+          return delRecord(pkids);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("删除成功");
+        });
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有工场账户记录数据项?', "警告", {
+      this.$confirm("是否确认导出所有工场账户记录数据项?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
-        return exportRecord(queryParams);
-      }).then(response => {
-        this.download(response.msg);
       })
+        .then(function() {
+          return exportRecord(queryParams);
+        })
+        .then(response => {
+          this.download(response.msg);
+        });
+    },
+    // 跳转提现明细
+    goWithdrawList() {
+      this.$router.push({ path: "withdraw" });
     }
   }
 };
 </script>
+
+<style rel="stylesheet/scss" lang="scss">
+.app-container {
+  .account-top {
+    font-size: 16px;
+    color: #606266;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e5e5e5;
+
+    .account-top-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .left {
+        display: flex;
+        align-items: center;
+        flex: 2;
+        .left-title {
+        }
+        .left-value {
+          margin-left: 10px;
+        }
+        .left-btn {
+          margin-left: 10px;
+        }
+      }
+      .right {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .right-title {
+        }
+        .right-value {
+          margin-left: 10px;
+        }
+        .right-btn {
+          margin-left: 10px;
+        }
+      }
+    }
+    .account-top-bottom {
+      margin-top: 10px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .left {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        .left-title {
+        }
+        .left-value {
+          margin-left: 10px;
+        }
+      }
+      .mid {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .mid-title {
+          display: flex;
+          align-items: center;
+        }
+        .mid-value {
+          display: flex;
+          align-items: center;
+          margin-left: 10px;
+        }
+        .mid-btn:hover {
+          cursor: pointer;
+        }
+        .mid-btn {
+          margin-left: 10px;
+          display: flex;
+          align-items: center;
+          color: #6044ff;
+        }
+      }
+      .right {
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        .right-title {
+        }
+        .right-value {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+}
+</style>
+

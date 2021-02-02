@@ -8,7 +8,7 @@
           </div>
           <div>
             <div class="text-center">
-              <userAvatar :workshopInfo="workshopInfo" />
+              <userAvatar :workshopInfo="workshopInfo" @getWorkshopInfo = "getWorkshopInfo" />
             </div>
             <ul class="list-group list-group-striped">
               <li class="list-group-item">

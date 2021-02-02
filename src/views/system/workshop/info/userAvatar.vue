@@ -137,7 +137,7 @@ export default {
           this.msgSuccess("修改成功");
           this.visible = false;
           console.log(this.$parent)
-          this.$parent.getWorkshopInfo();
+          this.$emit('getWorkshopInfo')
         });
       });
     },
