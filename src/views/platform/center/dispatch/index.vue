@@ -1,5 +1,5 @@
 <template>
-  <h2>巨象Faas工场管理平台</h2>
+  <h2>dispatch</h2>
 </template>
 
 <script>
