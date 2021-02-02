@@ -1,4 +1,6 @@
 <template>
+<el-card shadow="never"  class="waitInfo-card">
+
   <div class="waitInfo-main">
       <!-- 制帽业务中心 -->
       <div class="wait-item">
@@ -65,7 +67,7 @@
               <div class="top-title top-title-color3">派单业务中心</div>
           </div>
           <div class="mid">我的待办</div>
-          <div class="bottom border-bottom1">
+          <div class="bottom">
               <div class="bottom-item">
                   <div class="item-title">待取料</div>
                   <div class="item-value">20</div>
@@ -89,6 +91,8 @@
           </div>
       </div>
   </div>
+</el-card>
+
 </template>
 
 <script>
@@ -117,7 +121,11 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-    .waitInfo-main{
+.waitInfo-card{
+        
+        .waitInfo-main{
+             background-color: #f9f9f9;
+             padding-top: 1px;
         .wait-item{
             margin-top: 20px;
             .top{
@@ -171,4 +179,6 @@ export default {
             border-bottom: 1px solid #e5e5e5;
         }
    }
+}
+
 </style>

@@ -5,7 +5,12 @@
               <waitInfo></waitInfo>
           </div>
           <div class="content-right">
-              ss
+              <div class="top">
+                  <message></message>
+              </div>
+              <div class="bottom">
+                  <produceData></produceData>
+              </div>
           </div>
       </div>
   </div>
@@ -14,6 +19,8 @@
 <script>
 
 import waitInfo from './commponents/waitInfo'
+import message from './commponents/message'
+import produceData from './commponents/produce-data'
 export default {
   name: "roster",
   data() {
@@ -22,7 +29,9 @@ export default {
     };
   },
   components: {
-   waitInfo
+   waitInfo,
+   message,
+   produceData
   },
   watch: {},
   created() {
@@ -47,11 +56,19 @@ export default {
       display: flex;
       .content-left{
           width: 70%;
-          background-color: #f9f9f9;
+          height: 100%;
+         
+          padding: 10px;
       }
       .content-right{
           width: 30%;
+           padding: 10px;
+           height: 100%;
 
+            .top{};
+            .bottom{
+              margin-top: 15px;
+            }
 
       }
   }
