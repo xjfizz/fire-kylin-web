@@ -2,9 +2,14 @@
   <div class="order-dialog" v-if="visible">
     <!-- 检测是否已分配取料员 -->
     <el-dialog :title="title" :visible.sync="visible" width="100">
-      <div class="print-content">
+      <div
+        class="print-content"
+        v-loading="loading"
+        element-loading-text="正在加载中..."
+        element-loading-spinner="el-icon-loading"
+      >
         <div id="orderPrint">
-          <div class="print-main" >
+          <div class="print-main">
             <div class="left"></div>
             <div class="mid">
               <div class="top">
@@ -21,9 +26,11 @@
                 </div>
                 <div class="mid-productInfo">
                   <div class="productInfo-left">产品</div>
-                  <div class="productInfo-mid"  v-if="order.omsOrder">
+                  <div class="productInfo-mid" v-if="order.omsOrder">
                     <div class="mid-top">{{order.serverName || '暂无'}}</div>
-                    <div class="mid-mid">{{order.omsOrder.orderSpecification || '暂无'}} {{order.omsOrder.orderColor || '暂无'}}</div>
+                    <div
+                      class="mid-mid"
+                    >{{order.omsOrder.orderSpecification || '暂无'}} {{order.omsOrder.orderColor || '暂无'}}</div>
                     <div class="mid-bottom">{{order.omsOrder.orderQuantity || '0'}}个</div>
                   </div>
                 </div>
@@ -42,9 +49,7 @@
                 <div class="bottom-right">
                   <div class="productInfo-right">
                     <div class="order-image">
-                      <img
-                        :src="order.orderQrcode"
-                      />
+                      <img :src="order.orderQrcode" />
                     </div>
                   </div>
                 </div>
@@ -52,7 +57,6 @@
             </div>
             <div class="right"></div>
           </div>
-          
         </div>
       </div>
       <div class="bottom-btn">
@@ -64,9 +68,7 @@
 </template>
 
 <script>
-import {
-  orderPrint
-} from "@/api/module/production/oms/order/order";
+import { orderPrint } from "@/api/module/production/oms/order/order";
 export default {
   name: "orderPrint",
   props: {
@@ -88,7 +90,8 @@ export default {
   data() {
     return {
       visible: false,
-      order:{},
+      order: {},
+      loading: false,
       printObj: {
         id: "orderPrint", //打印标签的id
         popTitle: "Document" //文件标题
@@ -110,7 +113,8 @@ export default {
     // 打开
     open(e) {
       this.visible = true;
-      this.getOrderDetail(e)
+      this.loading = true;
+      this.getOrderDetail(e);
     },
 
     // 取消
@@ -118,16 +122,17 @@ export default {
       this.visible = false;
     },
     // 获取订单信息
-     getOrderDetail(e) {
-         let params = {
-             orderPkid:e.pkid
-         }
+    getOrderDetail(e) {
+      let params = {
+        orderPkid: e.pkid
+      };
       orderPrint(params).then(res => {
-          if(res.code == 200) {
-              this.order = res.data
-          }
-      })
-    },
+        if (res.code == 200) {
+          this.order = res.data;
+          this.loading = false;
+        }
+      });
+    }
   }
 };
 </script>
@@ -201,9 +206,9 @@ export default {
     // width: 100%;
     // height: 100%;
     width: 100%;
-    height:100%;
+    height: 100%;
     display: flex;
-    
+
     .left {
       width: 5%;
     }
