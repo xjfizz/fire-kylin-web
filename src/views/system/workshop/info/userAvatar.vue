@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="user-info-head" @click="editCropper()"><img v-bind:src="options.img" title="点击上传头像" class="img-circle img-lg" /></div>
+    <div class="user-info-head" @click="editCropper()"><img v-bind:src="workshopInfo.workshopAvatar" title="点击上传工场照片" class="img-circle img-lg" /></div>
     <el-dialog :title="title" :visible.sync="open" width="800px" append-to-body @opened="modalOpened">
       <el-row>
         <el-col :xs="24" :md="12" :style="{height: '350px'}">
@@ -55,15 +55,16 @@
 <script>
 import store from "@/store";
 import { VueCropper } from "vue-cropper";
-import { uploadAvatar } from "@/api/system/user";
+import { uploadWkpImage } from "@/api/system/workshop/info/info";
 
 export default {
   components: { VueCropper },
   props: {
-    user: {
+    workshopInfo: {
       type: Object
     }
   },
+
   data() {
     return {
       // 是否显示弹出层
@@ -71,9 +72,9 @@ export default {
       // 是否显示cropper
       visible: false,
       // 弹出层标题
-      title: "修改头像",
+      title: "修改图像",
       options: {
-        img: store.getters.avatar, //裁剪图片的地址
+        img: this.workshopInfo.workshopAvatar, //裁剪图片的地址
         autoCrop: true, // 是否默认生成截图框
         autoCropWidth: 200, // 默认生成截图框宽度
         autoCropHeight: 200, // 默认生成截图框高度
@@ -83,6 +84,11 @@ export default {
     };
   },
   methods: {
+
+    getParentVal(e){
+      this.options.img = e
+    },
+
     // 编辑头像
     editCropper() {
       this.open = true;
@@ -109,7 +115,7 @@ export default {
     },
     // 上传预处理
     beforeUpload(file) {
-      if (file.type.indexOf("image/") == -1) {
+      if (file.type.indexOf("image/") === -1) {
         this.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。");
       } else {
         const reader = new FileReader();
@@ -123,13 +129,15 @@ export default {
     uploadImg() {
       this.$refs.cropper.getCropBlob(data => {
         let formData = new FormData();
-        formData.append("avatarfile", data);
-        uploadAvatar(formData).then(response => {
+        formData.append("workshopAvatar", data);
+        uploadWkpImage(formData).then(response => {
           this.open = false;
-          this.options.img = process.env.VUE_APP_BASE_API + response.imgUrl;
-          store.commit('SET_AVATAR', this.options.img);
+          this.options.img =  response.data.name;
+          // store.commit('SET_AVATAR', this.options.img);
           this.msgSuccess("修改成功");
           this.visible = false;
+          console.log(this.$parent)
+          this.$parent.getWorkshopInfo();
         });
       });
     },

@@ -77,3 +77,11 @@ export function addWorkshopInfoDetail(data) {
     data: data
   })
 }
+// 工场头像上传
+export function uploadWkpImage(data) {
+  return request({
+    url: '/system/workshop/info/uploadWkpImage',
+    method: 'post',
+    data: data
+  })
+}

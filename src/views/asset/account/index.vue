@@ -1,50 +1,50 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="工场pkid" prop="workshopPkid">
+    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="80px">
+      <el-form-item label="订单编号" prop="relationOrderNo">
         <el-input
-          v-model="queryParams.workshopPkid"
-          placeholder="请输入工场pkid"
+          v-model="queryParams.relationOrderNo"
+          placeholder="请输入关联订单编号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="账户剩余金额" prop="balanceAmount">
+      <el-form-item label="流水编号" prop="transactionNo">
         <el-input
-          v-model="queryParams.balanceAmount"
-          placeholder="请输入账户剩余金额"
+          v-model="queryParams.transactionNo"
+          placeholder="请输入交易流水编号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="账户未入账金额" prop="unrecordedAmount">
-        <el-input
-          v-model="queryParams.unrecordedAmount"
-          placeholder="请输入账户未入账金额"
-          clearable
+      <el-form-item label="创建时间" prop="transactionCreateTime">
+        <el-date-picker
+          v-model="dateRange"
           size="small"
-          @keyup.enter.native="handleQuery"
-        />
+          style="width: 240px"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
       </el-form-item>
-      <el-form-item label="账户提现中金额" prop="withdrawProgressAmount">
-        <el-input
-          v-model="queryParams.withdrawProgressAmount"
-          placeholder="请输入账户提现中金额"
-          clearable
+      <el-form-item label="交易类型" prop="transactionType">
+        <el-select
+          v-model="queryParams.transactionType"
+          placeholder="请选择配送方式"
           size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="账户已提现金额" prop="completeWithdrawAmount">
-        <el-input
-          v-model="queryParams.completeWithdrawAmount"
-          placeholder="请输入账户已提现金额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in transactionTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -55,58 +55,34 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['wkp:account:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['wkp:account:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['wkp:account:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
           type="warning"
           plain
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['wkp:account:export']"
+          v-hasPermi="['wkp:record:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="accountList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="账户pkid" align="center" prop="pkid" />
-      <el-table-column label="工场pkid" align="center" prop="workshopPkid" />
-      <el-table-column label="账户剩余金额" align="center" prop="balanceAmount" />
-      <el-table-column label="账户未入账金额" align="center" prop="unrecordedAmount" />
-      <el-table-column label="账户提现中金额" align="center" prop="withdrawProgressAmount" />
-      <el-table-column label="账户已提现金额" align="center" prop="completeWithdrawAmount" />
-      <el-table-column label="备注" align="center" prop="remark" />
+    <el-table v-loading="loading" :data="recordList" @selection-change="handleSelectionChange">
+      <el-table-column label="创建交易时间" align="center" prop="transactionCreateTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.transactionCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="关联订单号" align="center" prop="relationOrderNo" />
+      <el-table-column label="交易流水号" align="center" prop="transactionNo" />
+      <el-table-column label="交易类型" align="center" prop="transactionType" :formatter="transactionTypeFormat" />
+      <el-table-column label="支付方式" align="center" prop="transactionPayType"  :formatter="transactionPayTypeFormat" />
+      <el-table-column label="交易金额" align="center" prop="transactionAmount" />
+      <el-table-column label="完成交易时间" align="center" prop="transactionCompleteTime" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.transactionCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="备注" align="center" prop="remark" show-overflow-tooltip />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
@@ -114,15 +90,8 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['wkp:account:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['wkp:account:remove']"
-          >删除</el-button>
+            v-hasPermi="['wkp:record:edit']"
+          >查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,23 +104,52 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改工场账户对话框 -->
+    <!-- 添加或修改工场账户记录对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="工场pkid" prop="workshopPkid">
           <el-input v-model="form.workshopPkid" placeholder="请输入工场pkid" />
         </el-form-item>
-        <el-form-item label="账户剩余金额" prop="balanceAmount">
-          <el-input v-model="form.balanceAmount" placeholder="请输入账户剩余金额" />
+        <el-form-item label="工场账户pkid" prop="workshopAccountPkid">
+          <el-input v-model="form.workshopAccountPkid" placeholder="请输入工场账户pkid" />
         </el-form-item>
-        <el-form-item label="账户未入账金额" prop="unrecordedAmount">
-          <el-input v-model="form.unrecordedAmount" placeholder="请输入账户未入账金额" />
+        <el-form-item label="交易创建时间" prop="transactionCreateTime">
+          <el-date-picker clearable size="small"
+                          v-model="form.transactionCreateTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择交易创建时间">
+          </el-date-picker>
         </el-form-item>
-        <el-form-item label="账户提现中金额" prop="withdrawProgressAmount">
-          <el-input v-model="form.withdrawProgressAmount" placeholder="请输入账户提现中金额" />
+        <el-form-item label="交易完成时间" prop="transactionCompleteTime">
+          <el-date-picker clearable size="small"
+                          v-model="form.transactionCompleteTime"
+                          type="date"
+                          value-format="yyyy-MM-dd"
+                          placeholder="选择交易完成时间">
+          </el-date-picker>
         </el-form-item>
-        <el-form-item label="账户已提现金额" prop="completeWithdrawAmount">
-          <el-input v-model="form.completeWithdrawAmount" placeholder="请输入账户已提现金额" />
+        <el-form-item label="关联订单pkid" prop="relationOrderPkid">
+          <el-input v-model="form.relationOrderPkid" placeholder="请输入关联订单pkid" />
+        </el-form-item>
+        <el-form-item label="关联订单编号" prop="relationOrderNo">
+          <el-input v-model="form.relationOrderNo" placeholder="请输入关联订单编号" />
+        </el-form-item>
+        <el-form-item label="交易流水编号" prop="transactionNo">
+          <el-input v-model="form.transactionNo" placeholder="请输入交易流水编号" />
+        </el-form-item>
+        <el-form-item label="交易类型" prop="transactionType">
+          <el-select v-model="form.transactionType" placeholder="请选择交易类型">
+            <el-option label="请选择字典生成" value="" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="交易支付类型" prop="transactionPayType">
+          <el-select v-model="form.transactionPayType" placeholder="请选择交易支付类型">
+            <el-option label="请选择字典生成" value="" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="交易金额" prop="transactionAmount">
+          <el-input v-model="form.transactionAmount" placeholder="请输入交易金额" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -166,10 +164,10 @@
 </template>
 
 <script>
-import { listAccount, getAccount, delAccount, addAccount, updateAccount, exportAccount } from "@/api/asset/account/account";
+import { listRecord, getRecord, delRecord, addRecord, updateRecord, exportRecord } from "@/api/asset/account/record/record";
 
 export default {
-  name: "Account",
+  name: "Record",
   components: {
   },
   data() {
@@ -186,8 +184,14 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 工场账户表格数据
-      accountList: [],
+      // 工场账户记录表格数据
+      recordList: [],
+      // 日期范围
+      dateRange: [],
+      // 交易类型字典数据
+      transactionTypeOptions: [],
+      // 交易支付方式字典数据
+      transactionPayTypeOptions: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -197,10 +201,15 @@ export default {
         pageNum: 1,
         pageSize: 10,
         workshopPkid: null,
-        balanceAmount: null,
-        unrecordedAmount: null,
-        withdrawProgressAmount: null,
-        completeWithdrawAmount: null,
+        workshopAccountPkid: null,
+        transactionCreateTime: null,
+        transactionCompleteTime: null,
+        relationOrderPkid: null,
+        relationOrderNo: null,
+        transactionNo: null,
+        transactionType: null,
+        transactionPayType: null,
+        transactionAmount: null,
       },
       // 表单参数
       form: {},
@@ -209,30 +218,44 @@ export default {
         workshopPkid: [
           { required: true, message: "工场pkid不能为空", trigger: "blur" }
         ],
-        balanceAmount: [
-          { required: true, message: "账户剩余金额不能为空", trigger: "blur" }
+        workshopAccountPkid: [
+          { required: true, message: "工场账户pkid不能为空", trigger: "blur" }
         ],
-        unrecordedAmount: [
-          { required: true, message: "账户未入账金额不能为空", trigger: "blur" }
+        transactionCreateTime: [
+          { required: true, message: "交易创建时间不能为空", trigger: "blur" }
         ],
-        withdrawProgressAmount: [
-          { required: true, message: "账户提现中金额不能为空", trigger: "blur" }
+        transactionNo: [
+          { required: true, message: "交易流水编号不能为空", trigger: "blur" }
         ],
-        completeWithdrawAmount: [
-          { required: true, message: "账户已提现金额不能为空", trigger: "blur" }
+        transactionType: [
+          { required: true, message: "交易类型不能为空", trigger: "change" }
+        ],
+        transactionPayType: [
+          { required: true, message: "交易支付类型不能为空", trigger: "change" }
+        ],
+        transactionAmount: [
+          { required: true, message: "交易金额不能为空", trigger: "blur" }
         ],
       }
     };
   },
   created() {
     this.getList();
+    // 从字典数据获取交易类型
+    this.getDicts("wkp_transaction_type").then(response => {
+      this.transactionTypeOptions = response.data;
+    });
+    // 从字典数据获取交易支付类型
+    this.getDicts("wkp_transaction_pay_type").then(response => {
+      this.transactionPayTypeOptions = response.data;
+    });
   },
   methods: {
-    /** 查询工场账户列表 */
+    /** 查询工场账户记录列表 */
     getList() {
       this.loading = true;
-      listAccount(this.queryParams).then(response => {
-        this.accountList = response.rows;
+      listRecord(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+        this.recordList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -247,10 +270,15 @@ export default {
       this.form = {
         pkid: null,
         workshopPkid: null,
-        balanceAmount: null,
-        unrecordedAmount: null,
-        withdrawProgressAmount: null,
-        completeWithdrawAmount: null,
+        workshopAccountPkid: null,
+        transactionCreateTime: null,
+        transactionCompleteTime: null,
+        relationOrderPkid: null,
+        relationOrderNo: null,
+        transactionNo: null,
+        transactionType: null,
+        transactionPayType: null,
+        transactionAmount: null,
         createBy: null,
         createTime: null,
         updateBy: null,
@@ -259,6 +287,21 @@ export default {
       };
       this.resetForm("form");
     },
+    // 交易类型字典翻译
+    transactionTypeFormat(row, column) {
+      return this.selectDictLabel(
+        this.transactionTypeOptions,
+        row.transactionType
+      );
+    },
+    // 交易支付方式字典翻译
+    transactionPayTypeFormat(row, column) {
+      return this.selectDictLabel(
+        this.transactionPayTypeOptions,
+        row.transactionType
+      );
+    },
+
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -266,6 +309,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
@@ -279,16 +323,16 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加工场账户";
+      this.title = "添加工场账户记录";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const pkid = row.pkid || this.ids
-      getAccount(pkid).then(response => {
+      getRecord(pkid).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改工场账户";
+        this.title = "修改工场账户记录";
       });
     },
     /** 提交按钮 */
@@ -296,13 +340,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.pkid != null) {
-            updateAccount(this.form).then(response => {
+            updateRecord(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addAccount(this.form).then(response => {
+            addRecord(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -314,29 +358,29 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除工场账户编号为"' + pkids + '"的数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return delAccount(pkids);
-        }).then(() => {
-          this.getList();
-          this.msgSuccess("删除成功");
-        })
+      this.$confirm('是否确认删除工场账户记录编号为"' + pkids + '"的数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return delRecord(pkids);
+      }).then(() => {
+        this.getList();
+        this.msgSuccess("删除成功");
+      })
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有工场账户数据项?', "警告", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(function() {
-          return exportAccount(queryParams);
-        }).then(response => {
-          this.download(response.msg);
-        })
+      this.$confirm('是否确认导出所有工场账户记录数据项?', "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(function() {
+        return exportRecord(queryParams);
+      }).then(response => {
+        this.download(response.msg);
+      })
     }
   }
 };

@@ -7,9 +7,9 @@
             <span>工场信息</span>
           </div>
           <div>
-<!--            <div class="text-center">-->
-<!--              <userAvatar :user="user" />-->
-<!--            </div>-->
+            <div class="text-center">
+              <userAvatar :workshopInfo="workshopInfo" />
+            </div>
             <ul class="list-group list-group-striped">
               <li class="list-group-item">
                 <svg-icon icon-class="github" style="margin-right: 5px"/>工场账号
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import userAvatar from "./userAvatar";
+import userAvatar from "@/views/system/workshop/info/userAvatar";
 import workshopInfoDetail from "@/views/system/workshop/info/workshopInfoDetail";
 import introduction from "@/views/system/workshop/info/introduction";
 import bank from "@/views/system/workshop/info/bank";
