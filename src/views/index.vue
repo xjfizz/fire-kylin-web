@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-editor-container">
 
-   <test></test>
+   <test :height="sty.height"></test>
 
     
   </div>
@@ -20,7 +20,9 @@ export default {
   },
   data() {
     return {
-      
+      sty:{
+        height:'80vh'
+      }
     }
   },
   methods: {

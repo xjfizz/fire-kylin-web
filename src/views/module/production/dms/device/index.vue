@@ -267,10 +267,12 @@
 import { listDevice, getDevice, delDevice, addDevice, updateDevice, exportDevice, listWorkshopPwUser, changeDeviceStatus, downloadImage } from "@/api/module/production/dms/device/device";
 import {changeServerStatus} from "@/api/module/production/pms/server/server";
 import domtoimage from 'dom-to-image';
+import qrCode from './commponents/qr-code'
 
 export default {
   name: "Device",
   components: {
+    qrCode
   },
   data() {
     return {
