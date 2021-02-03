@@ -152,6 +152,57 @@
           </el-collapse-item>
         </el-collapse>
       </div>
+
+      <div class="select-item-btns">
+        <el-button-group v-if="selectMoudleItem == 1">
+          <!-- 订单 -->
+          <el-button
+            :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
+            @click="selectMoudleBtn(1)"
+          >新增订单</el-button>
+          <el-button
+            :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
+            @click="selectMoudleBtn(2)"
+          >生产完成</el-button>
+          <el-button
+            :type="selectMoudleBtnSty == 3 ? 'primary' : ''"
+            @click="selectMoudleBtn(3)"
+          >支付完成</el-button>
+        </el-button-group>
+
+        <el-button-group v-if="selectMoudleItem == 2">
+          <!-- 用户 -->
+          <el-button
+            :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
+            @click="selectMoudleBtn(1)"
+          >活跃用户</el-button>
+          <el-button
+            :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
+            @click="selectMoudleBtn(2)"
+          >新增用户</el-button>
+        </el-button-group>
+
+        <el-button-group v-if="selectMoudleItem == 3">
+          <el-button
+            :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
+            @click="selectMoudleBtn(1)"
+          >微信支付</el-button>
+          <el-button
+            :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
+            @click="selectMoudleBtn(2)"
+          >余额支付</el-button>
+          <el-button
+            :type="selectMoudleBtnSty == 3 ? 'primary' : ''"
+            @click="selectMoudleBtn(3)"
+          >银联支付</el-button>
+        </el-button-group>
+
+        <el-button-group v-if="selectMoudleItem == 4">
+          <!-- 产量-->
+          <el-button :type="selectMoudleBtnSty == 1 ? 'primary' : ''" @click="selectMoudleBtn(1)">产量</el-button>
+        </el-button-group>
+      </div>
+
       <div class="produce-bottom">
         <el-collapse v-model="activeName3">
           <el-collapse-item name="1">
@@ -160,22 +211,67 @@
                 <span class="collapse-title">新增订单</span>
               </div>
             </template>
-            新增订单
+
+            <!-- 统计 -->
+            <div class="produce-bottom-main">
+              <lineChart></lineChart>
+            </div>
           </el-collapse-item>
         </el-collapse>
       </div>
+
+      <!-- 底部表格 -->
+      <div class="produce-bottom-content">
+        <div class="bottom-content-left">
+           <el-collapse v-model="activeName4">
+          <el-collapse-item name="1">
+            <template slot="title">
+              <div class="collapse-title-sty">
+                <span class="collapse-title">订单分类</span>
+              </div>
+            </template>
+
+            <!-- 统计 -->
+            <div class="produce-bottom-main">
+              <lineChart></lineChart>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+        </div>
+        <div class="bottom-content-right">
+             <el-collapse v-model="activeName5">
+          <el-collapse-item name="1">
+            <template slot="title">
+              <div class="collapse-title-sty">
+                <span class="collapse-title">订单排行榜</span>
+              </div>
+            </template>
+
+            <!-- 统计 -->
+            <div class="produce-bottom-main">
+              <lineChart></lineChart>
+            </div>
+          </el-collapse-item>
+        </el-collapse>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script>
+import lineChart from './chartCommponent/line-chart'
 export default {
-  name: "roster",
+  name: "produce",
+  components: {lineChart},
   data() {
     return {
       activeName1: "1",
       activeName2: "1",
       activeName3: "1",
+      activeName4: "1",
+      activeName5: "1",
       searchDate: "",
       searchKeyList: [
         {
@@ -193,10 +289,10 @@ export default {
       ],
       searchKey: "month",
       searchDateType: "month",
-      selectMoudleItem: 1
+      selectMoudleItem: 1,
+      selectMoudleBtnSty: 1
     };
   },
-  components: {},
   watch: {},
   created() {
     this.init();
@@ -266,6 +362,11 @@ export default {
     //选择统计模块
     selectMoudle(e) {
       this.selectMoudleItem = e;
+      this.selectMoudleBtnSty = 1;
+    },
+    // 切换图表按钮
+    selectMoudleBtn(e) {
+      this.selectMoudleBtnSty = e;
     }
   }
 };
@@ -429,9 +530,45 @@ export default {
         }
       }
     }
-
+    .select-item-btns {
+      margin-top: 10px;
+      padding: 10px 20px 10px 20px;
+      //background-color: #ffffff;
+    }
     .produce-bottom {
       margin-top: 20px;
+      padding: 10px 20px 10px 20px;
+      background-color: #ffffff;
+      .collapse-title-sty {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #e6e9ed;
+        .collapse-title {
+          font-size: 18px;
+          font-weight: 400;
+          color: #73879c;
+        }
+        .collapse-des {
+          margin-left: 10px;
+          font-size: 80%;
+          font-weight: 400;
+          color: #73879c;
+        }
+        .collapse-tips {
+          margin-left: 10px;
+          font-size: 80%;
+          font-weight: 400;
+          color: #ff0000;
+        }
+      }
+      .produce-bottom-main {
+        margin-top: 25px;
+        margin-bottom: 10px;
+      }
+    }
+    .produce-bottom-content{
+       margin-top: 20px;
       padding: 10px 20px 10px 20px;
       background-color: #ffffff;
       .collapse-title-sty {
