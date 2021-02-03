@@ -136,7 +136,6 @@ export default {
           // store.commit('SET_AVATAR', this.options.img);
           this.msgSuccess("修改成功");
           this.visible = false;
-          console.log(this.$parent)
           this.$emit('getWorkshopInfo')
         });
       });
