@@ -158,7 +158,7 @@ export default {
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
-          },
+          }
         ]
       });
     }

@@ -221,7 +221,48 @@
       </div>
 
       <!-- 底部表格 -->
-      <div class="produce-bottom-content">
+      <div class="produce-bottom-chart">
+        <div class="bottom-content-left">
+          <div class="produce-bottom-content">
+            <el-collapse v-model="activeName4">
+              <el-collapse-item name="1">
+                <template slot="title">
+                  <div class="collapse-title-sty">
+                    <span class="collapse-title">订单分类</span>
+                  </div>
+                </template>
+
+                <!-- 统计 -->
+                <div class="produce-bottom-main">
+                  <pieChart></pieChart>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </div>
+        <div class="bottom-content-right">
+          <div class="produce-bottom-content">
+            <el-collapse v-model="activeName5">
+              <el-collapse-item name="1">
+                <template slot="title">
+                  <div class="collapse-title-sty">
+                     <span class="collapse-title">订单排行榜 (Top:前五名)</span>
+                      <div class="collapse-title-right-icon" @click.stop="openPh">
+                        <i class="el-icon-tickets"></i>
+                      </div>
+                  </div>
+                </template>
+
+                <!-- 排行榜 -->
+                <div class="produce-bottom-main">
+                    <phChart></phChart>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="produce-bottom-content">
         <div class="bottom-content-left">
            <el-collapse v-model="activeName4">
           <el-collapse-item name="1">
@@ -231,9 +272,9 @@
               </div>
             </template>
 
-            <!-- 统计 -->
+            
             <div class="produce-bottom-main">
-              <lineChart></lineChart>
+              <pieChart></pieChart>
             </div>
           </el-collapse-item>
         </el-collapse>
@@ -243,28 +284,32 @@
           <el-collapse-item name="1">
             <template slot="title">
               <div class="collapse-title-sty">
-                <span class="collapse-title">订单排行榜</span>
+                <span class="collapse-title">订单排行榜 (Top:前五名)</span>
+                <div class="collapse-title-right-icon">
+                  <i class="el-icon-tickets"></i>
+                </div>
               </div>
             </template>
 
-            <!-- 统计 -->
+           
             <div class="produce-bottom-main">
-              <lineChart></lineChart>
+              <phChart></phChart>
             </div>
           </el-collapse-item>
         </el-collapse>
         </div>
-      </div>
-
+      </div>-->
     </div>
   </div>
 </template>
 
 <script>
-import lineChart from './chartCommponent/line-chart'
+import lineChart from "./chartCommponent/line-chart";
+import pieChart from "./chartCommponent/pie-chart";
+import phChart from "./chartCommponent/ph-chart";
 export default {
   name: "produce",
-  components: {lineChart},
+  components: { lineChart, pieChart, phChart },
   data() {
     return {
       activeName1: "1",
@@ -367,6 +412,10 @@ export default {
     // 切换图表按钮
     selectMoudleBtn(e) {
       this.selectMoudleBtnSty = e;
+    },
+    // 打开排行榜
+    openPh() {
+      
     }
   }
 };
@@ -378,6 +427,7 @@ export default {
   .produce-content {
     // padding: 20px;
     // background-color: #ffffff;
+    padding-bottom: 300px;
     .el-collapse {
       border: none;
     }
@@ -567,34 +617,146 @@ export default {
         margin-bottom: 10px;
       }
     }
-    .produce-bottom-content{
-       margin-top: 20px;
-      padding: 10px 20px 10px 20px;
-      background-color: #ffffff;
-      .collapse-title-sty {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid #e6e9ed;
-        .collapse-title {
-          font-size: 18px;
-          font-weight: 400;
-          color: #73879c;
+    .produce-bottom-chart {
+      display: flex;
+      justify-content: space-between;
+      .bottom-content-left {
+        width: 49%;
+       
+        .produce-bottom-content {
+          margin-top: 20px;
+          padding: 10px 20px 10px 20px;
+          background-color: #ffffff;
+          
+          .collapse-title-sty {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e6e9ed;
+            .collapse-title {
+              font-size: 18px;
+              font-weight: 400;
+              color: #73879c;
+            }
+            .collapse-des {
+              margin-left: 10px;
+              font-size: 80%;
+              font-weight: 400;
+              color: #73879c;
+            }
+            .collapse-tips {
+              margin-left: 10px;
+              font-size: 80%;
+              font-weight: 400;
+              color: #ff0000;
+            }
+          }
+          .produce-bottom-main {
+            margin-top: 25px;
+            margin-bottom: 10px;
+          }
         }
-        .collapse-des {
-          margin-left: 10px;
-          font-size: 80%;
-          font-weight: 400;
-          color: #73879c;
-        }
-        .collapse-tips {
-          margin-left: 10px;
-          font-size: 80%;
-          font-weight: 400;
-          color: #ff0000;
+      }
+      .bottom-content-right {
+         width: 49%;
+        .produce-bottom-content {
+          margin-top: 20px;
+          padding: 10px 20px 10px 20px;
+          background-color: #ffffff;
+          
+          .collapse-title-sty {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e6e9ed;
+            display: flex;
+          justify-content: space-between;
+            .collapse-title {
+              font-size: 18px;
+              font-weight: 400;
+              color: #73879c;
+            }
+            .collapse-des {
+              margin-left: 10px;
+              font-size: 80%;
+              font-weight: 400;
+              color: #73879c;
+            }
+            .collapse-tips {
+              margin-left: 10px;
+              font-size: 80%;
+              font-weight: 400;
+              color: #ff0000;
+            }
+            .collapse-title-right-icon{
+               font-size: 18px;
+               margin-right: 30px;
+            }
+          }
+          .produce-bottom-main {
+            margin-top: 25px;
+            margin-bottom: 10px;
+          }
         }
       }
     }
+    // .produce-bottom-content{
+    //   // margin-top: 20px;
+    //   display: flex;
+    //   justify-content: space-between;
+
+    //   .collapse-title-sty {
+    //     width: 100%;
+    //     display: flex;
+    //     align-items: center;
+    //     justify-content: space-between;
+    //     margin-left: 20px;
+    //     margin-right: 20px;
+    //     border-bottom: 1px solid #e6e9ed;
+    //     padding-top: 20px;
+
+    //     .collapse-title {
+    //       font-size: 18px;
+    //       font-weight: 400;
+    //       color: #73879c;
+    //     }
+    //     .collapse-title-right-icon{
+    //         font-size: 18px;
+    //     }
+    //     .collapse-des {
+    //       margin-left: 10px;
+    //       font-size: 80%;
+    //       font-weight: 400;
+    //       color: #73879c;
+    //     }
+    //     .collapse-tips {
+    //       margin-left: 10px;
+    //       font-size: 80%;
+    //       font-weight: 400;
+    //       color: #ff0000;
+    //     }
+    //   }
+
+    //   .bottom-content-left{
+    //     width: 49%;
+    //      margin-top: 20px;
+    //   .produce-bottom-main {
+    //       margin-top: 25px;
+    //       margin-bottom: 10px;
+    //     }
+    //   }
+    //   .bottom-content-right{
+    //       width: 49%;
+    //         margin-top: 20px;
+    //      // padding: 10px 20px 10px 20px;
+    //     // background-color: #ffffff;
+    //      .produce-bottom-main {
+    //          margin-top: 25px;
+    //          margin-bottom: 10px;
+    //      }
+    //   }
+
+    // }
   }
 }
 </style>
