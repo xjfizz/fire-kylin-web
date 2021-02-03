@@ -51,3 +51,13 @@ export function exportRecord(query) {
     params: query
   })
 }
+
+
+// 查询工场账户余额对账统计信息记录
+export function getStatistics(query) {
+  return request({
+    url: '/wkp/reconciliation/record/getStatistics',
+    method: 'get',
+    params: query
+  })
+}
