@@ -1,75 +1,34 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="工场pkid" prop="workshopPkid">
-        <el-input
-          v-model="queryParams.workshopPkid"
-          placeholder="请输入工场pkid"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="工场账户pkid" prop="workshopAccountPkid">
-        <el-input
-          v-model="queryParams.workshopAccountPkid"
-          placeholder="请输入工场账户pkid"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="提现创建时间" prop="withdrawCreateTime">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.withdrawCreateTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择提现创建时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="提现完成时间" prop="withdrawCompleteTime">
-        <el-date-picker clearable size="small"
-          v-model="queryParams.withdrawCompleteTime"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="选择提现完成时间">
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item label="提现流水编号" prop="withdrawNo">
+    <el-form v-show="showSearch" ref="queryForm" :inline="true" :model="queryParams" label-width="88px">
+      <el-form-item label="交易流水号" prop="withdrawNo">
         <el-input
           v-model="queryParams.withdrawNo"
-          placeholder="请输入提现流水编号"
           clearable
+          placeholder="请输入提现流水编号"
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="提现类型" prop="withdrawType">
-        <el-select v-model="queryParams.withdrawType" placeholder="请选择提现类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="提现支付类型" prop="withdrawPayType">
-        <el-select v-model="queryParams.withdrawPayType" placeholder="请选择提现支付类型" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
-        </el-select>
+      <el-form-item label="创建时间" prop="withdrawCreateTime">
+        <el-date-picker
+          v-model="dateRange"
+          end-placeholder="结束日期"
+          range-separator="-"
+          size="small"
+          start-placeholder="开始日期"
+          style="width: 240px"
+          type="daterange"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
       </el-form-item>
       <el-form-item label="提现状态" prop="withdrawStatus">
-        <el-select v-model="queryParams.withdrawStatus" placeholder="请选择提现状态" clearable size="small">
-          <el-option label="请选择字典生成" value="" />
+        <el-select v-model="queryParams.withdrawStatus" clearable placeholder="请选择提现状态" size="small">
+          <el-option label="请选择字典生成" value=""/>
         </el-select>
       </el-form-item>
-      <el-form-item label="提现金额" prop="withdrawAmount">
-        <el-input
-          v-model="queryParams.withdrawAmount"
-          placeholder="请输入提现金额"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-search" size="mini" type="primary" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -77,121 +36,79 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['withdraw:record:add']"
-        >新增</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['withdraw:record:edit']"
-        >修改</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['withdraw:record:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
           v-hasPermi="['withdraw:record:export']"
+          icon="el-icon-download"
+          plain
+          size="mini"
+          type="warning"
+          @click="handleExport"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="recordList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="账户pkid" align="center" prop="pkid" />
-      <el-table-column label="工场pkid" align="center" prop="workshopPkid" />
-      <el-table-column label="工场账户pkid" align="center" prop="workshopAccountPkid" />
-      <el-table-column label="提现创建时间" align="center" prop="withdrawCreateTime" width="180">
+      <el-table-column align="center" label="创建时间" prop="withdrawCreateTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.withdrawCreateTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.withdrawCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现完成时间" align="center" prop="withdrawCompleteTime" width="180">
+      <el-table-column align="center" label="交易流水号" prop="withdrawNo"/>
+      <el-table-column align="center" label="交易类型" prop="withdrawType"/>
+      <el-table-column align="center" label="支付方式" prop="withdrawPayType"/>
+      <el-table-column align="center" label="提现金额" prop="withdrawAmount"/>
+      <el-table-column align="center" label="提现状态" prop="withdrawStatus"/>
+      <el-table-column align="center" label="完成时间" prop="withdrawCompleteTime" width="180">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.withdrawCompleteTime, '{y}-{m}-{d}') }}</span>
+          <span>{{ parseTime(scope.row.withdrawCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="提现流水编号" align="center" prop="withdrawNo" />
-      <el-table-column label="提现类型" align="center" prop="withdrawType" />
-      <el-table-column label="提现支付类型" align="center" prop="withdrawPayType" />
-      <el-table-column label="提现状态" align="center" prop="withdrawStatus" />
-      <el-table-column label="提现金额" align="center" prop="withdrawAmount" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column align="center" label="备注" prop="remark"/>
+      <el-table-column align="center" class-name="small-padding fixed-width" label="操作">
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
             v-hasPermi="['withdraw:record:edit']"
-          >修改</el-button>
-          <el-button
+            icon="el-icon-edit"
             size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['withdraw:record:remove']"
-          >删除</el-button>
+            @click="handleUpdate(scope.row)"
+          >详情
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
       v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page.sync="queryParams.pageNum"
+      :total="total"
       @pagination="getList"
     />
 
     <!-- 添加或修改工场账户提现记录对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body width="500px">
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="工场pkid" prop="workshopPkid">
-          <el-input v-model="form.workshopPkid" placeholder="请输入工场pkid" />
+          <el-input v-model="form.workshopPkid" placeholder="请输入工场pkid"/>
         </el-form-item>
         <el-form-item label="工场账户pkid" prop="workshopAccountPkid">
-          <el-input v-model="form.workshopAccountPkid" placeholder="请输入工场账户pkid" />
+          <el-input v-model="form.workshopAccountPkid" placeholder="请输入工场账户pkid"/>
         </el-form-item>
         <el-form-item label="提现创建时间" prop="withdrawCreateTime">
-          <el-date-picker clearable size="small"
-            v-model="form.withdrawCreateTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择提现创建时间">
+          <el-date-picker v-model="form.withdrawCreateTime" clearable
+                          placeholder="选择提现创建时间"
+                          size="small"
+                          type="date"
+                          value-format="yyyy-MM-dd">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="提现完成时间" prop="withdrawCompleteTime">
-          <el-date-picker clearable size="small"
-            v-model="form.withdrawCompleteTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择提现完成时间">
+          <el-date-picker v-model="form.withdrawCompleteTime" clearable
+                          placeholder="选择提现完成时间"
+                          size="small"
+                          type="date"
+                          value-format="yyyy-MM-dd">
           </el-date-picker>
         </el-form-item>
         <el-form-item label="提现流水编号" prop="withdrawNo">
@@ -216,7 +133,7 @@
           <el-input v-model="form.withdrawAmount" placeholder="请输入提现金额" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <el-input v-model="form.remark" placeholder="请输入内容" type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -228,7 +145,7 @@
 </template>
 
 <script>
-import { listRecord, getRecord, delRecord, addRecord, updateRecord, exportRecord } from "@/api/asset/withdraw/withdraw";
+import {addRecord, delRecord, exportRecord, getRecord, listRecord, updateRecord} from "@/api/asset/withdraw/withdraw";
 
 export default {
   name: "Record",
@@ -250,6 +167,8 @@ export default {
       total: 0,
       // 工场账户提现记录表格数据
       recordList: [],
+      // 日期范围
+      dateRange: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -306,7 +225,7 @@ export default {
     /** 查询工场账户提现记录列表 */
     getList() {
       this.loading = true;
-      listRecord(this.queryParams).then(response => {
+      listRecord(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         this.recordList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -345,6 +264,7 @@ export default {
     },
     /** 重置按钮操作 */
     resetQuery() {
+      this.dateRange = [];
       this.resetForm("queryForm");
       this.handleQuery();
     },
