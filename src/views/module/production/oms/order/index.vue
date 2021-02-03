@@ -1,17 +1,17 @@
 <template>
   <div class="app-container">
     <el-form
-      :model="queryParams"
+      v-show="showSearch"
       ref="queryForm"
       :inline="true"
-      v-show="showSearch"
+      :model="queryParams"
       label-width="68px"
     >
       <el-form-item label="订单状态" prop="orderStatus">
         <el-select
           v-model="queryParams.orderStatus"
-          placeholder="请选择订单状态"
           clearable
+          placeholder="请选择订单状态"
           size="small"
           style="width: 240px"
         >
@@ -42,8 +42,8 @@
       <el-form-item label="订单编号" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
-          placeholder="请输入订单编号"
           clearable
+          placeholder="请输入订单编号"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -51,8 +51,8 @@
       <el-form-item label="用户名称" prop="userName">
         <el-input
           v-model="queryParams.userName"
-          placeholder="请输入用户名称"
           clearable
+          placeholder="请输入用户名称"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -60,8 +60,8 @@
       <el-form-item label="手机号码" prop="wxappPhone">
         <el-input
           v-model="queryParams.wxappPhone"
-          placeholder="请输入手机号码"
           clearable
+          placeholder="请输入手机号码"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -69,17 +69,17 @@
       <el-form-item label="创建时间" prop="orderCreateTime">
         <el-date-picker
           v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
           end-placeholder="结束日期"
+          range-separator="-"
+          size="small"
+          start-placeholder="开始日期"
+          style="width: 240px"
+          type="daterange"
+          value-format="yyyy-MM-dd"
         ></el-date-picker>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-search" size="mini" type="primary" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -87,39 +87,39 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
           icon="el-icon-s-help"
+          plain
           size="mini"
+          type="primary"
           @click="mergeOrders()"
         >合并取料</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
           icon="el-icon-s-goods"
+          plain
           size="mini"
+          type="success"
           @click="sendOrders()"
         >合并配送</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
           icon="el-icon-s-check"
+          plain
           size="mini"
+          type="primary"
           @click="confirmOrders"
         >确认接单</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
           v-hasPermi="['oms:order:export']"
+          icon="el-icon-download"
+          plain
+          size="mini"
+          type="warning"
+          @click="handleExport"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -131,114 +131,114 @@
       :data="orderList"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="订单编号" align="center" prop="orderNo" width="230" />
-      <el-table-column label="用户名称" align="center" prop="wmsUser.userName" />
-      <el-table-column label="手机号码" align="center" prop="wmsUser.wxappPhone" />
-      <el-table-column label="商品名称" align="center" prop="pmsServer.serverName" />
-      <el-table-column label="商品数量" align="center" prop="orderQuantity" />
-      <el-table-column label="商品规格" align="center" prop="orderSpecification" >
+      <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" label="订单编号" prop="orderNo" width="230" />
+      <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
+      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" />
+      <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
+      <el-table-column align="center" label="商品数量" prop="orderQuantity" />
+      <el-table-column align="center" label="商品规格" prop="orderSpecification" >
          <template slot-scope="{row}">
                 {{ row.orderSpecification || '暂无' }}
             </template>
       </el-table-column>
-      <el-table-column label="订单价格" align="center" prop="orderAmount">
+      <el-table-column align="center" label="订单价格" prop="orderAmount">
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
         </template>
       </el-table-column>
       <el-table-column
-        label="配送方式"
-        align="center"
-        prop="orderDeliveryType"
         :formatter="orderDeliveryTypeFormat"
+        align="center"
+        label="配送方式"
+        prop="orderDeliveryType"
         width="100"
       />
       <el-table-column
-        label="订单状态"
-        align="center"
-        prop="orderStatus"
         :formatter="orderStatusFormat"
+        align="center"
+        label="订单状态"
+        prop="orderStatus"
         width="100"
       />
-      <el-table-column label="订单创建时间" align="center" prop="orderCreateTime" width="180">
+      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="orderNote"  show-overflow-tooltip />
-      <el-table-column label="操作" align="left" class-name="small-padding fixed-width" width="200">
+      <el-table-column align="center" label="备注" prop="orderNote"  show-overflow-tooltip />
+      <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="200">
         <template slot-scope="scope">
           <el-button
+            icon="el-icon-printer"
             size="mini"
             type="text"
-            icon="el-icon-printer"
             @click="printOrder(scope.row)"
           >打印</el-button>
           <el-button
+            v-hasPermi="['oms:order:edit']"
+            icon="el-icon-edit"
             size="mini"
             type="text"
-            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['oms:order:edit']"
           >详情</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #008489"
-            icon="el-icon-s-help"
-            @click="pickOrder(scope.row)"
             v-show="scope.row.orderStatus === '2'"
             v-hasPermi="['oms:order:remove']"
+            icon="el-icon-s-help"
+            size="mini"
+            style="color: #008489"
+            type="text"
+            @click="pickOrder(scope.row)"
           >取料</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #787be8"
-            icon="el-icon-s-check"
-            @click="confirmOrderSingle(scope.row)"
             v-show="scope.row.orderStatus === '4'"
+            icon="el-icon-s-check"
+            size="mini"
+            style="color: #787be8"
+            type="text"
+            @click="confirmOrderSingle(scope.row)"
           >确认</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #C03639"
-            icon="el-icon-s-open"
-            @click="handleDelete(scope.row)"
             v-show="scope.row.orderStatus === '4'"
             v-hasPermi="['oms:order:remove']"
+            icon="el-icon-s-open"
+            size="mini"
+            style="color: #C03639"
+            type="text"
+            @click="handleDelete(scope.row)"
           >取消</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #f8ac59"
-            icon="el-icon-s-operation"
-            @click="rosterOrder(scope.row)"
             v-show="scope.row.orderStatus === '5'"
+            icon="el-icon-s-operation"
+            size="mini"
+            style="color: #f8ac59"
+            type="text"
+            @click="rosterOrder(scope.row)"
           >排班</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #f8ac59"
-            icon="el-icon-search"
-            @click="checkOrder(scope.row)"
             v-show="scope.row.orderStatus === '8'"
+            icon="el-icon-search"
+            size="mini"
+            style="color: #f8ac59"
+            type="text"
+            @click="checkOrder(scope.row)"
           >检测</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: #f8ac59"
+            v-show="scope.row.orderStatus === '12' && scope.row.orderDeliveryType == 1"
             icon="el-icon-truck"
+            size="mini"
+            style="color: #f8ac59"
+            type="text"
             @click="pickedGoods(scope.row)"
-            v-show="scope.row.orderStatus === '10' && scope.row.orderDeliveryType == 1"
           >已取货</el-button>
           <el-button
-            size="mini"
-            type="text"
-            style="color: indianred"
-            icon="el-icon-s-promotion"
-            @click="sendOrder(scope.row)"
             v-show="scope.row.orderStatus === '10' && scope.row.orderDeliveryType == 2"
+            icon="el-icon-s-promotion"
+            size="mini"
+            style="color: indianred"
+            type="text"
+            @click="sendOrder(scope.row)"
           >配送</el-button>
         </template>
       </el-table-column>
@@ -246,15 +246,15 @@
 
     <pagination
       v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page.sync="queryParams.pageNum"
+      :total="total"
       @pagination="getList"
     />
 
     <!-- 添加或修改wxapp端订单对话框 -->
     <el-dialog :title="title" :visible.sync="open" append-to-body @closed="handleClose">
-      <el-form ref="form" :model="form" label-width="180px" v-loading="loading">
+      <el-form ref="form" v-loading="loading" :model="form" label-width="180px">
         <el-card>
           <div slot="header" style="padding-left:15px">
             <span>订单进度</span>
@@ -263,27 +263,27 @@
             <div class="step-style">
               <el-steps
                 :active="formatStepStatus(form.orderStatus)"
-                finish-status="success"
                 align-center
+                finish-status="success"
               >
-                <el-step title="创建时间" :description="form.orderCreateTime"></el-step>
-                <el-step title="支付时间" :description="form.orderPayTime"></el-step>
-                <el-step title="加工时间" :description="form.productionStartTime"></el-step>
-                <el-step title="完成时间" :description="form.confirmReceiptTime"></el-step>
+                <el-step :description="form.orderCreateTime" title="创建时间"></el-step>
+                <el-step :description="form.orderPayTime" title="支付时间"></el-step>
+                <el-step :description="form.productionStartTime" title="加工时间"></el-step>
+                <el-step :description="form.confirmReceiptTime" title="完成时间"></el-step>
               </el-steps>
             </div>
           </div>
           <el-row style="margin-top: 10px">
             <el-card>
               <div slot="header">
-                <el-tag type="danger" effect="plain">商品信息</el-tag>
+                <el-tag effect="plain" type="danger">商品信息</el-tag>
               </div>
               <div class="el-table el-table--enable-row-hover el-table--medium">
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
                     <tr>
                       <td rowspan="2">
-                        <div class="cell" v-if="form.pmsServer">
+                        <div v-if="form.pmsServer" class="cell">
                           <el-popover placement="top-start" title trigger="hover">
                             <img
                               :src="form.pmsServer.serverImageUrl"
@@ -302,7 +302,7 @@
                         <div class="cell">商品名称：</div>
                       </td>
                       <td colspan="7">
-                        <div class="cell" v-if="form.pmsServer">{{ form.pmsServer.serverName }}</div>
+                        <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverName }}</div>
                       </td>
                     </tr>
                     <tr>
@@ -310,25 +310,25 @@
                         <div class="cell">商品规格：</div>
                       </td>
                       <td>
-                        <div class="cell" v-if="form">{{ form.orderSpecification }}</div>
+                        <div v-if="form" class="cell">{{ form.orderSpecification }}</div>
                       </td>
                       <td>
                         <div class="cell">商品价格：</div>
                       </td>
                       <td>
-                        <div class="cell" v-if="form">￥{{ form.orderAmount | money}}</div>
+                        <div v-if="form" class="cell">￥{{ form.orderAmount | money}}</div>
                       </td>
                       <td>
                         <div class="cell">商品数量：</div>
                       </td>
                       <td>
-                        <div class="cell" v-if="form">{{ form.orderQuantity }}</div>
+                        <div v-if="form" class="cell">{{ form.orderQuantity }}</div>
                       </td>
                       <td>
                         <div class="cell">商品线数：</div>
                       </td>
                       <td>
-                        <div class="cell" v-if="form">{{ form.orderLineQuantity }}</div>
+                        <div v-if="form" class="cell">{{ form.orderLineQuantity }}</div>
                       </td>
                     </tr>
                     <tr>
@@ -336,7 +336,7 @@
                         <div class="cell">备注信息：</div>
                       </td>
                       <td colspan="7">
-                        <div class="cell" v-if="form">{{ form.remark }}</div>
+                        <div v-if="form" class="cell">{{ form.remark }}</div>
                       </td>
                     </tr>
                   </tbody>
@@ -347,7 +347,7 @@
           <el-row style="margin-top: 10px">
             <el-card>
               <div slot="header">
-                <el-tag type="danger" effect="plain">订单信息</el-tag>
+                <el-tag effect="plain" type="danger">订单信息</el-tag>
               </div>
               <el-tabs v-model="activeName" @tab-click>
                 <el-tab-pane label="订单信息" name="order">
@@ -360,8 +360,8 @@
                           </td>
                           <td colspan="3">
                             <div
-                              class="cell"
                               v-if="form.wmsUser"
+                              class="cell"
                             >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
                           </td>
                         </tr>
@@ -370,13 +370,13 @@
                             <div class="cell">订单编号：</div>
                           </td>
                           <td>
-                            <div class="cell" v-if="form">{{ form.orderNo }}</div>
+                            <div v-if="form" class="cell">{{ form.orderNo }}</div>
                           </td>
                           <td>
                             <div class="cell">订单状态：</div>
                           </td>
                           <td>
-                            <div class="cell" v-if="form">{{ formatOrderStatus(form.orderStatus) }}</div>
+                            <div v-if="form" class="cell">{{ formatOrderStatus(form.orderStatus) }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -384,7 +384,7 @@
                             <div class="cell">订单备注：</div>
                           </td>
                           <td colspan="3">
-                            <div class="cell" v-if="form">{{ form.orderNote }}</div>
+                            <div v-if="form" class="cell">{{ form.orderNote }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -392,15 +392,15 @@
                             <div class="cell">加工费用：</div>
                           </td>
                           <td>
-                            <div class="cell" v-if="form">￥{{ form.orderProcessAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderProcessAmount | money }}</div>
                           </td>
                           <td>
                             <div class="cell">加工税费：</div>
                           </td>
                           <td>
                             <div
-                              class="cell"
                               v-if="form.pmsServer"
+                              class="cell"
                             >￥{{ form.orderTaxAmount | money }}（税率{{ form.pmsServer.serverTaxRate }}%）</div>
                           </td>
                         </tr>
@@ -409,13 +409,13 @@
                             <div class="cell">物流费用：</div>
                           </td>
                           <td>
-                            <div class="cell" v-if="form">￥{{ form.orderFreightAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderFreightAmount | money }}</div>
                           </td>
                           <td>
                             <div class="cell">实付金额：</div>
                           </td>
                           <td>
-                            <div class="cell" v-if="form">￥{{ form.orderPayAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderPayAmount | money }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -424,8 +424,8 @@
                           </td>
                           <td>
                             <div
-                              class="cell"
                               v-if="form"
+                              class="cell"
                             >{{ formatOrderPayType(form.orderPayType) }}</div>
                           </td>
                           <td>
@@ -433,8 +433,8 @@
                           </td>
                           <td>
                             <div
-                              class="cell"
                               v-if="form"
+                              class="cell"
                             >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
                           </td>
                         </tr>
@@ -456,15 +456,15 @@
                                 <div class="cell">运单编号：</div>
                               </td>
                               <td>
-                                <div class="cell" v-if="form">{{ form.reclaimerOmsWaybill.waybillNo }}</div>
+                                <div v-if="form" class="cell">{{ form.reclaimerOmsWaybill.waybillNo }}</div>
                               </td>
                               <td>
                                 <div class="cell">取料方式：</div>
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form"
+                                  class="cell"
                                 >上门取料</div>
                               </td>
                             </tr>
@@ -474,8 +474,8 @@
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form.wmsUser"
+                                  class="cell"
                                 >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }})</div>
                               </td>
                               <td>
@@ -483,8 +483,8 @@
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form"
+                                  class="cell"
                                 >{{ parseTime(form.reclaimerOmsWaybill.waybillCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
                               </td>
                             </tr>
@@ -493,7 +493,7 @@
                                 <div class="cell">取料信息：</div>
                               </td>
                               <td colspan="3">
-                                <div class="cell" v-if="form.wmsUserReceiveAddress">
+                                <div v-if="form.wmsUserReceiveAddress" class="cell">
                                   {{ form.wmsUserReceiveAddress.receiveName }}，
                                   {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
                                   {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}
@@ -506,8 +506,8 @@
                               </td>
                               <td colspan="3">
                                 <div
-                                  class="cell"
                                   v-if="form.reclaimerUserInfo"
+                                  class="cell"
                                 >{{ form.reclaimerUserInfo.nickName }}，{{ form.reclaimerUserInfo.phonenumber || '暂无手机号' }}</div>
                               </td>
                             </tr>
@@ -516,10 +516,10 @@
                       </div>
                     </el-card>
                   </el-row>
-                  <el-row style="margin-top: 10px" v-if="form.deliveryOmsWaybill">
+                  <el-row v-if="form.deliveryOmsWaybill" style="margin-top: 10px">
                     <el-card>
                       <div slot="header">
-                        <el-tag type="success" effect="plain">配送</el-tag>
+                        <el-tag effect="plain" type="success">配送</el-tag>
                       </div>
                       <div class="el-table el-table--enable-row-hover el-table--medium">
                         <table cellspacing="0" style="width: 100%;">
@@ -529,15 +529,15 @@
                                 <div class="cell">运单编号：</div>
                               </td>
                               <td>
-                                <div class="cell" v-if="form">{{ form.deliveryOmsWaybill.waybillNo}}</div>
+                                <div v-if="form" class="cell">{{ form.deliveryOmsWaybill.waybillNo}}</div>
                               </td>
                               <td>
                                 <div class="cell">配送方式：</div>
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form"
+                                  class="cell"
                                 >配送上门</div>
                               </td>
                             </tr>
@@ -547,8 +547,8 @@
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form.wmsUser"
+                                  class="cell"
                                 >{{ form.wmsUser.nickName }}（{{ form.wmsUser.wxappPhone }}）</div>
                               </td>
                               <td>
@@ -556,8 +556,8 @@
                               </td>
                               <td>
                                 <div
-                                  class="cell"
                                   v-if="form"
+                                  class="cell"
                                 >{{ parseTime(form.deliveryOmsWaybill.waybillCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
                               </td>
                             </tr>
@@ -566,7 +566,7 @@
                                 <div class="cell">配送信息：</div>
                               </td>
                               <td colspan="3">
-                                <div class="cell" v-if="form.wmsUserReceiveAddress">
+                                <div v-if="form.wmsUserReceiveAddress" class="cell">
                                   {{ form.wmsUserReceiveAddress.receiveName }}，
                                   {{ form.wmsUserReceiveAddress.receivePhone }}，{{ form.wmsUserReceiveAddress.province }}，{{ form.wmsUserReceiveAddress.city }}，
                                   {{ form.wmsUserReceiveAddress.region }}，{{ form.wmsUserReceiveAddress.detailAddress }}
@@ -579,8 +579,8 @@
                               </td>
                               <td colspan="3">
                                 <div
-                                  class="cell"
                                   v-if="form.wmsUser"
+                                  class="cell"
                                 >{{ form.deliveryUserInfo.nickName }}，{{ form.deliveryUserInfo.phonenumber || '暂无手机号'}}</div>
                               </td>
                             </tr>
@@ -600,8 +600,8 @@
                           </td>
                           <td>
                             <div
-                              class="cell"
                               v-if="form"
+                              class="cell"
                             >{{ formatOrderPayType(form.orderPayType) }}</div>
                           </td>
                         </tr>
@@ -611,8 +611,8 @@
                           </td>
                           <td>
                             <div
-                              class="cell"
                               v-if="form"
+                              class="cell"
                             >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
                           </td>
                         </tr>
@@ -633,21 +633,21 @@
     <!-- 对话框-start -->
     <div class="order-dialog">
       <!-- 取料分配配送员-dialog -->
-      <el-dialog title="选择配送员" :visible.sync="pickerVisible" width="400px" center>
+      <el-dialog :visible.sync="pickerVisible" center title="选择配送员" width="400px">
         <div class="relationVisibleMain">
           <div class="relationVisibleMain-top">
-            <el-input placeholder="请输入工号/姓名" v-model="pickerSearchKey" clearable></el-input>
+            <el-input v-model="pickerSearchKey" clearable placeholder="请输入工号/姓名"></el-input>
 
             <el-button
               class="search-button"
-              type="primary"
               icon="el-icon-search"
               size="medium"
+              type="primary"
               @click="getPickerList()"
             >查询</el-button>
           </div>
-          <div class="mid" v-if="pickerList.length > 0">
-            <div class="item" v-for="(item,index) in pickerList" :key="index">
+          <div v-if="pickerList.length > 0" class="mid">
+            <div v-for="(item,index) in pickerList" :key="index" class="item">
               <div class="left">
                 <el-radio
                   v-model="selelctPickerId"
@@ -662,32 +662,32 @@
               </div>
             </div>
           </div>
-          <div class="mid mid-no" v-else>
+          <div v-else class="mid mid-no">
             <span>暂无数据</span>
           </div>
           <div slot="footer" class="dialog-footer bottom">
             <el-button class="opt-button" size="medium" @click="cancelPicker()">取消</el-button>
-            <el-button class="opt-button" type="primary" size="medium" @click="confirmPicker()">确认</el-button>
+            <el-button class="opt-button" size="medium" type="primary" @click="confirmPicker()">确认</el-button>
           </div>
         </div>
       </el-dialog>
 
       <!-- 生产员分配-dialog -->
-      <el-dialog title="选择生产员" :visible.sync="producterVisible" width="400px" center>
+      <el-dialog :visible.sync="producterVisible" center title="选择生产员" width="400px">
         <div class="relationVisibleMain">
           <div class="relationVisibleMain-top">
-            <el-input placeholder="请输入工号/姓名" v-model="producterSearchKey" clearable></el-input>
+            <el-input v-model="producterSearchKey" clearable placeholder="请输入工号/姓名"></el-input>
 
             <el-button
               class="search-button"
-              type="primary"
               icon="el-icon-search"
               size="medium"
+              type="primary"
               @click="getProducterList()"
             >查询</el-button>
           </div>
-          <div class="mid" v-if="producterList.length > 0">
-            <div class="item" v-for="(item,index) in producterList" :key="index">
+          <div v-if="producterList.length > 0" class="mid">
+            <div v-for="(item,index) in producterList" :key="index" class="item">
               <div class="left">
                 <el-radio
                   v-model="selelctProducterId"
@@ -702,15 +702,15 @@
               </div>
             </div>
           </div>
-          <div class="mid mid-no" v-else>
+          <div v-else class="mid mid-no">
             <span>暂无数据</span>
           </div>
           <div slot="footer" class="dialog-footer bottom">
             <el-button class="opt-button" size="medium" @click="cancelProducter()">取消</el-button>
             <el-button
               class="opt-button"
-              type="primary"
               size="medium"
+              type="primary"
               @click="confirmProducter()"
             >确认</el-button>
           </div>
@@ -718,21 +718,21 @@
       </el-dialog>
 
       <!-- 检测员分配-dialog -->
-      <el-dialog title="选择检测员" :visible.sync="checkerVisible" width="400px" center>
+      <el-dialog :visible.sync="checkerVisible" center title="选择检测员" width="400px">
         <div class="relationVisibleMain">
           <div class="relationVisibleMain-top">
-            <el-input placeholder="请输入工号/姓名" v-model="checkerSearchKey" clearable></el-input>
+            <el-input v-model="checkerSearchKey" clearable placeholder="请输入工号/姓名"></el-input>
 
             <el-button
               class="search-button"
-              type="primary"
               icon="el-icon-search"
               size="medium"
+              type="primary"
               @click="getCheckerList()"
             >查询</el-button>
           </div>
-          <div class="mid" v-if="checkerList.length > 0">
-            <div class="item" v-for="(item,index) in checkerList" :key="index">
+          <div v-if="checkerList.length > 0" class="mid">
+            <div v-for="(item,index) in checkerList" :key="index" class="item">
               <div class="left">
                 <el-radio
                   v-model="selelctCheckerId"
@@ -747,12 +747,12 @@
               </div>
             </div>
           </div>
-          <div class="mid mid-no" v-else>
+          <div v-else class="mid mid-no">
             <span>暂无数据</span>
           </div>
           <div slot="footer" class="dialog-footer bottom">
             <el-button class="opt-button" size="medium" @click="cancelChecker()">取消</el-button>
-            <el-button class="opt-button" type="primary" size="medium" @click="confirmChecker()">确认</el-button>
+            <el-button class="opt-button" size="medium" type="primary" @click="confirmChecker()">确认</el-button>
           </div>
         </div>
       </el-dialog>
@@ -760,9 +760,9 @@
       <!-- 订单是否取料检测组件 -->
       <isPickDialog
         ref="isPickDialogRef"
+        :isPickList="isPickList"
         :title="dialogTitle"
         :visible="isPickVisible"
-        :isPickList="isPickList"
       ></isPickDialog>
 
       <!-- 打印组件 -->
@@ -774,25 +774,26 @@
 
 <script>
 import {
-  listOrder,
-  getOrder,
-  delOrder,
   addOrder,
-  updateOrder,
-  exportOrder,
-  getPickers,
-  mergeOrder,
   confirmOrder,
-  getProducters,
-  listRoster,
-  orderRosterProduct,
+  delOrder,
+  exportOrder,
   getCheckerListApi,
+  getOrder,
+  getPickers,
+  getProducters,
+  listOrder,
+  listRoster,
+  mergeOrder,
   orderAssignChecker,
   orderAssignSender,
-  orderPicked
+  orderPicked,
+  orderRosterProduct,
+  updateOrder
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
+
 export default {
   name: "Order",
   components: {
@@ -1092,18 +1093,18 @@ export default {
             return 1;
           }
       }
-      
+
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
       return  row.orderDeliveryType == 1 ? (row.orderStatus == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)) : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
-     
+
     },
     // 运单状态格式化
     formatOrderStatus(value) {
-      
+
       return  this.form.orderDeliveryType == 1 ? (value == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, value)) : this.selectDictLabel(this.orderStatusOptions, value)
-      
+
     },
     // 订单支付类型格式化
     formatOrderPayType(value) {
@@ -1761,5 +1762,5 @@ export default {
   }
 };
 </script>
-<style rel="stylesheet/scss" lang="scss">
+<style lang="scss" rel="stylesheet/scss">
 </style>

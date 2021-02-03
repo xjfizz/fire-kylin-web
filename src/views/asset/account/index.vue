@@ -1,53 +1,55 @@
 <template>
   <div class="app-container">
     <div class="account-top">
-      <div class="account-top-top">
-        <div class="left">
-          <div class="left-title">可提现余额:</div>
-          <div class="left-value">8000元</div>
-          <div class="left-btn">
-            <el-button size="mini" type="primary">提现</el-button>
+      <el-card>
+        <div class="account-top-top">
+          <div class="left">
+            <div class="left-title"><label>可提现余额:</label></div>
+            <div class="left-value">￥{{ wkpAccount.balanceAmount | money }} 元</div>
+            <div class="left-btn">
+              <el-button size="mini" type="primary">提现</el-button>
+            </div>
+          </div>
+          <div class="right">
+            <div class="right-title"><label>提现账户:</label></div>
+            <div class="right-value">【交通银行】 62231554444145511</div>
+            <div class="right-btn">
+              <el-button size="mini" type="warning">管理</el-button>
+            </div>
           </div>
         </div>
-        <div class="right">
-          <div class="right-title">提现账户:</div>
-          <div class="right-value">【交通银行】 62231554444145511</div>
-          <div class="right-btn">
-            <el-button size="mini" type="success">管理</el-button>
+        <div class="account-top-bottom">
+          <div class="left">
+            <div class="left-title"><label>未入账金额:</label></div>
+            <div class="left-value">￥{{ wkpAccount.unrecordedAmount | money }} 元</div>
+          </div>
+          <div class="mid">
+            <div class="mid-title"><label>提现中:</label></div>
+            <div class="mid-value">￥{{ wkpAccount.withdrawProgressAmount | money }} 元</div>
+            <div class="mid-btn" @click="goWithdrawList">
+              提现明细
+              <!-- <el-button  type="text">提现明细</el-button> -->
+            </div>
+          </div>
+          <div class="right">
+            <div class="right-title"><label>已提金额:</label></div>
+            <div class="right-value">￥{{ wkpAccount.completeWithdrawAmount | money }} 元</div>
           </div>
         </div>
-      </div>
-      <div class="account-top-bottom">
-        <div class="left">
-          <div class="left-title">未入账:</div>
-          <div class="left-value">8000.00元</div>
-        </div>
-        <div class="mid">
-          <div class="mid-title">提现中:</div>
-          <div class="mid-value">80000元</div>
-          <div class="mid-btn" @click="goWithdrawList">
-            提现明细
-            <!-- <el-button  type="text">提现明细</el-button> -->
-          </div>
-        </div>
-        <div class="right">
-          <div class="right-title">已提现</div>
-          <div class="right-value">30元</div>
-        </div>
-      </div>
+      </el-card>
     </div>
     <el-form
-      :model="queryParams"
+      v-show="showSearch"
       ref="queryForm"
       :inline="true"
-      v-show="showSearch"
+      :model="queryParams"
       label-width="80px"
     >
       <el-form-item label="订单编号" prop="relationOrderNo">
         <el-input
           v-model="queryParams.relationOrderNo"
-          placeholder="请输入关联订单编号"
           clearable
+          placeholder="请输入关联订单编号"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -55,8 +57,8 @@
       <el-form-item label="流水编号" prop="transactionNo">
         <el-input
           v-model="queryParams.transactionNo"
-          placeholder="请输入交易流水编号"
           clearable
+          placeholder="请输入交易流水编号"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -64,13 +66,13 @@
       <el-form-item label="创建时间" prop="transactionCreateTime">
         <el-date-picker
           v-model="dateRange"
-          size="small"
-          style="width: 240px"
-          value-format="yyyy-MM-dd"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="开始日期"
           end-placeholder="结束日期"
+          range-separator="-"
+          size="small"
+          start-placeholder="开始日期"
+          style="width: 240px"
+          type="daterange"
+          value-format="yyyy-MM-dd"
         ></el-date-picker>
       </el-form-item>
       <el-form-item label="交易类型" prop="transactionType">
@@ -89,7 +91,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-search" size="mini" type="primary" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -97,122 +99,177 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
           v-hasPermi="['wkp:record:export']"
-        >导出</el-button>
+          icon="el-icon-download"
+          plain
+          size="mini"
+          type="warning"
+          @click="handleExport"
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="recordList" @selection-change="handleSelectionChange">
-      <el-table-column label="创建交易时间" align="center" prop="transactionCreateTime" width="180">
+      <el-table-column align="center" label="创建交易时间" prop="transactionCreateTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.transactionCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="关联订单号" align="center" prop="relationOrderNo" />
-      <el-table-column label="交易流水号" align="center" prop="transactionNo" />
+      <el-table-column align="center" label="关联订单号" prop="relationOrderNo"/>
+      <el-table-column align="center" label="交易流水号" prop="transactionNo"/>
       <el-table-column
-        label="交易类型"
-        align="center"
-        prop="transactionType"
         :formatter="transactionTypeFormat"
+        align="center"
+        label="交易类型"
+        prop="transactionType"
       />
       <el-table-column
-        label="支付方式"
-        align="center"
-        prop="transactionPayType"
         :formatter="transactionPayTypeFormat"
+        align="center"
+        label="支付方式"
+        prop="transactionPayType"
       />
-      <el-table-column label="交易金额" align="center" prop="transactionAmount" />
-      <el-table-column label="完成交易时间" align="center" prop="transactionCompleteTime" width="180">
+      <el-table-column align="center" label="交易金额" prop="transactionAmount">
+        <template slot-scope="scope">
+          <span v-if="scope.row.transactionType === '2' || scope.row.transactionType === '3'" style="color: red">
+            ￥-{{ scope.row.transactionAmount | money }}
+          </span>
+          <span v-else>
+            ￥{{ scope.row.transactionAmount | money }}
+          </span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="完成交易时间" prop="transactionCompleteTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.transactionCompleteTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" show-overflow-tooltip />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column align="center" label="备注" prop="remark" show-overflow-tooltip/>
+      <el-table-column align="center" class-name="small-padding fixed-width" label="操作">
         <template slot-scope="scope">
           <el-button
+            v-hasPermi="['wkp:record:edit']"
+            icon="el-icon-edit"
             size="mini"
             type="text"
-            icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['wkp:record:edit']"
-          >查看</el-button>
+          >查看
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
       v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page.sync="queryParams.pageNum"
+      :total="total"
       @pagination="getList"
     />
 
     <!-- 添加或修改工场账户记录对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="工场pkid" prop="workshopPkid">
-          <el-input v-model="form.workshopPkid" placeholder="请输入工场pkid" />
-        </el-form-item>
-        <el-form-item label="工场账户pkid" prop="workshopAccountPkid">
-          <el-input v-model="form.workshopAccountPkid" placeholder="请输入工场账户pkid" />
-        </el-form-item>
-        <el-form-item label="交易创建时间" prop="transactionCreateTime">
-          <el-date-picker
-            clearable
-            size="small"
-            v-model="form.transactionCreateTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择交易创建时间"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="交易完成时间" prop="transactionCompleteTime">
-          <el-date-picker
-            clearable
-            size="small"
-            v-model="form.transactionCompleteTime"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择交易完成时间"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item label="关联订单pkid" prop="relationOrderPkid">
-          <el-input v-model="form.relationOrderPkid" placeholder="请输入关联订单pkid" />
-        </el-form-item>
-        <el-form-item label="关联订单编号" prop="relationOrderNo">
-          <el-input v-model="form.relationOrderNo" placeholder="请输入关联订单编号" />
-        </el-form-item>
-        <el-form-item label="交易流水编号" prop="transactionNo">
-          <el-input v-model="form.transactionNo" placeholder="请输入交易流水编号" />
-        </el-form-item>
-        <el-form-item label="交易类型" prop="transactionType">
-          <el-select v-model="form.transactionType" placeholder="请选择交易类型">
-            <el-option label="请选择字典生成" value />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="交易支付类型" prop="transactionPayType">
-          <el-select v-model="form.transactionPayType" placeholder="请选择交易支付类型">
-            <el-option label="请选择字典生成" value />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="交易金额" prop="transactionAmount">
-          <el-input v-model="form.transactionAmount" placeholder="请输入交易金额" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
+        <el-card>
+          <div slot="header" style="padding-left:15px">
+            <el-tag effect="plain" type="danger">交易时间轴</el-tag>
+          </div>
+          <div class="detail-container">
+            <div class="step-style">
+              <el-steps
+                :active="formatStepStatus(form)"
+                align-center
+                finish-status="success"
+              >
+                <el-step :description="form.transactionCreateTime" title="创建交易时间"></el-step>
+                <el-step :description="form.transactionCompleteTime" title="完成交易时间"></el-step>
+              </el-steps>
+            </div>
+          </div>
+          <el-row v-if="form" style="margin-top: 10px">
+            <el-card>
+              <div slot="header">
+                <el-tag effect="plain" type="warning">交易详情</el-tag>
+              </div>
+              <div class="el-table el-table--enable-row-hover el-table--medium">
+                <table cellspacing="0" style="width: 100%;">
+                  <tbody>
+                  <tr>
+                    <td>
+                      <div class="cell">创建交易时间：</div>
+                    </td>
+                    <td>
+                      <div v-if="form" class="cell">{{ form.transactionCreateTime }}</div>
+                    </td>
+                    <td>
+                      <div class="cell">完成交易时间：</div>
+                    </td>
+                    <td>
+                      <div v-if="form" class="cell">{{ form.transactionCompleteTime }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell">关联单号：</div>
+                    </td>
+                    <td>
+                      <div v-if="form" class="cell">{{ form.relationOrderNo }}</div>
+                    </td>
+                    <td>
+                      <div class="cell">交易流水号：</div>
+                    </td>
+                    <td>
+                      <div v-if="form" class="cell">{{ form.transactionNo }}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell">交易类型：</div>
+                    </td>
+                    <td>
+                      <div
+                        v-if="form"
+                        class="cell"
+                      >{{ formatTransactionType(form.transactionType) }}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="cell">支付方式：</div>
+                    </td>
+                    <td>
+                      <div
+                        v-if="form"
+                        class="cell"
+                      >{{ formatTransactionPayType(form.transactionPayType) }}
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cell">交易金额：</div>
+                    </td>
+                    <td colspan="3">
+                      <div
+                        v-if="form.transactionType === '2' || form.transactionType === '3'"
+                        class="cell"
+                        style="color:red;"
+                      >￥-{{ form.transactionAmount | money }}
+                      </div>
+                      <div v-else class="cell">
+                        ￥{{ form.transactionAmount | money }}
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </el-card>
+          </el-row>
+        </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -221,12 +278,13 @@
 
 <script>
 import {
-  listRecord,
-  getRecord,
-  delRecord,
   addRecord,
-  updateRecord,
-  exportRecord
+  delRecord,
+  exportRecord,
+  getAccount,
+  getRecord,
+  listRecord,
+  updateRecord
 } from "@/api/asset/account/record/record";
 
 export default {
@@ -246,6 +304,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
+      // 工场账户对象
+      wkpAccount: {},
       // 工场账户记录表格数据
       recordList: [],
       // 日期范围
@@ -302,6 +362,7 @@ export default {
     };
   },
   created() {
+    this.getWorkshopAccount();
     this.getList();
     // 从字典数据获取交易类型
     this.getDicts("wkp_transaction_type").then(response => {
@@ -312,7 +373,37 @@ export default {
       this.transactionPayTypeOptions = response.data;
     });
   },
+  // 订单金额过滤器
+  filters: {
+    money(value) {
+      if (!value) return "0.00";
+      const intPart = Number(value).toFixed(0); //获取整数部分
+      const intPartFormat = intPart
+        .toString()
+        .replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"); //将整数部分逢三一断
+      let floatPart = ".00"; //预定义小数部分
+      const value2Array = value.toString().split(".");
+      //=2表示数据有小数位
+      if (value2Array.length === 2) {
+        floatPart = value2Array[1].toString(); //拿到小数部分
+        if (floatPart.length === 1) {
+          //补0,
+          return intPartFormat + "." + floatPart + "0";
+        } else {
+          return intPartFormat + "." + floatPart;
+        }
+      } else {
+        return intPartFormat + floatPart;
+      }
+    }
+  },
   methods: {
+    /** 查询工场账户信息 */
+    getWorkshopAccount() {
+      getAccount().then(response => {
+        this.wkpAccount = response.data;
+      })
+    },
     /** 查询工场账户记录列表 */
     getList() {
       this.loading = true;
@@ -350,6 +441,22 @@ export default {
         remark: null
       };
       this.resetForm("form");
+    },
+    // 交易类型
+    formatTransactionType(value) {
+      return this.selectDictLabel(this.transactionTypeOptions, value);
+    },
+    // 交易支付类型
+    formatTransactionPayType(value) {
+      return this.selectDictLabel(this.transactionPayTypeOptions, value);
+    },
+    // 步骤条状态激活
+    formatStepStatus(value) {
+      if (this.form.transactionCreateTime !== '' && this.form.transactionCompleteTime !== '') {
+        return 2;
+      } else {
+        return 1;
+      }
     },
     // 交易类型字典翻译
     transactionTypeFormat(row, column) {
@@ -396,7 +503,7 @@ export default {
       getRecord(pkid).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改工场账户记录";
+        this.title = "工场账户记录-详情";
       });
     },
     /** 提交按钮 */
@@ -462,7 +569,7 @@ export default {
 };
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style lang="scss" rel="stylesheet/scss">
 .app-container {
   .account-top {
     font-size: 16px;

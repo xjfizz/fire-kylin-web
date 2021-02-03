@@ -51,3 +51,11 @@ export function exportRecord(query) {
     params: query
   })
 }
+
+// 获取工场账户信息
+export function getAccount() {
+  return request({
+    url: '/wkp/account/getAccount',
+    method: 'get'
+  })
+}
