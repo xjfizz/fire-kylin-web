@@ -58,6 +58,8 @@ export default {
     justify-content: space-between;
     border-bottom: 1px solid #e6e6e6;
     padding: 15px 30px 15px 5px;
+    // background-color: #fdf8f9;
+    // margin-top: 2px;
     .left {
       display: flex;
       align-items: center;

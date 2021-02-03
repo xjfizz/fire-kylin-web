@@ -415,7 +415,7 @@ export default {
     },
     // 打开排行榜
     openPh() {
-      
+
     }
   }
 };
@@ -620,6 +620,7 @@ export default {
     .produce-bottom-chart {
       display: flex;
       justify-content: space-between;
+       width: 100%;
       .bottom-content-left {
         width: 49%;
        

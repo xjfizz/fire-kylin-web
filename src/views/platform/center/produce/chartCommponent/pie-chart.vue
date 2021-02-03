@@ -73,7 +73,7 @@ export default {
           orient: "vertical",
           left: "left"
         },
-        color: ["red", "orange", "yellow", "green", "blue", "indigo", "purple"],
+        color: ["#dc3545", "#17a2b8", "#007bff", "#dc3545", "blue", "indigo", "purple"],
         series: [
           {
             name: "服务分类",
