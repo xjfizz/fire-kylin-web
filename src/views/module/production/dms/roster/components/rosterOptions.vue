@@ -5,17 +5,19 @@
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
   >
-    <div class="content-item">
+    <div class="roster-options-content-item">
       <!--  :class="[(item.deviceStatus == 0 ? 'item-stop' : ''), (item.id == selectItemId ? 'item-select' : '')]" -->
       <div class="item-time">排班日期:{{searchDate}}</div>
       <div class="item-f">
         <div
+        
           class="item"
           :class="item.deviceStatus == 1 ? 'item-stop' : '' "
           v-for="(item,index) in deviceList"
           :key="index"
           @click="selectItem(item)"
         >
+        <!-- deviceList -->
           <!-- <el-radio v-model="item.isSelected" label="true"></el-radio> -->
           <!-- <el-image class="item-selected-img" src="../../../../../../assets/images/selected.png"></el-image> -->
           <img
@@ -423,9 +425,9 @@ export default {
 };
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 .main-options {
-  .content-item {
+  .roster-options-content-item {
     height: 60vh;
     overflow: auto;
     .item-time {
@@ -445,6 +447,12 @@ export default {
       grid-template-columns: repeat(auto-fill, 100px);
       grid-gap: 10px;
       padding-top: 10px;
+      // display: flex;
+      // justify-content: flex-start;            
+      // display: -webkit-flex;
+      // flex-direction: row;
+      // flex-wrap: wrap;
+     
       // border-top: 1px solid #e5e5e5;
       .item {
         cursor: pointer;

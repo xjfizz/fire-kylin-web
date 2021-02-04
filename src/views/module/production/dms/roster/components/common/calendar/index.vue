@@ -5,7 +5,7 @@
       <span>已复制{{copyDate}}计划</span>
       <el-button class="insert-btn" size="mini" @click="insertRoster()">插入</el-button>
     </div>
-    <div class="mid">
+    <div class="calendar-main-mid">
       <Calendar v-on:choseDay="clickDay" v-on:changeMonth="changeDate" v-on:isToday="clickToday"></Calendar>
       <!--   :markDate="[copyDate]" -->
     </div>
@@ -113,88 +113,91 @@ export default {
 <style rel="stylesheet/scss" lang="scss">
 .calendar-main {
   // 606266 c0c4cc 1890ff
-  .wh_item_date:hover {
-    background: #ffffff;
-    color: #1890ff;
-    cursor: pointer;
-  }
-  .wh_content_all {
-    background-color: #ffffff;
-    color: #606266;
-  }
-  .wh_content:first-child .wh_content_item_tag,
-  .wh_content:first-child .wh_content_item {
-    color: #606266;
-  }
-  .wh_content_item,
-  wh_content_item_tag {
-    color: #606266;
-  }
 
-  .wh_jiantou1 {
-    border-top: 2px solid #606266;
-    border-left: 2px solid #606266;
-  }
-
-  .wh_jiantou1:active,
-  .wh_jiantou2:active {
-    border-color: #606266;
-  }
-
-  .wh_jiantou2 {
-    border-top: 2px solid #606266;
-    border-right: 2px solid #606266;
-  }
-  .wh_content_item > .wh_isMark {
-    background: #1890ff;
-    color: #ffffff;
-  }
-  .wh_content_item .wh_other_dayhide {
-    color: #c0c4cc;
-  }
-  .wh_content_item .wh_want_dayhide {
-    color: #c0c4cc;
-  }
-  .wh_content_item .wh_isToday {
-    background: #ffffff;
-    color: #1890ff;
-  }
-  .wh_content_item .wh_chose_day {
-    background: #1890ff;
-    color: #fff;
-  }
-
-  .wh_top_changge li {
-    color: #606266;
-  }
   .calendar-top {
-    display: flex;
+    display: flex !important;
     justify-content: flex-start;
     align-items: center;
     margin-left: 30px;
     margin-right: 30px;
-    color: #ffffff;
+    color: #ffffff !important;
     letter-spacing: 1px;
-    background-color: #ec7e3d;
+    background-color: #ec7e3d !important;
     padding: 3px 5px;
     .insert-btn {
       margin-left: auto;
     }
   }
-  .mid {
+  .calendar-main-mid {
     margin-top: 10px;
     margin-left: 30px;
     margin-right: 30px;
     min-height: 350px;
-    border: 1px solid #e5e5e5;
-    box-shadow: 0 0 5px #dadada;
+    border: 1px solid #e5e5e5 !important;
+    box-shadow: 0 0 5px #dadada !important;
   }
   .bottom {
     display: flex;
     justify-content: center;
-    border-top: 1px solid #e5e5e5;
+    border-top: 1px solid #e5e5e5 !important;
     margin-top: 20px;
     padding-top: 10px;
   }
 }
+</style>
+<style>
+    .calendar-main-mid .wh_item_date:hover {
+    background: #ffffff !important;
+    color: #1890ff !important;
+    cursor: pointer !important;
+  }
+  .calendar-main-mid .wh_content_all {
+    background-color: #ffffff !important;
+    color: #606266 !important;
+  }
+  .calendar-main-mid .wh_content:first-child .wh_content_item_tag,
+  .calendar-main-mid .wh_content:first-child .wh_content_item {
+    color: #606266 !important;
+  }
+  .calendar-main-mid .wh_content_item,
+  wh_content_item_tag {
+    color: #606266 !important;
+  }
+
+  .calendar-main-mid .wh_jiantou1 {
+    border-top: 2px solid #606266 !important;
+    border-left: 2px solid #606266 !important;
+  }
+
+  .calendar-main-mid .wh_jiantou1:active,
+  .calendar-main-mid .wh_jiantou2:active {
+    border-color: #606266 !important;
+  }
+
+  .calendar-main-mid .wh_jiantou2 {
+    border-top: 2px solid #606266 !important;
+    border-right: 2px solid #606266 !important;
+  }
+  .calendar-main-mid .wh_content_item > .wh_isMark {
+    background: #1890ff !important;
+    color: #ffffff !important;
+  }
+  .calendar-main-mid .wh_content_item .wh_other_dayhide {
+    color: #c0c4cc !important;
+  }
+  .calendar-main-mid .wh_content_item .wh_want_dayhide {
+    color: #c0c4cc !important;
+  }
+  .calendar-main-mid .wh_content_item .wh_isToday {
+    background: #ffffff !important;
+    color: #1890ff !important;
+  }
+  .calendar-main-mid .wh_content_item .wh_chose_day {
+    background: #1890ff !important;
+    color: #fff !important;
+  }
+
+  .calendar-main-mid .wh_top_changge li {
+    color: #606266 !important;
+  }
 </style>
