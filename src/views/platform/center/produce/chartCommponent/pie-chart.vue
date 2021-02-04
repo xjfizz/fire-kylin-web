@@ -73,6 +73,18 @@ export default {
           orient: "vertical",
           left: "left"
         },
+         toolbox: {
+          show: true,
+          feature: {
+            dataZoom: {
+              yAxisIndex: "none"
+            },
+            dataView: { readOnly: false },
+            // magicType: { type: ["line", "bar"] },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
         color: ["#dc3545", "#17a2b8", "#007bff", "#dc3545", "blue", "indigo", "purple"],
         series: [
           {
@@ -88,7 +100,6 @@ export default {
               trigger: "item",
             //   formatter: "{b}:{c}  (万元) {d}%"
              formatter: function(item) {
-                 console.log('item',item)
                  return `订单分类 <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.value2} ${item.data.unit} `
                  }
             },
