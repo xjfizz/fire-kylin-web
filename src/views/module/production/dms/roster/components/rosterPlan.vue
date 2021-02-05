@@ -1,11 +1,11 @@
 <template>
   <div
-    class="main"
+    class="roster-main"
     element-loading-text="拼命加载中"
     element-loading-spinner="el-icon-loading"
     v-loading="loading"
   >
-    <div class="content-item" v-if="this.rosterList.length > 0">
+    <div class="roster-content-item" v-if="this.rosterList.length > 0">
       <div class="item-time">排班日期:{{searchDate}}</div>
       <div class="item-f">
        <div
@@ -305,8 +305,8 @@ export default {
 };
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
-.main {
+<style rel="stylesheet/scss" lang="scss" scoped>
+.roster-main {
   .content-item-no {
     display: flex;
     align-items: center;
@@ -321,7 +321,7 @@ export default {
       color: #676a6c;
     }
   }
-  .content-item {
+  .roster-content-item {
     // min-height: 500px;
     height: 60vh;
     overflow: auto;
@@ -342,7 +342,14 @@ export default {
       grid-template-columns: repeat(auto-fill, 100px);
       grid-gap: 10px;
       padding-top: 10px;
-      padding-right: 20px;
+      // display: flex;
+      // justify-content: flex-start;            
+      // display: -webkit-flex;
+      // flex-direction: row;
+      // flex-wrap: wrap;
+    
+      // padding-top: 10px;
+      // padding-right: 20px;
       // border-top: 1px solid #e5e5e5;
       .item {
         cursor: pointer;
