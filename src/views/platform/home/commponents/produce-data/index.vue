@@ -13,7 +13,7 @@
           <div class="item-bottom">(万件)</div>
         </div>
        <div class="item" :class="itemSelectPie == 3 ? 'item-borderl' : ''" @click="selectPie(3)">
-          <div class="item-top">200000000.31</div>
+          <div class="item-top">20000.31</div>
           <div class="item-mid">总订单数量</div>
           <div class="item-bottom">(个)</div>
         </div>

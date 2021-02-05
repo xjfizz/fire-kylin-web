@@ -55,13 +55,13 @@ export default {
   .home-content{
       display: flex;
       .content-left{
-          width: 70%;
+          width: 60%;
           height: 100%;
          
           padding: 10px;
       }
       .content-right{
-          width: 30%;
+          width: 40%;
            padding: 10px;
            height: 100%;
 
