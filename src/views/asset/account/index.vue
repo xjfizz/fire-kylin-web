@@ -12,7 +12,7 @@
           </div>
           <div class="right">
             <div class="right-title"><span>提现账户:</span></div>
-            <div v-if="wkpAccount" class="right-value">【交通银行】 62231554444145511</div>
+            <div v-if="wkpAccount" class="right-value"></div>
             <div class="right-btn">
               <el-button size="mini" type="warning">管理</el-button>
             </div>
@@ -84,7 +84,7 @@
         <el-select
           v-model="queryParams.transactionType"
           clearable
-          placeholder="请选择配送方式"
+          placeholder="请选择交易类型"
           size="small"
           style="width: 240px"
         >
@@ -328,6 +328,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        orderByColumn: "transactionCompleteTime",
+        isAsc: "desc",
         workshopPkid: null,
         workshopAccountPkid: null,
         transactionCreateTime: null,
@@ -383,6 +385,7 @@ export default {
   filters: {
     money(value) {
       if (!value) return "0.00";
+      if (value === 0) return "0.00";
       const intPart = Number(value).toFixed(0); //获取整数部分
       const intPartFormat = intPart
         .toString()
