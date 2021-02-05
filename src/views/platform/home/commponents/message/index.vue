@@ -1,5 +1,6 @@
 <template>
-  <el-card shadow="never" class="message-card">
+<div class="message">
+    <el-card shadow="never" class="message-card">
     <div class="message-main">
       <el-tabs
         class="message-tabs"
@@ -8,25 +9,25 @@
         @tab-click="handleClick"
       >
         <el-tab-pane label="公司通知" name="first">
-          <div class="tab-main" v-infinite-scroll="load" style="overflow:auto">
+          <div class="message-tab-main" v-infinite-scroll="load" style="overflow:auto">
             <div class="message-item" v-for="item in count">
               <div class="message-top">
-                <div class="top-message">【放假通知】 巨象信息部2021年春节放假20210207开始，节后上班时间定于20210219</div>
+                <div class="message-top-message">【放假通知】 巨象信息部2021年春节放假20210207开始，节后上班时间定于20210219</div>
               </div>
               <div class="message-bottom">
-                <div class="bottom-left">
-                  <div class="left-time">
-                    <div class="time-title">发布时间:</div>
-                    <div class="time-value">2-2</div>
+                <div class="message-bottom-left">
+                  <div class="message-left-time">
+                    <div class="message-time-title">发布时间:</div>
+                    <div class="message-time-value">2-2</div>
                   </div>
-                  <div class="left-user">
-                    <div class="user-title">发布人:</div>
-                    <div class="user-value">张三</div>
+                  <div class="message-left-user">
+                    <div class="message-user-title">发布人:</div>
+                    <div class="message-user-value">张三</div>
                   </div>
                 </div>
-                <div class="bottom-right">
-                  <div v-if="false" class="read-message">已读</div>
-                  <div v-if="true" class="read-message read-message-no">标为已读</div>
+                <div class="message-bottom-right">
+                  <div v-if="false" class="message-read-message">已读</div>
+                  <div v-if="true" class="message-read-message message-read-message-no">标为已读</div>
                 </div>
               </div>
             </div>
@@ -39,6 +40,8 @@
       </el-tabs>
     </div>
   </el-card>
+</div>
+
 </template>
 
 <script>
@@ -80,24 +83,25 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
+ .message .el-card__body {
+    padding: 0;
+  } 
 .message-card {
   height: 300px;
-  .el-card__body {
-    padding: 0;
-  }
+ 
   .message-tabs {
     height: 300px;
 
-    .el-tabs__content {
+   .message-tabs .el-tabs__content {
       padding: 0;
     }
-    .tab-main {
+    .message-tab-main {
       height: 250px;
       overflow: auto;
       .message-item {
         .message-top {
           padding: 10px 10px 3px 10px;
-          .top-message {
+          .message-top-message {
             font-size: 15px;
           }
         }
@@ -109,34 +113,34 @@ export default {
           color: #a89e9e;
           border-bottom: 1px solid #e5e5e5;
           padding: 3px 10px 10px 10px;
-          .bottom-left {
+          .message-bottom-left {
             display: flex;
             align-items: center;
-            .left-time {
+            .message-left-time {
               display: flex;
               align-items: center;
-              .time-title {
+              .message-time-title {
               }
-              .time-value {
+              .message-time-value {
                 margin-left: 10px;
               }
             }
-            .left-user {
+            .message-left-user {
               display: flex;
               align-items: center;
               margin-left: 20px;
 
-              .user-title {
+              .message-user-title {
               }
-              .user-value {
+              .message-user-value {
                 margin-left: 10px;
               }
             }
           }
-          .bottom-right {
-            .read-message {
+          .message-bottom-right {
+            .message-read-message {
             }
-            .read-message-no {
+            .message-read-message-no {
               color: #9040fb;
             }
           }

@@ -1,14 +1,14 @@
 <template>
   <div class="app-container">
-      <div class="home-content">
-          <div class="content-left">
+      <div class="platform-home-content">
+          <div class="platform-content-left">
               <waitInfo></waitInfo>
           </div>
-          <div class="content-right">
-              <div class="top">
+          <div class="platform-content-right">
+              <div class="platform-top">
                   <message></message>
               </div>
-              <div class="bottom">
+              <div class="platform-bottom">
                   <produceData></produceData>
               </div>
           </div>
@@ -52,21 +52,21 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 .app-container {
-  .home-content{
+  .platform-home-content{
       display: flex;
-      .content-left{
+      .platform-content-left{
           width: 60%;
           height: 100%;
          
           padding: 10px;
       }
-      .content-right{
+      .platform-content-right{
           width: 40%;
            padding: 10px;
            height: 100%;
 
-            .top{};
-            .bottom{
+            .platform-top{};
+            .platform-bottom{
               margin-top: 15px;
             }
 
