@@ -5,7 +5,7 @@
         <div class="account-top-top">
           <div class="left">
             <div class="left-title"><span>可提现余额:</span></div>
-            <div v-if="wkpAccount.balanceAmount" class="left-value">￥{{ wkpAccount.balanceAmount | money }} 元</div>
+            <div v-if="wkpAccount" class="left-value">￥{{ wkpAccount.balanceAmount | money }} 元</div>
             <div class="left-btn">
               <el-button size="mini" type="primary">提现</el-button>
             </div>
@@ -21,12 +21,12 @@
         <div class="account-top-bottom">
           <div class="left">
             <div class="left-title"><span>未入账金额:</span></div>
-            <div v-if="wkpAccount.unrecordedAmount" class="left-value">￥{{ wkpAccount.unrecordedAmount | money }} 元
+            <div v-if="wkpAccount" class="left-value">￥{{ wkpAccount.unrecordedAmount | money }} 元
             </div>
           </div>
           <div class="mid">
             <div class="mid-title"><span>提现中:</span></div>
-            <div v-if="wkpAccount.withdrawProgressAmount" class="mid-value">
+            <div v-if="wkpAccount" class="mid-value">
               ￥{{ wkpAccount.withdrawProgressAmount | money }} 元
             </div>
             <div class="mid-btn" @click="goWithdrawList">
@@ -36,7 +36,7 @@
           </div>
           <div class="right">
             <div class="right-title"><span>已提金额:</span></div>
-            <div v-if="wkpAccount.completeWithdrawAmount" class="right-value">
+            <div v-if="wkpAccount" class="right-value">
               ￥{{ wkpAccount.completeWithdrawAmount | money }} 元
             </div>
           </div>
