@@ -50,7 +50,7 @@
             <template slot="title">
               <div class="collapse-title-sty">
                 <span class="collapse-title">统计</span>
-                <span class="collapse-tips">※统计：平台订单、用户、实收</span>
+                <span class="collapse-tips">※统计：工场订单、用户、实收</span>
               </div>
             </template>
             <!-- 统计 -->
