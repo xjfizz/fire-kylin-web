@@ -10,52 +10,52 @@
       >
         <div id="orderPrint">
           <div class="print-main">
-            <div class="left"></div>
-            <div class="mid">
-              <div class="top">
-                <div class="item-title">订单</div>
-                <div class="item-value" v-if="order.omsOrder">{{order.omsOrder.orderNo}}</div>
+            <div class="print-left"></div>
+            <div class="print-mid">
+              <div class="print-top">
+                <div class="print-item-title">订单</div>
+                <div class="print-item-value" v-if="order.omsOrder">{{order.omsOrder.orderNo}}</div>
               </div>
-              <div class="order-mid">
-                <div class="mid-user">
-                  <div class="user-left">客户</div>
-                  <div class="user-right" v-if="order.wmsUser">
-                    <div class="right-top">{{order.wmsUser.userName}}</div>
-                    <div class="right-bottom">{{order.wmsUser.wxappPhone}}</div>
+              <div class="print-order-mid">
+                <div class="print-mid-user">
+                  <div class="print-user-left">客户</div>
+                  <div class="print-user-right" v-if="order.wmsUser">
+                    <div class="print-right-top">{{order.wmsUser.userName}}</div>
+                    <div class="print-right-bottom">{{order.wmsUser.wxappPhone}}</div>
                   </div>
                 </div>
-                <div class="mid-productInfo">
-                  <div class="productInfo-left">产品</div>
-                  <div class="productInfo-mid" v-if="order.omsOrder">
-                    <div class="mid-top">{{order.serverName || '暂无'}}</div>
+                <div class="print-mid-productInfo">
+                  <div class="print-productInfo-left">产品</div>
+                  <div class="print-productInfo-mid" v-if="order.omsOrder">
+                    <div class="print-mid-top">{{order.serverName || '暂无'}}</div>
                     <div
-                      class="mid-mid"
+                      class="print-mid-mid"
                     >{{order.omsOrder.orderSpecification || '暂无'}} {{order.omsOrder.orderColor || '暂无'}}</div>
-                    <div class="mid-bottom">{{order.omsOrder.orderQuantity || '0'}}个</div>
+                    <div class="print-mid-bottom">{{order.omsOrder.orderQuantity || '0'}}个</div>
                   </div>
                 </div>
               </div>
-              <div class="bottom">
-                <div class="bottom-left">
-                  <div class="bottom-item">
-                    <div class="bottom-item-title">经理</div>
-                    <div class="bottom-item-value">{{order.productionManager}}</div>
+              <div class="print-bottom">
+                <div class="print-bottom-left">
+                  <div class="print-bottom-item">
+                    <div class="print-bottom-item-title">经理</div>
+                    <div class="print-bottom-item-value">{{order.productionManager}}</div>
                   </div>
-                  <div class="bottom-item">
-                    <div class="bottom-item-title">时间</div>
-                    <div class="bottom-item-value">{{order.printDateTime}}</div>
+                  <div class="print-bottom-item">
+                    <div class="print-bottom-item-title">时间</div>
+                    <div class="print-bottom-item-value">{{order.printDateTime}}</div>
                   </div>
                 </div>
-                <div class="bottom-right">
-                  <div class="productInfo-right">
-                    <div class="order-image">
+                <div class="print-bottom-right">
+                  <div class="print-productInfo-right">
+                    <div class="print-order-image">
                       <img :src="order.orderQrcode" />
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="right"></div>
+            <div class="print-right"></div>
           </div>
         </div>
       </div>
@@ -209,98 +209,98 @@ export default {
     height: 100%;
     display: flex;
 
-    .left {
+    .print-left {
       width: 5%;
     }
-    .mid {
+    .print-mid {
       width: 90%;
       // border-left: 1px solid #cac6c6;
       //  border-right: 1px solid #cac6c6;
 
-      .top {
+      .print-top {
         display: flex;
         align-items: center;
         padding-top: 5px;
         padding-bottom: 5px;
 
-        .item-title {
+        .print-item-title {
           display: flex;
           align-items: center;
         }
-        .item-value {
+        .print-item-value {
           margin-left: 10px;
 
           display: flex;
           align-items: center;
         }
       }
-      .order-mid {
+      .print-order-mid {
         padding-top: 5px;
         padding-bottom: 2px;
         // border-top: 1px solid #cac6c6;
         // border-bottom: 1px solid #cac6c6;
 
-        .mid-user {
+        .print-mid-user {
           display: flex;
 
-          .user-left {
+          .print-user-left {
           }
-          .user-right {
+          .print-user-right {
             margin-left: 10px;
 
-            .right-top {
+            .print-right-top {
             }
-            .right-bottom {
+            .print-right-bottom {
               margin-top: 5px;
             }
           }
         }
-        .mid-productInfo {
+        .print-mid-productInfo {
           margin-top: 5px;
           display: flex;
           height: 120px;
 
-          .productInfo-left {
+          .print-productInfo-left {
           }
-          .productInfo-mid {
+          .print-productInfo-mid {
             margin-left: 10px;
-            .mid-top {
+            .print-mid-top {
             }
-            .mid-mid {
+            .print-mid-mid {
               margin-top: 5px;
             }
-            .mid-bottom {
+            .print-mid-bottom {
               margin-top: 5px;
             }
           }
         }
       }
-      .bottom {
+      .print-bottom {
         margin-top: -30px;
         padding-bottom: 5px;
         display: flex;
         justify-content: space-between;
-        .bottom-left {
-          .bottom-item {
+        .print-bottom-left {
+          .print-bottom-item {
             margin-top: 10px;
             display: flex;
             align-items: center;
-            .bottom-item-title {
+            .print-bottom-item-title {
             }
-            .bottom-item-value {
+            .print-bottom-item-value {
               margin-left: 10px;
             }
           }
         }
-        .bottom-right {
-          .productInfo-right {
+        .print-bottom-right {
+          .print-productInfo-right {
             right: 10px;
             bottom: 2px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             // width: 80%;
-            .order-image {
+            .print-order-image {
               margin-top: -50px;
               img {
                 width: 120px;
@@ -311,7 +311,7 @@ export default {
         }
       }
     }
-    .right {
+    .print-right {
       width: 5%;
     }
   }
