@@ -270,6 +270,8 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        orderByColumn: "modifyTime",
+        isAsc: "desc",
         workshopPkid: null,
         workshopAccountPkid: null,
         modifyTime: null,
