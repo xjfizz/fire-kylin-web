@@ -1,11 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '@/layout'
-import ParentView from '@/components/ParentView';
+
+Vue.use(Router)
 
 /**
  * Note: 路由配置项
@@ -61,8 +59,8 @@ export const constantRoutes = [
       {
         path: 'index',
         component: (resolve) => require(['@/views/index'], resolve),
-        name: '首页',
-        meta: { title: '首页', icon: 'dashboard', noCache: true, affix: true }
+        name: 'Fass工场',
+        meta: {title: 'Fass工场', icon: 'dashboard', noCache: true, affix: true}
       }
     ]
   },

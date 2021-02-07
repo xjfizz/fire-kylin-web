@@ -1,11 +1,11 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
+    <el-form v-show="showSearch" ref="queryForm" :inline="true" :model="queryParams" label-width="68px">
       <el-form-item label="服务分类" prop="serverCategoryPkid">
         <el-select
           v-model="queryParams.serverCategoryPkid"
-          placeholder="请选择服务分类"
           clearable
+          placeholder="请选择服务分类"
           size="small"
           style="width: 240px"
         >
@@ -20,8 +20,8 @@
       <el-form-item label="服务名称" prop="serverName">
         <el-input
           v-model="queryParams.serverName"
-          placeholder="请输入服务名称"
           clearable
+          placeholder="请输入服务名称"
           size="small"
           @keyup.enter.native="handleQuery"
         />
@@ -29,8 +29,8 @@
       <el-form-item label="服务状态" prop="serverStatus">
         <el-select
           v-model="queryParams.serverStatus"
-          placeholder="请选择服务状态"
           clearable
+          placeholder="请选择服务状态"
           size="small"
           style="width: 240px"
         >
@@ -42,8 +42,24 @@
           />
         </el-select>
       </el-form-item>
+      <el-form-item label="是否含税" prop="serverTaxStatus">
+        <el-select
+          v-model="queryParams.serverTaxStatus"
+          clearable
+          placeholder="请选择服务含税状态"
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in serverTaxStatusOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
+        <el-button icon="el-icon-search" size="mini" type="primary" @click="handleQuery">搜索</el-button>
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
       </el-form-item>
     </el-form>
@@ -51,67 +67,83 @@
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
         <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
           v-hasPermi="['module-production:server:add']"
+          icon="el-icon-plus"
+          plain
+          size="mini"
+          type="primary"
+          @click="handleAdd"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
           v-hasPermi="['module-production:server:edit']"
-        >修改</el-button>
+          :disabled="single"
+          icon="el-icon-edit"
+          plain
+          size="mini"
+          type="success"
+          @click="handleUpdate"
+        >修改
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
           v-hasPermi="['module-production:server:remove']"
-        >删除</el-button>
+          :disabled="multiple"
+          icon="el-icon-delete"
+          plain
+          size="mini"
+          type="danger"
+          @click="handleDelete"
+        >删除
+        </el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
           v-hasPermi="['module-production:server:export']"
-        >导出</el-button>
+          icon="el-icon-download"
+          plain
+          size="mini"
+          type="warning"
+          @click="handleExport"
+        >导出
+        </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="serverList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="服务分类ID" align="center" prop="serverCategoryPkid" />
-      <el-table-column label="服务分类名称" align="center" prop="pmsServerCategory.categoryName" />
-      <el-table-column label="服务ID" align="center" prop="pkid" />
-      <el-table-column label="服务名称" align="center" prop="serverName" />
-      <el-table-column prop="serverImageUrl" label="服务图像" header-align="center" align="center">
+      <el-table-column align="center" type="selection" width="55"/>
+      <el-table-column align="center" label="服务分类ID" prop="serverCategoryPkid"/>
+      <el-table-column align="center" label="服务分类名称" prop="pmsServerCategory.categoryName"/>
+      <el-table-column align="center" label="服务ID" prop="pkid"/>
+      <el-table-column align="center" label="服务名称" prop="serverName"/>
+      <el-table-column align="center" header-align="center" label="服务图像" prop="serverImageUrl">
         <template slot-scope="scope">
           <el-popover placement="top-start" title="" trigger="hover">
             <img :src="scope.row.serverImageUrl" alt="图片预览" style="width: 200px;height: 200px">
-            <img slot="reference" :src="scope.row.serverImageUrl" style="width: 50px;height: 50px" :onerror="errorimg">
+            <img slot="reference" :onerror="errorimg" :src="scope.row.serverImageUrl" style="width: 50px;height: 50px">
           </el-popover>
         </template>
       </el-table-column>
-      <el-table-column label="服务金额" align="center" prop="serverAmount" />
-      <el-table-column label="服务单位" align="center" prop="serverUnit" />
-      <el-table-column label="服务顺序" align="center" prop="serverSort" />
-      <el-table-column label="服务状态" align="center" key="serverStatus" v-if="columns[4].visible">
+      <el-table-column align="center" label="服务金额" prop="serverAmount"/>
+      <el-table-column align="center" label="服务单位" prop="serverUnit"/>
+      <el-table-column align="center" label="服务顺序" prop="serverSort"/>
+      <el-table-column align="center" label="是否含税" prop="serverTaxStatus">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.serverTaxStatus === '0'" type="success">
+            {{ formatServerTaxStatus(scope.row.serverTaxStatus) }}
+          </el-tag>
+          <el-tag v-else type="danger">{{ formatServerTaxStatus(scope.row.serverTaxStatus) }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="服务税率(%)" prop="serverTaxRate">
+        <template slot-scope="scope">
+          <span>{{ scope.row.serverTaxRate * 100 }}%</span>
+        </template>
+      </el-table-column>
+      <el-table-column v-if="columns[4].visible" key="serverStatus" align="center" label="服务状态">
         <template slot-scope="scope">
           <el-switch
             v-model="scope.row.serverStatus"
@@ -121,42 +153,44 @@
           ></el-switch>
         </template>
       </el-table-column>
-      <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns[5].visible" width="160">
+      <el-table-column v-if="columns[5].visible" align="center" label="创建时间" prop="createTime" width="160">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column align="center" label="备注" prop="remark"/>
+      <el-table-column align="center" class-name="small-padding fixed-width" label="操作">
         <template slot-scope="scope">
           <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
             v-hasPermi="['module-production:server:edit']"
-          >修改</el-button>
-          <el-button
+            icon="el-icon-edit"
             size="mini"
             type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
+            @click="handleUpdate(scope.row)"
+          >修改
+          </el-button>
+          <el-button
             v-hasPermi="['module-production:server:remove']"
-          >删除</el-button>
+            icon="el-icon-delete"
+            size="mini"
+            type="text"
+            @click="handleDelete(scope.row)"
+          >删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination
       v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
+      :page.sync="queryParams.pageNum"
+      :total="total"
       @pagination="getList"
     />
 
     <!-- 添加或修改web端服务对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="600px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open" append-to-body width="600px">
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-card>
           <el-form-item label="服务分类" prop="serverCategoryPkid">
@@ -173,38 +207,56 @@
             <el-input v-model="form.serverName" placeholder="请输入服务名称" />
           </el-form-item>
           <el-form-item label="服务单价" prop="serverAmount">
-            <el-input-number v-model="form.serverAmount" controls-position="right" placeholder="请输入服务单价" :min="0" />（元）
+            <el-input-number v-model="form.serverAmount" :min="0" controls-position="right" placeholder="请输入服务单价"/>
+            （元）
           </el-form-item>
           <el-form-item label="服务单位" prop="serverUnit">
-            <el-input v-model="form.serverUnit" placeholder="请输入服务单位" />
+            <el-input v-model="form.serverUnit" placeholder="请输入服务单位" type="mini"/>
           </el-form-item>
           <el-form-item label="服务排序" prop="serverSort">
-            <el-input-number v-model="form.serverSort" controls-position="right" placeholder="请输入服务排序" :min="0" />
+            <el-input-number v-model="form.serverSort" :min="0" controls-position="right" placeholder="请输入服务排序"/>
+          </el-form-item>
+          <el-form-item label="是否含税" prop="serverTaxStatus">
+            <el-radio-group v-model="form.serverTaxStatus" @change="changeServerTaxStatus">
+              <el-radio
+                v-for="dict in serverTaxStatusOptions"
+                :key="dict.dictValue"
+                :label="dict.dictValue"
+              >{{ dict.dictLabel }}
+              </el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="服务税率" prop="serverTaxRate">
-            <el-input-number v-model="form.serverTaxRate" controls-position="right"  placeholder="请输入服务税率" :min="0" />（%）
+            <el-input-number v-if="form.serverTaxStatus === '0'" v-model="form.serverTaxRate" :min="0"
+                             controls-position="right"
+                             disabled placeholder="请输入服务税率"/>
+            <el-input-number v-else v-model="form.serverTaxRate" :max="100" :min="0"
+                             controls-position="right"
+                             placeholder="请输入服务税率">
+            </el-input-number>
+            （%）
           </el-form-item>
           <el-row>
-            <el-form-item label="服务图像" :label-width="formLabelWidth" prop="serverImageUrl" style="margin-bottom:0px">
+            <el-form-item :label-width="formLabelWidth" label="服务图像" prop="serverImageUrl" style="margin-bottom:0px">
               <el-upload
                 ref="upload"
                 :action="upload.url"
+                :auto-upload="false"
+                :before-upload="handleBeforeUpload"
+                :file-list="fileListShow"
                 :headers="upload.headers"
                 :limit=upload.limitNum
-                accept="image/png,image/gif,image/jpg,image/jpeg"
-                list-type="picture-card"
-                :auto-upload="false"
-                :on-success="handleAvatarSuccess"
                 :on-exceed="handleExceed"
-                :before-upload="handleBeforeUpload"
                 :on-preview="handlePictureCardPreview"
                 :on-remove="handleRemove"
-                :file-list="fileListShow">
+                :on-success="handleAvatarSuccess"
+                accept="image/png,image/gif,image/jpg,image/jpeg"
+                list-type="picture-card">
                 <i class="el-icon-plus"></i>
               </el-upload>
               <!--图片预览的dialog-->
               <el-dialog :visible.sync="dialogVisible">
-                <img width="100%" :src="dialogImageUrl" alt="">
+                <img :src="dialogImageUrl" alt="" width="100%">
               </el-dialog>
               <p style="color: #999;">图片上传限制： 1.最多1张； 2.最大不超过2M</p>
             </el-form-item>
@@ -223,7 +275,7 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="备注" prop="remark">
-            <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+            <el-input v-model="form.remark" placeholder="请输入内容" type="textarea"/>
           </el-form-item>
         </el-card>
       </el-form>
@@ -236,7 +288,16 @@
 </template>
 
 <script>
-import { listServer, getServer, delServer, addServer, updateServer, exportServer, changeServerStatus, listServerCategory } from "@/api/module/production/pms/server/server";
+import {
+  addServer,
+  changeServerStatus,
+  delServer,
+  exportServer,
+  getServer,
+  listServer,
+  listServerCategory,
+  updateServer
+} from "@/api/module/production/pms/server/server";
 import {getToken} from "@/utils/auth";
 
 export default {
@@ -261,6 +322,8 @@ export default {
       serverList: [],
       // 状态数据字典
       statusOptions: [],
+      // 服务税率状态数据字典
+      serverTaxStatusOptions: [],
       // 服务分类数据字典
       serverCategoryOptions: [],
       // 弹出层标题
@@ -268,7 +331,7 @@ export default {
       // 是否显示弹出层
       open: false,
       // 加载默认头像图片
-      errorimg:'this.src="'+require('../../../../../assets/images/user_profile.jpg')+'"',
+      errorimg: 'this.src="' + require('../../../../../assets/images/user_profile.jpg') + '"',
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -278,6 +341,7 @@ export default {
         serverCategoryPkid: null,
         serverName: null,
         serverStatus: null,
+        serverTaxStatus: null
       },
       // 列信息npm
       columns: [
@@ -333,6 +397,9 @@ export default {
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
+    this.getDicts("pms_tax_status").then(response => {
+      this.serverTaxStatusOptions = response.data;
+    });
     // 获取工场服务分类集合
     this.getServerCategoryList();
   },
@@ -359,13 +426,23 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function() {
+      }).then(function () {
         return changeServerStatus(row.pkid, row.serverStatus);
       }).then(() => {
         this.msgSuccess(text + "成功");
-      }).catch(function() {
+      }).catch(function () {
         row.serverStatus = row.serverStatus === "0" ? "1" : "0";
       });
+    },
+    // 订单支付类型格式化
+    formatServerTaxStatus(value) {
+      return this.selectDictLabel(this.serverTaxStatusOptions, value);
+    },
+    changeServerTaxStatus() {
+      // 当不含税状态选中时：清空填写的服务税率
+      if (this.form.serverTaxStatus === '0') {
+        this.form.serverTaxRate = 0;
+      }
     },
     // 取消按钮
     cancel() {
@@ -383,6 +460,7 @@ export default {
         serverAmount: null,
         serverUnit: null,
         serverTaxRate: null,
+        serverTaxStatus: "0",
         serverSort: null,
         serverStatus: "0",
         delFlag: null,
@@ -390,7 +468,9 @@ export default {
         createTime: null,
         updateBy: null,
         updateTime: null,
-        remark: null
+        remark: null,
+        fileListShow: [],
+        fileListPut: []
       };
       this.resetForm("form");
     },
