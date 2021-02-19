@@ -147,7 +147,7 @@ export default {
             name: "新增订单",
             type: "line",
             data: [11, 11, 15, 13, 12, 13, 10],
-            smooth: false,
+            smooth: true,
             color: ["#d02929"], //折线条的颜色
             markPoint: {
               data: [
