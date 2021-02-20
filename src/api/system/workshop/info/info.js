@@ -77,11 +77,28 @@ export function addWorkshopInfoDetail(data) {
     data: data
   })
 }
+
 // 工场头像上传
 export function uploadWkpImage(data) {
   return request({
     url: '/system/workshop/info/uploadWkpImage',
     method: 'post',
     data: data
+  })
+}
+
+// 获取平台行业
+export function listAllIndustry() {
+  return request({
+    url: '/system/workshop/info/listIndustry',
+    method: 'get'
+  })
+}
+
+// 获取工场服务标签
+export function listServerTag() {
+  return request({
+    url: '/system/workshop/info/listServerTag',
+    method: 'get'
   })
 }

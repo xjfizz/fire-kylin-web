@@ -21,7 +21,7 @@
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="education" style="margin-right: 5px"/>工场行业
-                <div class="pull-right">{{ workshopInfo.workshopIndustry }}</div>
+                <div class="pull-right">{{ this.supplierIndustryFormat(workshopInfo.workshopIndustry) }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="bookmark-outline-add" style="margin-right: 5px"/>服务标签
@@ -86,27 +86,82 @@ import userAvatar from "@/views/system/workshop/info/userAvatar";
 import workshopInfoDetail from "@/views/system/workshop/info/workshopInfoDetail";
 import introduction from "@/views/system/workshop/info/introduction";
 import bank from "@/views/system/workshop/info/bank";
-import { listInfo, getInfo, delInfo, addInfo, updateInfo, exportInfo, getWorkshopInfoDetail } from "@/api/system/workshop/info/info";
+import {getWorkshopInfoDetail, listAllIndustry} from "@/api/system/workshop/info/info";
 
 export default {
   name: "Profile",
   components: { userAvatar, workshopInfoDetail, introduction, bank },
   data() {
     return {
+      loading: false,
+      // 平台行业表格数据
+      industryList: [],
+      // 工场服务标签
+      serverTagList: [],
+      // 工场数据信息
       workshopInfo: {},
       activeTab: "workshopInfoDetail"
     };
   },
   created() {
+    this.getIndustryList();
     this.getWorkshopInfo();
+    // this.getServerTagList();
   },
   methods: {
+    /** 查询平台行业列表 */
+    getIndustryList() {
+      this.loading = true;
+      listAllIndustry().then(response => {
+        this.industryList = response.data;
+        this.loading = false;
+      });
+    },
+    /** 查询工场服务标签列表 */
+    // getServerTagList() {
+    //   this.loading = true;
+    //   listServerTag().then(response => {
+    //     this.serverTagList = response.data;
+    //     this.loading = false;
+    //   });
+    // },
     // 获取工场信息
-    getWorkshopInfo(){
+    getWorkshopInfo() {
       getWorkshopInfoDetail().then(response => {
         this.workshopInfo = response.data;
       });
-    }
+    },
+    // 客服状态字典翻译
+    supplierIndustryFormat(value) {
+      return this.formatSupplierIndustry(this.industryList, value);
+    },
+
+    // 客服状态字典翻译
+    // serverTagFormat(value) {
+    //   return this.formatServerTag(this.serverTagList, value);
+    // },
+
+    formatSupplierIndustry(datas, value) {
+      var actions = [];
+      Object.keys(datas).some((key) => {
+        if (datas[key].pkid == (value)) {
+          actions.push(datas[key].industryName);
+          return true;
+        }
+      })
+      return actions.join('');
+    },
+
+    // formatServerTag(datas, value) {
+    //   var actions = [];
+    //   Object.keys(datas).some((key) => {
+    //     if (datas[key].pkid == (value)) {
+    //       actions.push(datas[key].categoryName);
+    //       return true;
+    //     }
+    //   })
+    //   return actions.join('');
+    // },
   }
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <svg-icon icon-class="question" @click="goto"/>
+    <svg-icon icon-class="question" @click="note"/>
   </div>
 </template>
 
@@ -13,9 +13,16 @@ export default {
     }
   },
   methods: {
-    goto() {
-      window.open(this.url)
-    }
+    note() {
+      const h = this.$createElement;
+      this.$notify({
+        title: '温馨提示',
+        message: h('i', {style: 'color: teal'}, '巨象官方联系方式为：0521-88888888')
+      });
+    },
+    // goto() {
+    //   window.open(this.url)
+    // }
   }
 }
 </script>

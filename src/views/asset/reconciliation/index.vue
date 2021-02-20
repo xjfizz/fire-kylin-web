@@ -17,7 +17,7 @@
         <el-select
           v-model="queryParams.transactionType"
           clearable
-          placeholder="请选择配送方式"
+          placeholder="请选择交易类型"
           size="small"
           style="width: 240px"
         >
@@ -282,6 +282,12 @@ export default {
         beforeModifyAmount: null,
         modifyAmountType: null,
       },
+      // 统计查询参数
+      statisticsQueryParams: {
+        orderByColumn: "modifyTime",
+        isAsc: "desc",
+        transactionType: null,
+      },
       // 表单参数
       form: {},
       // 表单校验
@@ -328,9 +334,8 @@ export default {
     /** 查询工场账户余额对账记录列表 */
     getWkpStatistics() {
       this.loading = true;
-      this.queryParams.pageNum = null;
-      this.queryParams.pageSize = null;
-      getStatistics(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
+      this.statisticsQueryParams.transactionType = this.queryParams.transactionType;
+      getStatistics(this.addDateRange(this.statisticsQueryParams, this.dateRange)).then(response => {
         this.statisticsInfo = response.data;
         this.loading = false;
       });

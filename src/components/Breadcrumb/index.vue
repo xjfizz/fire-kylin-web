@@ -35,7 +35,7 @@ export default {
       const first = matched[0]
 
       if (!this.isDashboard(first)) {
-        matched = [{path: '/index', meta: {title: 'Fass工场'}}].concat(matched)
+        matched = [{path: '/index', meta: {title: 'Faas工场'}}].concat(matched)
       }
 
       this.levelList = matched.filter(item => item.meta && item.meta.title && item.meta.breadcrumb !== false)
@@ -45,7 +45,7 @@ export default {
       if (!name) {
         return false
       }
-      return name.trim() === 'Fass工场'
+      return name.trim() === 'Faas工场'
     },
     handleLink(item) {
       const { redirect, path } = item
