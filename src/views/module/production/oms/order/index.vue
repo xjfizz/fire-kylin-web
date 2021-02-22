@@ -775,8 +775,8 @@
 <script>
 import {
   addOrder,
+  cancelOrder,
   confirmOrder,
-  delOrder,
   exportOrder,
   getCheckerListApi,
   getOrder,
@@ -1192,7 +1192,7 @@ export default {
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
       this.$confirm(
-        '是否确认删除wxapp端订单编号为"' + pkids + '"的数据项?',
+        '是否确认取消订单编号为【' + row.orderNo + '】的数据项?',
         "警告",
         {
           confirmButtonText: "确定",
@@ -1201,17 +1201,17 @@ export default {
         }
       )
         .then(function() {
-          return delOrder(pkids);
+          return cancelOrder(pkids);
         })
         .then(() => {
           this.getList();
-          this.msgSuccess("删除成功");
+          this.msgSuccess("订单平台取消成功");
         });
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm("是否确认导出所有wxapp端订单数据项?", "警告", {
+      this.$confirm("是否确认导出所有订单数据项?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
