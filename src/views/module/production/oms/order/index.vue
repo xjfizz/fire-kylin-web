@@ -957,12 +957,11 @@ export default {
   filters: {
     money(value) {
       if (!value) return "0.00";
-      const intPart = Number(value).toFixed(0); //获取整数部分
-      const intPartFormat = intPart
-        .toString()
-        .replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"); //将整数部分逢三一断
-      let floatPart = ".00"; //预定义小数部分
       const value2Array = value.toString().split(".");
+      const intPart = value2Array[0].toString(); //获取整数部分
+      const intPartFormat = intPart.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,"); //将整数部分逢三一断
+      let floatPart = ".00"; //预定义小数部分
+
       //=2表示数据有小数位
       if (value2Array.length === 2) {
         floatPart = value2Array[1].toString(); //拿到小数部分
