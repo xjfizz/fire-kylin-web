@@ -166,6 +166,16 @@
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
+      <!-- 图片 -->
+       <el-table-column align="center" header-align="center" label="上传图片" prop="orderAnnexImageUrl">
+        <template slot-scope="scope">
+          <el-popover v-if="scope.row.orderAnnexImageUrl" placement="top-start" title="" trigger="hover">
+            <img  :src="scope.row.orderAnnexImageUrl" alt="图片预览" style="width: 200px;height: 200px">
+            <img  slot="reference" :src="scope.row.orderAnnexImageUrl" style="width: 50px;height: 50px">
+          </el-popover>
+            <span v-else>暂无图片</span>
+       </template>
+      </el-table-column>
       <el-table-column align="center" label="备注" prop="orderNote"  show-overflow-tooltip />
       <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="200">
         <template slot-scope="scope">
