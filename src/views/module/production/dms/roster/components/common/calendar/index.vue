@@ -93,8 +93,8 @@ export default {
         });
       }
       let params = {
-        copyRosterDate: this.insertDate,
-        insertRosterDate: this.copyDate
+        copyRosterDate:this.copyDate, // this.insertDate,
+        insertRosterDate: this.insertDate
       };
       copyRoster(params).then(res => {
         if (res.code == 200) {
@@ -102,7 +102,7 @@ export default {
             type: "success",
             message: "插入成功!"
           });
-           this.$parent.$parent.cancelPlanForm(this.copyDate);
+           this.$parent.$parent.cancelPlanForm(this.insertDate);
         }
       });
     }

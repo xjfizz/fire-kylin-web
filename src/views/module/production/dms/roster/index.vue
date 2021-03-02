@@ -117,7 +117,7 @@ export default {
     // 点击查询日期按钮
     searchList() {
       this.rosterPlanShow = true;
-       this.copyDate = ''
+      // this.copyDate = ''
       setTimeout(() => {
         this.getRosterPlan();
       }, 500);

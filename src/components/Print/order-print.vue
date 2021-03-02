@@ -31,7 +31,7 @@
                     <div
                       class="print-mid-mid"
                     >{{order.omsOrder.orderSpecification || '暂无'}} {{order.omsOrder.orderColor || '暂无'}}</div>
-                    <div class="print-mid-bottom">{{order.omsOrder.orderQuantity || '0'}}个</div>
+                    <div class="print-mid-bottom">{{order.omsOrder.orderQuantity || '0'}}打</div>
                   </div>
                 </div>
               </div>
