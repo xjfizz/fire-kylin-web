@@ -134,7 +134,7 @@
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="订单编号" prop="orderNo" width="230" />
       <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
-      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" />
+      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone"  width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
       <el-table-column align="center" label="商品规格" prop="orderSpecification" >
