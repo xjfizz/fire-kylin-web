@@ -130,7 +130,7 @@
             <div class="left">历史关联</div>
             <div
               class="right"
-              v-if=" deviceDetailForm.deviceRelationRecords && deviceDetailForm.deviceRelationRecords.length > 2"
+              v-if=" deviceDetailForm.deviceRelationRecords && deviceDetailForm.deviceRelationRecords.length >= 2"
             >
               <div
                 class="right-top"

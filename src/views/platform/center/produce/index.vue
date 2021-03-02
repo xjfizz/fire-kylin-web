@@ -423,7 +423,9 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 .app-container {
-  background-color: #f9f9f9;
+  // background-color: #f9f9f9;
+  // background-color: #ffffff;
+
   .produce-content {
     // padding: 20px;
     // background-color: #ffffff;
