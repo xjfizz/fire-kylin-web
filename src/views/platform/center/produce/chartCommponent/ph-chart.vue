@@ -1,25 +1,30 @@
 <template>
   <div :class="className" :style="{height:height,width:width}">
     <div class="content">
-      <div class="content-item" v-for="item in 5">
+      <div v-if="data.length > 0" class="content-item" v-for="item in data">
         <div class="left">
           <div class="left-left">
             <img
-              src="https://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTLBszrcIsTs7P2SRE3XaU7gQq8T6x87UKLibJU8Clicu1h7z3lG3qkrootQrd3TqY8dtDFaSfXPLHcA/132"
+              :src="item.userAvatar"
             />
           </div>
           <div class="left-right">
-            <div class="left-top">润通帽业</div>
+            <div class="left-top">{{item.userName || '暂无'}}</div>
             <div class="left-bottom">
               <!-- <div class="bottom-icon"></div>
                           <div class="bottom-title">统计日期:</div>
               <div class="bottom-time">2020</div>-->
-              <blockquote class="left-bottom-message">统计日期: 2020</blockquote>
+              <blockquote class="left-bottom-message">统计日期: 
+                <span v-if="item.orderDayDate">{{item.orderDayDate}}</span>
+                <span v-if="item.orderMonthDate">{{item.orderMonthDate}}</span>
+                <span v-if="item.orderYearDate">{{item.orderYearDate}}</span>
+              </blockquote>
             </div>
           </div>
         </div>
-        <div class="right">200单</div>
+        <div class="right">{{item.orderNum || 0}}单</div>
       </div>
+      <div v-if="data.length == 0" class="no-data">暂无数据</div>
     </div>
   </div>
 </template>
@@ -38,7 +43,15 @@ export default {
     height: {
       type: String,
       default: "400px"
-    }
+    },
+     chartTitle: {
+      type: String,
+      default: ""
+    },
+     data: {
+      type: Array,
+      default: []
+    },
   },
   data() {
     return {
@@ -110,5 +123,14 @@ export default {
       color: #dc3545;
     }
   }
+}
+.no-data{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 400;
+  color: #73879c;
+  margin-top: 20px;
 }
 </style>

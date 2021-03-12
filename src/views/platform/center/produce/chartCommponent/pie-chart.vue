@@ -21,6 +21,18 @@ export default {
     height: {
       type: String,
       default: "400px"
+    },
+    chartTitle: {
+      type: String,
+      default: ""
+    },
+    data: {
+      type: Array,
+      default: []
+    },
+    type: {
+      type: Number,
+      default: 1
     }
   },
   data() {
@@ -43,6 +55,7 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, "macarons");
+      let _this = this;
       this.chart.setOption({
         // title: {
         //   text: "某站点用户访问来源",
@@ -53,7 +66,7 @@ export default {
           trigger: "item"
         },
         title: {
-          text: "订单分类",
+          text: _this.chartTitle,
           left: "center",
           subtext: "",
           textStyle: {
@@ -73,7 +86,7 @@ export default {
           orient: "vertical",
           left: "left"
         },
-         toolbox: {
+        toolbox: {
           show: true,
           feature: {
             dataZoom: {
@@ -85,23 +98,32 @@ export default {
             saveAsImage: {}
           }
         },
-        color: ["#dc3545", "#17a2b8", "#007bff", "#dc3545", "blue", "indigo", "purple"],
+        color: [
+          "#dc3545",
+          "#17a2b8",
+          "#007bff",
+          "#dc3545",
+          "blue",
+          "indigo",
+          "purple"
+        ],
         series: [
           {
             name: "服务分类",
             type: "pie",
             radius: "60%",
             center: ["50%", "50%"], //设置饼图位置
-            data: [
-              { value: 1048, name: "板带", unit: "万元", value2:90000 },
-              { value: 735, name: "魔术贴", unit: "万元",value2:6000 }
-            ],
+            data: _this.data,
             tooltip: {
               trigger: "item",
-            //   formatter: "{b}:{c}  (万元) {d}%"
-             formatter: function(item) {
-                 return `订单分类 <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.value2} ${item.data.unit} `
-                 }
+              //   formatter: "{b}:{c}  (万元) {d}%"
+              formatter: function(item) {
+                if (_this.type == 2) {
+                  return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) `;
+                } else {
+                  return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.money} `;
+                }
+              }
             },
             emphasis: {
               itemStyle: {

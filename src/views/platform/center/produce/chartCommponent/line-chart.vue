@@ -21,6 +21,26 @@ export default {
     height: {
       type: String,
       default: "400px"
+    },
+    chartTitle: {
+      type: String,
+      default: ""
+    },
+    dataNum: {
+      type: String,
+      default: ""
+    },
+    dataY: {
+      type: Array,
+      default: []
+    },
+    dataX: {
+      type: Array,
+      default: []
+    },
+    type: {
+      type: Number,
+      default: 1
     }
   },
   data() {
@@ -43,14 +63,24 @@ export default {
   methods: {
     initChart() {
       this.chart = echarts.init(this.$el, "macarons");
+      let _this = this;
       // 绘制图表
       this.chart.setOption({
         title: {
-          text: "1000单",
+          text: _this.dataNum,
           subtext: "",
-           textStyle: {
-              color: "#666666"
-            }
+          textStyle: {
+            //文字颜色
+            color: "#333333",
+            //字体风格,'normal','italic','oblique'
+            fontStyle: "normal",
+            //字体粗细 'normal','bold','bolder','lighter',100 | 200 | 300 | 400...
+            fontWeight: "bold",
+            //字体系列
+            fontFamily: "sans-serif",
+            //字体大小
+            fontSize: 18
+          }
         },
         tooltip: {
           trigger: "axis",
@@ -64,7 +94,7 @@ export default {
           }
         },
         legend: {
-          data: ["新增订单"],
+          data: [_this.chartTitle],
           orient: "vertical",
           left: "center",
           textStyle: {
@@ -72,7 +102,7 @@ export default {
             color: "#888888" //字体颜色
           }
         },
-      
+
         toolbox: {
           show: true,
           feature: {
@@ -109,20 +139,22 @@ export default {
             }
           },
 
-          data: [
-            "2019-02-25",
-            "2019-03-04",
-            "2019-03-18",
-            "2019-03-26",
-            "2019-04-16",
-            "2019-04-26",
-            "2019-05-04"
-          ]
+          data: _this.dataX
         },
         yAxis: {
           type: "value",
           axisLabel: {
-            formatter: "{value}",
+            formatter: function(value) {
+              if (_this.type == 1) {
+                return `${value}单`;
+              } else if (_this.type == 2) {
+                return `${value}次`;
+              } else if (_this.type == 3) {
+                return `￥${value}`;
+              } else if (_this.type == 4) {
+                return `${value}件`;
+              }
+            },
             textStyle: {
               color: "#000000"
             }
@@ -144,10 +176,10 @@ export default {
         },
         series: [
           {
-            name: "新增订单",
+            name: _this.chartTitle,
             type: "line",
-            data: [11, 11, 15, 13, 12, 13, 10],
-            smooth: true,
+            data: _this.dataY,
+            smooth: true, // 曲线开启
             color: ["#d02929"], //折线条的颜色
             markPoint: {
               data: [
