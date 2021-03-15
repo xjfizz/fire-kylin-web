@@ -134,13 +134,11 @@
       <el-table-column align="center" type="selection" width="55" />
       <el-table-column align="center" label="订单编号" prop="orderNo" width="230" />
       <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
-      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone"  width="150" />
+      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
-      <el-table-column align="center" label="商品规格" prop="orderSpecification" >
-         <template slot-scope="{row}">
-                {{ row.orderSpecification || '暂无' }}
-            </template>
+      <el-table-column align="center" label="商品规格" prop="orderSpecification">
+        <template slot-scope="{row}">{{ row.orderSpecification || '暂无' }}</template>
       </el-table-column>
       <el-table-column align="center" label="订单价格" prop="orderAmount">
         <template slot-scope="scope">
@@ -167,16 +165,19 @@
         </template>
       </el-table-column>
       <!-- 图片 -->
-       <el-table-column align="center" header-align="center" label="上传图片" prop="orderAnnexImageUrl">
+      <el-table-column align="center" header-align="center" label="上传图片" prop="orderAnnexImageUrl">
         <template slot-scope="scope">
-          <el-popover v-if="scope.row.orderAnnexImageUrl" placement="top-start" title="" trigger="hover">
-            <img  :src="scope.row.orderAnnexImageUrl" alt="图片预览" style="width: 200px;height: 200px">
-            <img  slot="reference" :src="scope.row.orderAnnexImageUrl" style="width: 50px;height: 50px">
-          </el-popover>
-            <span v-else>暂无图片</span>
-       </template>
+          <el-image
+            v-if="scope.row.orderAnnexImageUrl"
+            style="width: 50px; height: 50px"
+            :src="scope.row.orderAnnexImageUrl"
+            :preview-src-list="[scope.row.orderAnnexImageUrl]"
+          ></el-image>
+         
+          <span v-else>暂无图片</span>
+        </template>
       </el-table-column>
-      <el-table-column align="center" label="备注" prop="orderNote"  show-overflow-tooltip />
+      <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
       <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="200">
         <template slot-scope="scope">
           <el-button
@@ -466,16 +467,16 @@
                                 <div class="cell">运单编号：</div>
                               </td>
                               <td>
-                                <div v-if="form" class="cell">{{ form.reclaimerOmsWaybill.waybillNo }}</div>
+                                <div
+                                  v-if="form"
+                                  class="cell"
+                                >{{ form.reclaimerOmsWaybill.waybillNo }}</div>
                               </td>
                               <td>
                                 <div class="cell">取料方式：</div>
                               </td>
                               <td>
-                                <div
-                                  v-if="form"
-                                  class="cell"
-                                >上门取料</div>
+                                <div v-if="form" class="cell">上门取料</div>
                               </td>
                             </tr>
                             <tr>
@@ -545,10 +546,7 @@
                                 <div class="cell">配送方式：</div>
                               </td>
                               <td>
-                                <div
-                                  v-if="form"
-                                  class="cell"
-                                >配送上门</div>
+                                <div v-if="form" class="cell">配送上门</div>
                               </td>
                             </tr>
                             <tr>
@@ -1072,48 +1070,52 @@ export default {
     },
     // 步骤条状态激活
     formatStepStatus(value) {
-       value = Number(value)
-      if(this.form.orderDeliveryType == 1) {
-         if (value >= 4 && value < 7) {
-            // 订单已支付
-            return 2;
-          } else if (value >= 7 && value <13) {
-            // 订单加工中
-            return 3;
-          } else if (value >= 13) {
-            // 订单已完成
-            return 4;
-          } else {
-            // 其他
-            return 1;
-          }
+      value = Number(value);
+      if (this.form.orderDeliveryType == 1) {
+        if (value >= 4 && value < 7) {
+          // 订单已支付
+          return 2;
+        } else if (value >= 7 && value < 13) {
+          // 订单加工中
+          return 3;
+        } else if (value >= 13) {
+          // 订单已完成
+          return 4;
+        } else {
+          // 其他
+          return 1;
+        }
       } else {
-           if (value >= 2 && value < 7) {
-            // 订单已支付
-            return 2;
-          } else if (value >= 7 && value <13) {
-            // 订单加工中
-            return 3;
-          } else if (value >= 13) {
-            // 订单已完成
-            return 4;
-          } else {
-            // 其他
-            return 1;
-          }
+        if (value >= 2 && value < 7) {
+          // 订单已支付
+          return 2;
+        } else if (value >= 7 && value < 13) {
+          // 订单加工中
+          return 3;
+        } else if (value >= 13) {
+          // 订单已完成
+          return 4;
+        } else {
+          // 其他
+          return 1;
+        }
       }
-
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
-      return  row.orderDeliveryType == 1 ? (row.orderStatus == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)) : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
-
+      return row.orderDeliveryType == 1
+        ? row.orderStatus == 12
+          ? "待取货"
+          : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
+        : this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
     },
     // 运单状态格式化
     formatOrderStatus(value) {
-
-      return  this.form.orderDeliveryType == 1 ? (value == 12 ? '待取货' : this.selectDictLabel(this.orderStatusOptions, value)) : this.selectDictLabel(this.orderStatusOptions, value)
-
+      return this.form.orderDeliveryType == 1
+        ? value == 12
+          ? "待取货"
+          : this.selectDictLabel(this.orderStatusOptions, value)
+        : this.selectDictLabel(this.orderStatusOptions, value);
     },
     // 订单支付类型格式化
     formatOrderPayType(value) {
@@ -1201,7 +1203,7 @@ export default {
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
       this.$confirm(
-        '是否确认取消订单编号为【' + row.orderNo + '】的数据项?',
+        "是否确认取消订单编号为【" + row.orderNo + "】的数据项?",
         "警告",
         {
           confirmButtonText: "确定",

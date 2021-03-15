@@ -1,5 +1,5 @@
 <template>
-  <h2>dispatch</h2>
+  <h2>待裁业务等待完善~</h2>
 </template>
 
 <script>
