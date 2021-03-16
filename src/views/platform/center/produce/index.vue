@@ -1,6 +1,11 @@
 <template>
   <div class="app-container">
-    <div class="produce-content" >
+    <div
+      class="produce-content"
+      v-loading="loading"
+      element-loading-text="加载中"
+      element-loading-spinner="el-icon-loading"
+    >
       <div class="produce-top">
         <el-collapse v-model="activeName1">
           <el-collapse-item name="1">
@@ -55,11 +60,7 @@
               </div>
             </template>
             <!-- 统计 -->
-            <div class="produce-mid-main"
-             v-loading="loading"
-            element-loading-text="加载中"
-            element-loading-spinner="el-icon-loading"
-            >
+            <div class="produce-mid-main">
               <div class="select-moudle">
                 <el-tooltip class="item" effect="dark" content="统计查询时间范围内；订单" placement="bottom">
                   <div
@@ -338,12 +339,13 @@ import produceApi from "@/api/platform/center/produce";
 
 import timeFormat from "./unit/timeFormat";
 
+
 export default {
   name: "produce",
   components: { lineChart, pieChart, phChart },
   data() {
     return {
-      loading:false,
+      loading: false,
       userInfo: this.$store.state.user.userInfo,
       dialogPhVisible: false,
       activeName1: "1",
@@ -403,10 +405,10 @@ export default {
     this.init();
   },
   mounted() {
-    // this.init();
+     this.init();
   },
   methods: {
-    // 初始化
+   // 初始化
     init() {
       this.searchDate = this.dataFormat();
       this.search();
@@ -491,7 +493,7 @@ export default {
     // 获取tab数据
     getTabData() {
       console.log("timeFormat", this.searchDate, this.searchDateType);
-      this.loading = true
+      this.loading = true;
       let params = {
         queryDate: timeFormat.timeSearchFormat(
           this.searchDate,
@@ -506,7 +508,7 @@ export default {
       produceApi.getObtainTabList(params).then(res => {
         if (res.code == 200) {
           this.tabData = res.data;
-           this.loading = false
+          this.loading = false;
         }
       });
     },

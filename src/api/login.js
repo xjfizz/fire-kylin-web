@@ -17,6 +17,20 @@ export function login(username, password, code, uuid) {
   })
 }
 
+// 大屏登录方法
+export function loginBigScreen(username, password) {
+  password = encrypt(password);
+  const data = {
+    username,
+    password
+  }
+  return request({
+    url: '/dataScreenLogin',
+    method: 'post',
+    data: data
+  })
+}
+
 // 获取用户详细信息
 export function getInfo() {
   return request({

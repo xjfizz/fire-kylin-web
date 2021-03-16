@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { getCodeImg } from "@/api/login";
 
 
 export default {
@@ -23,11 +24,28 @@ export default {
   },
   data() {
     return {
-     
+      loginForm:{
+        password: 'qdzyds2021', //  "qdzyds2021", // decrypt('qdzyds2021')
+        username: "qdzyds",
+        loginSource:1, // 登陆来源
+      },
+    }
+  },
+  created() {
+    if(this.$route.query.jumpSource == 'jxBigScreen') {
+      // 清除token
+      this.goLogin()
     }
   },
   methods: {
-   
+    // 登陆操作
+    goLogin() {
+      this.$store.dispatch("Login", this.loginForm).then(() => {
+           this.$router.replace({name:'Produce'})
+          }).catch(() => {
+            
+          });
+    },
   }
 }
 </script>

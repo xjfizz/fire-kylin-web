@@ -1,5 +1,14 @@
-import {getInfo, login, logout} from '@/api/login'
-import {getToken, removeToken, setToken} from '@/utils/auth'
+import {
+  getInfo,
+  login,
+  loginBigScreen,
+  logout
+} from '@/api/login'
+import {
+  getToken,
+  removeToken,
+  setToken
+} from '@/utils/auth'
 
 const user = {
   state: {
@@ -34,24 +43,48 @@ const user = {
 
   actions: {
     // 登录
-    Login({ commit }, userInfo) {
-      const username = userInfo.username.trim()
-      const password = userInfo.password
-      const code = userInfo.code
-      const uuid = userInfo.uuid
-      return new Promise((resolve, reject) => {
-        login(username, password, code, uuid).then(res => {
-          setToken(res.token)
-          commit('SET_TOKEN', res.token)
-          resolve()
-        }).catch(error => {
-          reject(error)
+    Login({
+      commit
+    }, userInfo) {
+      if (!userInfo.loginSource) {
+        const username = userInfo.username.trim()
+        const password = userInfo.password
+        const code = userInfo.code
+        const uuid = userInfo.uuid
+        return new Promise((resolve, reject) => {
+          login(username, password, code, uuid).then(res => {
+            setToken(res.token)
+            commit('SET_TOKEN', res.token)
+            resolve()
+          }).catch(error => {
+            reject(error)
+          })
         })
-      })
+      } else {
+        commit('SET_TOKEN', '')
+        commit('SET_ROLES', [])
+        commit('SET_PERMISSIONS', [])
+        removeToken()
+        const username = userInfo.username.trim()
+        const password = userInfo.password
+        return new Promise((resolve, reject) => {
+          loginBigScreen(username, password).then(res => {
+            setToken(res.token)
+            commit('SET_TOKEN', res.token)
+            resolve()
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      }
+
     },
 
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetInfo({
+      commit,
+      state
+    }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(res => {
           const user = res.user
@@ -74,7 +107,10 @@ const user = {
     },
 
     // 退出系统
-    LogOut({ commit, state }) {
+    LogOut({
+      commit,
+      state
+    }) {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
@@ -89,7 +125,9 @@ const user = {
     },
 
     // 前端 登出
-    FedLogOut({ commit }) {
+    FedLogOut({
+      commit
+    }) {
       return new Promise(resolve => {
         commit('SET_TOKEN', '')
         removeToken()
