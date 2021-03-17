@@ -113,6 +113,9 @@
         >确认接单</el-button>
       </el-col>
       <el-col :span="1.5">
+        <el-button icon="el-icon-s-check" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
+      </el-col>
+      <el-col :span="1.5">
         <el-button
           v-hasPermi="['oms:order:export']"
           icon="el-icon-download"
@@ -130,13 +133,17 @@
       v-loading="loading"
       :data="orderList"
       @selection-change="handleSelectionChange"
+       :row-key="getRowKeys"
     >
-      <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="订单编号" prop="orderNo" width="230" />
+      <el-table-column align="center" type="selection" width="55"  :reserve-selection="true"  />
+      <el-table-column align="center" label="订单编号" prop="orderNo" width="180" />
       <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
+      <el-table-column align="center" label="商品颜色" prop="orderColor">
+        <template slot-scope="{row}">{{ row.orderColor || '暂无' }}</template>
+      </el-table-column>
       <el-table-column align="center" label="商品规格" prop="orderSpecification">
         <template slot-scope="{row}">{{ row.orderSpecification || '暂无' }}</template>
       </el-table-column>
@@ -173,7 +180,7 @@
             :src="scope.row.orderAnnexImageUrl"
             :preview-src-list="[scope.row.orderAnnexImageUrl]"
           ></el-image>
-         
+
           <span v-else>暂无图片</span>
         </template>
       </el-table-column>
@@ -774,7 +781,8 @@
       ></isPickDialog>
 
       <!-- 打印组件 -->
-      <orderPrint ref="orderPrintRef" :title="printDialogTitle"></orderPrint>
+      <!-- <orderPrint ref="orderPrintRef" :title="printDialogTitle"></orderPrint> -->
+      <orderPrints ref="orderPrintRefs" :title="printDialogTitle"></orderPrints>
     </div>
     <!-- 对话框-end -->
   </div>
@@ -801,17 +809,20 @@ import {
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
+import orderPrints from "@/components/Print/order-prints"; // 批量打印
 
 export default {
   name: "Order",
   components: {
     isPickDialog,
-    orderPrint
+    orderPrint,
+    orderPrints
   },
   data() {
     return {
       dialogTitle: "",
       printDialogTitle: "订单打印", //订单打印
+      printDialogTitles: "批量打印", //订单打印
       isSingle: false, // 是否单选
       pickerVisible: false, // 取料对话框
       producterVisible: false, // 生产员对话框
@@ -1020,6 +1031,10 @@ export default {
       this.activeName = "order";
       this.open = false;
       this.reset();
+    },
+    // 分页记忆多选
+    getRowKeys(row) {
+      return row.pkid
     },
     // 表单重置
     reset() {
@@ -1716,7 +1731,30 @@ export default {
     },
     // 点击打印
     printOrder(e) {
-      this.$refs.orderPrintRef.open(e);
+      // this.$refs.orderPrintRef.open(e);
+      this.printOrders(e);
+    },
+    // 批量打印
+    printOrders(val) {
+      console.log("this.selectOrderList", this.selectOrderList, val);
+      let ids = null;
+      if (val.pkid) {
+        // 单个打印
+        this.printDialogTitle = "订单打印";
+        ids = [val.pkid];
+        this.$refs.orderPrintRefs.open(ids);
+      } else {
+        // 多个打印
+        this.printDialogTitle = "批量打印";
+        if (!this.selectOrderList.length) {
+          return this.$message({
+            type: "warning",
+            message: "请先选择相应订单!"
+          });
+        }
+        let ids = this.selectOrderList.map(item => item.pkid);
+        this.$refs.orderPrintRefs.open(ids);
+      }
     },
     // 分配检测员
     checkOrder(e) {

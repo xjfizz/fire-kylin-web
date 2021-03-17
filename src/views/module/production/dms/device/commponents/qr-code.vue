@@ -4,7 +4,7 @@
          二维码大小[限制为正方形]
          二维码中间显示：文字或LOGO[默认不显示]-->
     <div id="meQrcode">
-        <div class="qrcode_box">
+       <div class="qrcode_box">
           <img class="qrcode_canvas" id="qrcode_canvas" ref="qrcode_canvas" alt="二维码图片">
           <img v-if="qrLogo" class="qrcode_logo" ref="qrcode_logo" :src="qrLogo" alt="二维码logo">
           <canvas :width="qrSize" :height="qrSize" class="canvas" ref="canvas"></canvas>
@@ -76,16 +76,22 @@ export default {
           ctx.fillStyle = "#fff";
           ctx.fillRect(
             fleft - tp / 2,
-            ftop - tp / 2,
+             //ftop - tp / 2,
+             this.qrSize,
             tw + tp,
             this.qrTextSize + tp
           );
           ctx.textBaseline = "top"; //设置绘制文本时的文本基线。
           ctx.fillStyle = "#f40";
-          ctx.fillText(this.qrText, fleft, ftop);
+         // ctx.fillText('this.qrText', fleft, ftop);
+         //  ctx.fillText(`设备编码: ${this.qrText}`, fleft, ftop*2);
+        //  let logoPosition = (this.qrSize - this.qrTextSize) / 2; //logo相对于canvas居中定位
+          ctx.fillText(`${this.qrText}`, this.qrSize/2-tw/2, ftop*2-6);
+
         }
         canvas.style.display = "none";
         qrcode_canvas.src = canvas.toDataURL();
+         this.$emit('createErCode', {imgUrl:qrcode_canvas.src,imgName:this.qrText})
         qrcode_canvas.style.display = "inline-block";
       }, 500);
     });

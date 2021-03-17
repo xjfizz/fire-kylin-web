@@ -148,7 +148,7 @@ export default {
               if (_this.type == 1) {
                 return `${value}单`;
               } else if (_this.type == 2) {
-                return `${value}人`;
+                return `${value}次`;
               } else if (_this.type == 3) {
                 return `￥${value}`;
               } else if (_this.type == 4) {

@@ -121,6 +121,7 @@
 
     <el-table v-loading="loading" :data="deviceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
+      <el-table-column label="ID" align="center" width="55" prop="pkid" />
       <el-table-column label="设备编号" align="center" prop="deviceCode" />
       <el-table-column label="设备名称" align="center" prop="deviceName" />
       <el-table-column label="设备型号" align="center" prop="deviceModel" />
@@ -133,13 +134,13 @@
             @click="handleView(scope.row)"
             v-hasPermi="['dms:device:edit']"
           >查看</el-button>
-          <el-button
+          <!-- <el-button
             size="mini"
             type="text"
             icon="el-icon-download"
             @click="handleDownload(scope.row)"
             v-hasPermi="['dms:device:edit']"
-          >下载</el-button>
+          >下载</el-button> -->
         </template>
       </el-table-column>
       <el-table-column label="设备状态" align="center" prop="deviceStatus" :formatter="deviceStatusFormat" width="100" >
@@ -200,7 +201,7 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
        <el-card>
          <el-form-item label="设备编号" prop="deviceCode">
-           <el-input v-model="form.deviceCode" placeholder="请输入设备编号" :disabled="disabledFlag"/>
+           <el-input maxlength="9" v-model="form.deviceCode" placeholder="请输入设备编号" :disabled="disabledFlag"/>
          </el-form-item>
          <el-form-item label="设备名称" prop="deviceName">
            <el-input v-model="form.deviceName" placeholder="请输入设备名称" />
@@ -240,15 +241,17 @@
 
     <!-- 设备二维码对话框 -->
     <el-dialog :title="viewTitle" :visible.sync="viewOpen" width="500px" append-to-body>
-      <el-form ref="viewForm" :model="viewForm" label-width="130px">
+      <el-form ref="viewForm" :model="viewForm" >
         <el-card>
           <div slot="header"><el-tag type="danger" effect="plain">【{{ viewForm.deviceCode }}】设备二维码</el-tag></div>
-          <el-form-item label="" prop="deviceQrCode" STYLE="margin-top: 40px">
+          <!-- <qrCode :qr-url='viewForm.deviceCode' :qr-size='300' :qr-text="viewForm.deviceCode"></qrCode> -->
+          <el-form-item label="" prop="deviceQrCode"  align="center">
             <template v-if="viewForm.deviceQrCode">
-              <el-popover placement="top-start" title="" trigger="hover">
+              <!-- <el-popover placement="top-start" title="" trigger="hover">
                 <img  :src="viewForm.deviceQrCode" alt="图片预览" style="width: 200px;height: 200px">
                 <img  slot="reference" :src="viewForm.deviceQrCode" style="width: 150px;height: 150px">
-              </el-popover>
+              </el-popover> -->
+              <qrCode @createErCode="createErCode" :qr-url='viewForm.deviceCode' :qr-size='250' :qr-text-size="16" :qr-text=" '设备编码: ' + viewForm.deviceCode"></qrCode>
             </template>
             <template v-else>
               <el-tag type="info" effect="plain">暂无设备二维码</el-tag>
@@ -257,6 +260,7 @@
         </el-card>
       </el-form>
       <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="downErCode">下 载</el-button>
         <el-button @click="viewCancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -345,7 +349,8 @@ export default {
         deviceStatus: [
           { required: true, message: "设备状态不能为空", trigger: "blur" }
         ],
-      }
+      },
+      erCodeImg:{}, // 二维码图片
     };
   },
   created() {
@@ -564,7 +569,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除工场设备编号为【' + pkids + '】的数据项?', "警告", {
+      this.$confirm('是否确认删除工场设备ID为【' + pkids + '】的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -587,7 +592,24 @@ export default {
         }).then(response => {
           this.download(response.msg);
         })
-    }
+    },
+    // 生成组装二维码e
+    createErCode(e) {
+       console.log('downErCode',e)
+       this.erCodeImg = e
+    },
+    // 下载二维码
+    downErCode() {
+      console.log('downErCode',this.erCodeImg)
+      this.downs(this.erCodeImg)
+    },
+    // 下载图片
+    downs(e) {
+      var alink = document.createElement("a");
+      alink.href = e.imgUrl;
+      alink.download =`${e.imgName}`; //图片名
+      alink.click();
+   }
   }
 };
 </script>

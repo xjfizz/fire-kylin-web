@@ -125,12 +125,21 @@ export function orderRosterProduct(data) {
 }
 
 
-// 查询设备排班列表
+// 单个打印
 export function orderPrint(data) {
   return request({
     url: '/oms/web/order/orderPrint',
     method: 'get',
     params: data
+  })
+}
+
+// 批量打印
+export function orderPrints(data) {
+  return request({
+    url: '/oms/web/order/batchPrintOrder',
+    method: 'post',
+    data: data
   })
 }
 
