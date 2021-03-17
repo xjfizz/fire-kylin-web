@@ -113,7 +113,7 @@
         >确认接单</el-button>
       </el-col>
       <el-col :span="1.5">
-        <el-button icon="el-icon-s-check" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
+        <el-button icon="el-icon-printer" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -1033,7 +1033,7 @@ export default {
       this.reset();
     },
     // 分页记忆多选
-    getRowKeys(row) {
+     getRowKeys(row) {
       return row.pkid
     },
     // 表单重置
