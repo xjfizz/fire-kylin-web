@@ -22,6 +22,7 @@ import Pagination from "@/components/Pagination";
 import RightToolbar from "@/components/RightToolbar"
 // 打印插件
 import Print from 'vue-print-nb'
+import 'default-passive-events'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts

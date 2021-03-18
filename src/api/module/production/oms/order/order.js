@@ -171,3 +171,30 @@ export function orderPicked(data) {
     data: data
   })
 }
+
+// 获取当天f分配过生产员的设备
+export function listRosterDevice(query) {
+  return request({
+    url: '/oms/web/order/listRosterDevice',
+    method: 'get',
+    params: query
+  })
+}
+
+// 分配生产设备
+export function orderAssignDevice(data) {
+  return request({
+    url: '/oms/web/order/assignProduce',
+    method: 'post',
+    data: data
+  })
+}
+
+// 分配生产设备
+export function orderAssignDeviceAgain(data) {
+  return request({
+    url: '/oms/web/order/againAssignProduce',
+    method: 'put',
+    data: data
+  })
+}

@@ -115,6 +115,9 @@
       <el-col :span="1.5">
         <el-button icon="el-icon-printer" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
       </el-col>
+       <el-col :span="1.5">
+        <el-button  icon="el-icon-s-operation" plain size="mini" type="success" @click="printOrders">批量分配</el-button>
+      </el-col>
       <el-col :span="1.5">
         <el-button
           v-hasPermi="['oms:order:export']"
@@ -185,7 +188,7 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
-      <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="200">
+      <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
           <el-button
             icon="el-icon-printer"
@@ -217,8 +220,8 @@
             type="text"
             @click="confirmOrderSingle(scope.row)"
           >确认</el-button>
-          <el-button
-            v-show="scope.row.orderStatus === '4'"
+         <el-button
+            v-show="[1,2,3,4,5,6].indexOf(Number(scope.row.orderStatus)) > -1"
             v-hasPermi="['oms:order:remove']"
             icon="el-icon-s-open"
             size="mini"
@@ -232,8 +235,16 @@
             size="mini"
             style="color: #f8ac59"
             type="text"
-            @click="rosterOrder(scope.row)"
-          >排班</el-button>
+            @click="rosterOrder(scope.row,1)"
+          >分配生产</el-button>
+           <el-button
+            v-show=" scope.row.orderStatus === '6' && scope.row.assignProduceFlag == 1"
+            icon="el-icon-s-operation"
+            size="mini"
+            style="color: #f8ac59"
+            type="text"
+            @click="rosterOrder(scope.row,2)"
+          >重新分配</el-button>
           <el-button
             v-show="scope.row.orderStatus === '8'"
             icon="el-icon-search"
@@ -635,6 +646,32 @@
                     </table>
                   </div>
                 </el-tab-pane>
+                <el-tab-pane label="生产信息" name="producing">
+                    <!-- <div class="producting-content-main"> 
+                      <div class="producting-content">
+                        <el-steps class="producting-content-steps" direction="vertical"  :active="productingList.length"  align-center  finish-status="success">
+                          <el-step v-for="(item,index) in productingList" :key="index" class="producting-content-step" :title="item.productingTitle" >
+                            <template slot="description">
+                              <div class="producting-content-text">
+                                <div>{{item.user}}-{{item.deviceCode}}-{{item.productingTitle}}</div>
+                                <div>{{item.createTime}}</div>
+                               </div>
+                            </template>
+                          </el-step>
+                      </el-steps>
+                      </div>
+                    </div> -->
+                    <div class="producting-content-main"> 
+                      <el-timeline>
+                        <el-timeline-item v-for="(item,index) in productingList" :key="index"  :color="index == 0 ? '#48aafd' : ''" :timestamp="item.createTime" placement="top">
+                          <el-card>
+                            <h4>{{item.productingTitle}}</h4>
+                            <p>{{item.user}}-{{item.deviceCode}}-{{item.productingTitle}}</p>
+                          </el-card>
+                        </el-timeline-item>
+                      </el-timeline>
+                    </div>
+                </el-tab-pane>
               </el-tabs>
             </el-card>
           </el-row>
@@ -687,31 +724,33 @@
         </div>
       </el-dialog>
 
-      <!-- 生产员分配-dialog -->
-      <el-dialog :visible.sync="producterVisible" center title="选择生产员" width="400px">
+      <!-- 生产员设备分配-dialog -->
+      <el-dialog :visible.sync="producterVisible" center title="选择设备" width="400px">
         <div class="relationVisibleMain">
           <div class="relationVisibleMain-top">
-            <el-input v-model="producterSearchKey" clearable placeholder="请输入工号/姓名"></el-input>
+            <el-input v-model="deviceSearchKey" clearable placeholder="请输入设备编号/名称/员工姓名"></el-input>
 
             <el-button
               class="search-button"
               icon="el-icon-search"
               size="medium"
               type="primary"
-              @click="getProducterList()"
+              @click="getListRosterDevice()"
             >查询</el-button>
           </div>
-          <div v-if="producterList.length > 0" class="mid">
-            <div v-for="(item,index) in producterList" :key="index" class="item">
+          <div v-if="devicerList.length > 0" class="mid">
+            <div v-for="(item,index) in devicerList" :key="index" class="item">
               <div class="left">
                 <el-radio
-                  v-model="selelctProducterId"
-                  :label="item.userId"
-                  @change="selectProducter(item)"
+                  v-model="selelctDeviceId"
+                  :label="item.devicePkid"
+                  @change="selectDevicer(item)"
                 >
                   <span class="left-value">
-                    <span>{{item.nickName}}</span>
-                    <span v-if="item.jobNumber">/{{item.jobNumber}}</span>
+                    <span>{{item.deviceName}}</span>
+                    <span>-{{item.deviceCode}}</span>
+                    <span>-生产员{{item.rosterUserName}}</span>
+                    <!-- <span v-if="item.jobNumber">/{{item.jobNumber}}</span> -->
                   </span>
                 </el-radio>
               </div>
@@ -805,7 +844,10 @@ import {
   orderAssignSender,
   orderPicked,
   orderRosterProduct,
-  updateOrder
+  updateOrder,
+  listRosterDevice,
+  orderAssignDevice,
+  orderAssignDeviceAgain
 } from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
@@ -831,11 +873,14 @@ export default {
       pickerList: [], // 取料员list
       checkerList: [], // 检测员list
       pickerSearchKey: "", //取料查询关键字
+      deviceSearchKey: "", //排班设备查询关键字
       checkerSearchKey: "", //检测查询关键字
       producterSearchKey: "", // 生产员关键字查询
       producterList: [], // 生产员list
+      devicerList: [], // 排班设备list
       selelctPickerId: "", // 选择的配送员ID
       selelctProducterId: "", // 选择生产员ID
+      selelctDeviceId: "", // 选择排班设备ID
       selelctCheckerId: "", // 选择检测员ID
       isPickVisible: false, // 检测是否已取料
       isPickList: [
@@ -952,7 +997,16 @@ export default {
         orderFreightAmount: [
           { required: true, message: "运费金额不能为空", trigger: "blur" }
         ]
-      }
+      },
+      productingList:[ // 生产信息列表
+        {productingTitle: '开始生产',productingStatus:1,user:'苏铭',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+        {productingTitle: '生产暂停',productingStatus:2,user:'苏铭',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+        {productingTitle: '继续生产',productingStatus:3,user:'张三',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+        {productingTitle: '生产暂停',productingStatus:2,user:'张三',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+        {productingTitle: '继续生产',productingStatus:3,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+        {productingTitle: '生产完成',productingStatus:4,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
+      ], 
+      rosterDeviceType:1,// 排班类型 1 排班 2 重新排班
     };
   },
   mounted() {
@@ -1480,6 +1534,10 @@ export default {
     selectProducter(item) {
       this.selelctProducterId = item.userId;
     },
+    // 选择排班设备
+    selectDevicer(item) {
+      this.selelctDeviceId = item.devicePkid;
+    },
     // 选择检测员
     selectChecker(item) {
       this.selelctCheckerId = item.userId;
@@ -1491,6 +1549,7 @@ export default {
     // 取消生产员对话框
     cancelProducter() {
       this.producterVisible = false;
+      this.deviceSearchKey = ''
     },
     // 取消检测员对话框
     cancelChecker() {
@@ -1535,14 +1594,18 @@ export default {
     },
     // 确认配送弹框
     confirmProducter() {
-      if (!this.selelctProducterId) {
+      if (!this.selelctDeviceId) {
         return this.$message({
           type: "warning",
-          message: "请先选择生产员!"
+          message: "请先选择设备!"
         });
       }
-
-      this.rosterOrderApi();
+      
+      if(this.rosterDeviceType == 1) {
+        this.rosterOrderApi();
+      }else {
+         this.rosterOrderApiAgain();
+      }
     },
     // 确认配送弹框
     confirmChecker() {
@@ -1559,20 +1622,52 @@ export default {
     rosterOrderApi() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
-        orderPkids,
-        produceUserPkid: this.selelctProducterId,
+        orderPkids:orderPkids,
+        devicePkid: this.selelctDeviceId,
         workshopPkid: this.$store.state.user.userInfo.workshopId
       };
       console.log("params", params, this.$store);
-      orderRosterProduct(params).then(res => {
+      orderAssignDevice(params).then(res => {
         if (res.code == 200) {
           this.producterVisible = false;
-          this.selelctProducterId = "";
+          this.selelctDeviceId = "";
           this.selectOrderList = [];
           this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
+          });
+        } else {
+           this.$message({
+            type: "warning",
+            message: res.msg
+          });
+        }
+      });
+    },
+       // 单个重新排班api
+    rosterOrderApiAgain() {
+      let orderPkids = this.selectOrderList.map(item => item.pkid);
+      let params = {
+        orderPkids:orderPkids,
+        devicePkid: this.selelctDeviceId,
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      console.log("params", params, this.$store);
+      orderAssignDeviceAgain(params).then(res => {
+        if (res.code == 200) {
+          this.producterVisible = false;
+          this.selelctDeviceId = "";
+          this.selectOrderList = [];
+          this.handleQuery();
+          this.$message({
+            type: "success",
+            message: "操作成功!"
+          });
+        } else {
+           this.$message({
+            type: "warning",
+            message: res.msg
           });
         }
       });
@@ -1702,8 +1797,9 @@ export default {
         });
     },
     // 排班弹框
-    rosterOrder(e) {
+    rosterOrder(e,type) {
       this.selectOrderList = [e];
+      this.rosterDeviceType = type
       this.getRosterList();
     },
 
@@ -1719,7 +1815,7 @@ export default {
           // this.rosterList = res.data;
           if (res.data.length > 0) {
             this.producterVisible = true;
-            this.getProducterList();
+            this.getListRosterDevice();
           } else {
             this.$message({
               type: "warning",
@@ -1807,9 +1903,46 @@ export default {
           });
         }
       });
-    }
+    },
+      /** 获取当天已排班设备*/
+    getListRosterDevice() {
+      // this.loading = true;
+      let params = {
+        queryKey: this.deviceSearchKey || "",
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      listRosterDevice(params).then(res => {
+        if (res.code == 200) {
+           this.devicerList = res.data;
+           this.selelctDeviceId = this.devicerList[0] ? this.devicerList[0].devicePkid : '' ;
+        }
+      });
+    },
   }
 };
 </script>
 <style lang="scss" rel="stylesheet/scss">
+.producting-content-main{
+  height: 300px;
+  padding: 20px;
+  overflow: auto; 
+}
+.producting-content-main ul{
+  padding-left: 0px;
+}
+.producting-content-main .el-card{
+     color: #48aafd;
+}
+.producting-content{
+ 
+}
+.producting-content-text{
+   margin: 10px 0 10px 0;
+}
+.producting-content-step{
+
+}
+.producting-content-steps{
+ 
+}
 </style>

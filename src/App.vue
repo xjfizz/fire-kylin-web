@@ -5,11 +5,11 @@
 </template>
 
 <script>
-import websocket from '@/utils/webSocket'
+// import websocket from '@/utils/webSocket'
 export default  {
   name:  'App',
    created(){
-	  websocket.Init("user-1")
+	  // websocket.Init("user-1")
   }
 }
 </script>
