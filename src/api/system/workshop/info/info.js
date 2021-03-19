@@ -102,3 +102,11 @@ export function listServerTag() {
     method: 'get'
   })
 }
+
+// 获取平台客服
+export function getPlatformPhone() {
+  return request({
+    url: '/wms/info/getPlaCustomerServicePhone',
+    method: 'get'
+  })
+}

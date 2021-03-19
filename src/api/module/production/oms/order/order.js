@@ -198,3 +198,5 @@ export function orderAssignDeviceAgain(data) {
     data: data
   })
 }
+
+

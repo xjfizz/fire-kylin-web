@@ -1,6 +1,9 @@
 <template>
-  <div class="login">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
+  <div class="login" >
+    <el-form   v-loading="loading"
+      element-loading-text="登陆中"
+      element-loading-spinner="el-icon-loading"
+     ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h1 class="title">巨象Faas工场管理平台</h1>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
@@ -35,8 +38,7 @@
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
         <el-button
-          :loading="loading"
-          size="medium"
+         size="medium"
           type="primary"
           style="width:100%;"
           @click.native.prevent="handleLogin"
@@ -48,8 +50,8 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>巨象信息技术有限公司</span>
-      <span>Copyright © 2021-2030 Giant Elephant Technology All Rights Reserved.</span>
+      <span>苏州巨象信息技术有限公司</span>
+      <span>Copyright © 2021-2030  Ju Xiang All Rights Reserved.</span>
     </div>
   </div>
 </template>
@@ -115,10 +117,10 @@ export default {
       };
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      this.loading = true;
+       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
-          if (this.loginForm.rememberMe) {
+           if (this.loginForm.rememberMe) {
             Cookies.set("username", this.loginForm.username, { expires: 30 });
             Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
             Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
@@ -200,5 +202,8 @@ export default {
 }
 .login-code-img {
   height: 38px;
+}
+.el-loading-spinner .el-loading-text{
+  color: #8bbbe8;
 }
 </style>

@@ -116,7 +116,7 @@
         <el-button icon="el-icon-printer" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
       </el-col>
        <el-col :span="1.5">
-        <el-button  icon="el-icon-s-operation" plain size="mini" type="success" @click="printOrders">批量分配</el-button>
+        <el-button  icon="el-icon-s-operation" plain size="mini" type="success" @click="rosterOrders">批量分配</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -311,7 +311,7 @@
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
                     <tr>
-                      <td rowspan="2">
+                      <td rowspan="3">
                         <div v-if="form.pmsServer" class="cell">
                           <el-popover placement="top-start" title trigger="hover">
                             <img
@@ -647,30 +647,41 @@
                   </div>
                 </el-tab-pane>
                 <el-tab-pane label="生产信息" name="producing">
-                    <!-- <div class="producting-content-main"> 
-                      <div class="producting-content">
-                        <el-steps class="producting-content-steps" direction="vertical"  :active="productingList.length"  align-center  finish-status="success">
-                          <el-step v-for="(item,index) in productingList" :key="index" class="producting-content-step" :title="item.productingTitle" >
-                            <template slot="description">
-                              <div class="producting-content-text">
-                                <div>{{item.user}}-{{item.deviceCode}}-{{item.productingTitle}}</div>
-                                <div>{{item.createTime}}</div>
-                               </div>
-                            </template>
-                          </el-step>
-                      </el-steps>
-                      </div>
-                    </div> -->
+                    
                     <div class="producting-content-main"> 
-                      <el-timeline>
-                        <el-timeline-item v-for="(item,index) in productingList" :key="index"  :color="index == 0 ? '#48aafd' : ''" :timestamp="item.createTime" placement="top">
+                      <div class="producting-content-main-list">
+                        <div v-if="form.orderAssignTime" style="color:#888888;margin-bottom:30px;font-size:15px">
+                         <span style="">指派: {{ dataFormatSecond(new Date(form.orderAssignTime))}}</span>
+                         <span style="margin-left:30px;">设备: {{form.deviceAssignCode}}</span>
+                      </div>
+                      <div style="color:#888888;margin-bottom:30px;font-size:15px;display: flex;justify-content: center;" v-else>
+                        <span>暂无指派信息</span>
+                      </div>
+                     
+                      <!-- <el-timeline v-if="form.produceRecordInfo && form.produceRecordInfo.length > 0">
+                        <el-timeline-item v-for="(item,index) in form.produceRecordInfo" :key="index"  :color="index == 0 ? '#48aafd' : ''" :timestamp="item.orderOperateTime" placement="top">
                           <el-card>
-                            <h4>{{item.productingTitle}}</h4>
-                            <p>{{item.user}}-{{item.deviceCode}}-{{item.productingTitle}}</p>
+                            <h4>{{productStatus[item.orderOperateStatus-1].value}}</h4>
+                          <div>
+                              <span>生产员{{item.assignProduceUserName}}在设备编号为</span>
+                              <span style="color:#ff5400;font-weight:600;">{{item.deviceCode}}</span>
+                              <span>的设备上</span>
+                              <span>{{productStatus[item.orderOperateStatus-1].value}}</span>
+                            </div>
                           </el-card>
                         </el-timeline-item>
+                      </el-timeline> -->
+                      <el-timeline v-if="form.produceRecordInfo && form.produceRecordInfo.length > 0">
+                        <el-timeline-item v-for="(item,index) in form.produceRecordInfo" :key="index" >
+                           <span style="color:#888888;font-weight:600;">{{productStatus[item.orderOperateStatus-1].value}}</span>
+                           <span style="color:#999999;margin-left:20px">{{item.assignProduceUserName}}</span>
+                           <span style="color:#999999;margin-left:20px">{{item.orderOperateTime}}</span>
+                        </el-timeline-item>
                       </el-timeline>
+                      <div v-else class="no-data-product" >暂无生产信息</div>
                     </div>
+                      </div>
+                      
                 </el-tab-pane>
               </el-tabs>
             </el-card>
@@ -1006,6 +1017,12 @@ export default {
         {productingTitle: '继续生产',productingStatus:3,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
         {productingTitle: '生产完成',productingStatus:4,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
       ], 
+      productStatus:[
+        {key:1,value:'开始生产'},
+        {key:2,value:'暂停生产'},
+        {key:3,value:'继续生产'},
+        {key:4,value:'完成生产'},
+      ],
       rosterDeviceType:1,// 排班类型 1 排班 2 重新排班
     };
   },
@@ -1058,6 +1075,12 @@ export default {
         this.p(d.getMonth() + 1) +
         "-" +
         this.p(d.getDate());
+      return str;
+    },
+    dataFormatSecond(d) {
+      console.log("d", d);
+      let str =
+        d.getFullYear() +"-" +this.p(d.getMonth() + 1) +"-" + this.p(d.getDate()) + " " + this.p(d.getHours()) + ":" + this.p(d.getMinutes()) + ":" + this.p(d.getSeconds());
       return str;
     },
     //创建补0函数
@@ -1200,6 +1223,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
+      this.selectOrderList = []
       this.getList();
     },
     /** 重置按钮操作 */
@@ -1377,6 +1401,22 @@ export default {
       }
       this.pickerVisible = true;
       this.getPickerList();
+    },
+    // 批量分配
+    rosterOrders() {
+     if (this.queryParams.orderStatus != 5) {
+        return this.$message({
+          type: "warning",
+          message: "请先筛选出待排单订单!"
+        });
+      }
+      if (this.selectOrderList.length == 0) {
+        return this.$message({
+          type: "warning",
+          message: "请先选择订单!"
+        });
+      }
+      this.rosterOrder(null,1);
     },
 
     // 取料单选
@@ -1798,7 +1838,7 @@ export default {
     },
     // 排班弹框
     rosterOrder(e,type) {
-      this.selectOrderList = [e];
+      this.selectOrderList = e ? [e] : this.selectOrderList;
       this.rosterDeviceType = type
       this.getRosterList();
     },
@@ -1917,7 +1957,7 @@ export default {
            this.selelctDeviceId = this.devicerList[0] ? this.devicerList[0].devicePkid : '' ;
         }
       });
-    },
+    }
   }
 };
 </script>
@@ -1926,12 +1966,24 @@ export default {
   height: 300px;
   padding: 20px;
   overflow: auto; 
+  // display: flex;
+  // justify-content: center;
+}
+.producting-content-main-list{
+
 }
 .producting-content-main ul{
   padding-left: 0px;
 }
 .producting-content-main .el-card{
      color: #48aafd;
+}
+.no-data-product{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #999999;
+  margin-top: 100px;
 }
 .producting-content{
  

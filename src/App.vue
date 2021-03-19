@@ -13,3 +13,8 @@ export default  {
   }
 }
 </script>
+<style>
+#app{
+  touch-action: none;
+}
+</style>

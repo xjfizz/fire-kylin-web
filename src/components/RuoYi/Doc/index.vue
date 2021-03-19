@@ -5,19 +5,32 @@
 </template>
 
 <script>
+import {getPlatformPhone} from "@/api/system/workshop/info/info";
 export default {
   name: 'RuoYiDoc',
   data() {
     return {
-      url: 'http://doc.ruoyi.vip/ruoyi-vue'
+      url: 'http://doc.ruoyi.vip/ruoyi-vue',
+      platform:{}
     }
   },
   methods: {
     note() {
-      const h = this.$createElement;
-      this.$notify({
-        title: '温馨提示',
-        message: h('i', {style: 'color: teal'}, '巨象官方联系方式为：0521-88888888')
+      this.getWorkshopInfo()
+     
+    },
+     // 获取工场信息
+    getWorkshopInfo() {
+      getPlatformPhone().then(response => {
+        if(response.data.length > 0) {
+           this.platform = response.data[0];
+        }
+       const h = this.$createElement;
+        console.log('=======',this.$store)
+        this.$notify({
+          title: '温馨提示',
+          message: h('i', {style: 'color: teal'}, `巨象官方联系方式为：${this.platform.infoPhone || '暂无客服'}`)
+        });
       });
     },
     // goto() {

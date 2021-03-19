@@ -158,7 +158,8 @@ import {
   relationDevice,
   removeDevicePeople,
   getProducter,
-  stopOrStart
+  stopOrStart,
+  checkDeviceIsOrders
 } from "@/api/module/production/dms/roster/roster";
 export default {
   name: "rosterOptions",
@@ -270,15 +271,52 @@ export default {
       console.log(this.selectList, this.deviceList);
     },
     // 关联人员
-    relationPeople() {
+     relationPeople() {
       console.log(this.selectList, this.deviceList);
       if (this.selectList.length == 0) {
         return this.$message({ type: "warning", message: "请先选择设备!" });
       }
-      this.getProducterList();
-      this.relationVisible = true;
+        this.getProducterList();
+        this.relationVisible = true;
     },
-    // 关联人员-对话框-选择人员
+    // 检测设备挂单状态
+    checkDevicesOrders(callBack) {
+      let params = {
+        relationDevicePkids: this.selectList,
+        // relationUserPkid: this.selelctProducerId || "",
+        //  rosterDate: this.searchDate
+      };
+      checkDeviceIsOrders(params).then(res => {
+        if (res.code == 200) {
+          if(res.data.orderAssignDeviceStatus) {
+            //  this.openTips(this.confirmRelationApi)
+            this.openTips(callBack)
+            } else {
+             callBack();
+          }
+        }
+      });
+    },
+    // 唤起警告框-设备有单
+    openTips(callBack) {
+        this.$confirm("当前设备关联订单存在未暂停的订单, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "info"
+      })
+        .then(() => {
+           // this.confirmRelationApi();
+           callBack()
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作"
+          });
+        });
+    },
+
+  // 关联人员-对话框-选择人员
     selectProducer(val) {
       console.log("val", val);
     },
@@ -293,7 +331,7 @@ export default {
       if (!this.selelctProducerId) {
         return this.$message({ type: "warning", message: "请选择关联人员!" });
       }
-      this.confirmRelationApi();
+      this.checkDevicesOrders(this.confirmRelationApi)
     },
     confirmRelationApi() {
       let params = {
@@ -348,7 +386,8 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.removeRelationApi();
+         // this.removeRelationApi();
+          this.checkDevicesOrders(this.removeRelationApi)
         })
         .catch(() => {
           this.$message({

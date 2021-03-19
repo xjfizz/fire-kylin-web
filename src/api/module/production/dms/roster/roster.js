@@ -64,3 +64,12 @@ export function copyRoster(data) {
   })
 }
 
+// 检测设备订单是否有未停止订单
+export function checkDeviceIsOrders(data) {
+  return request({
+    url: '/dms/roster/checkOrderAssignDeviceStatus',
+    method: 'post',
+    data: data
+  })
+}
+

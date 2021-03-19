@@ -198,7 +198,7 @@
           <el-button
             :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
             @click="selectMoudleBtn(2)"
-          >余额支付</el-button>
+          >保证金支付</el-button>
         </el-button-group>
 
         <el-button-group v-if="selectMoudleItem == 4">
@@ -452,7 +452,7 @@ export default {
           this.mainData.pieData.chartTitle = "商品支付分类";
           this.mainData.rankData.chartTitle = "用户支付排行榜";
         } else if (this.selectMoudleBtnSty == 2) {
-          this.mainData.lineData.chartTitle = "余额支付";
+          this.mainData.lineData.chartTitle = "保证金支付";
           this.mainData.pieData.chartTitle = "商品支付分类";
           this.mainData.rankData.chartTitle = "用户支付排行榜";
         }
@@ -832,7 +832,7 @@ export default {
           this.mainData.rankData.chartTitle = "用户支付排行榜";
           this.getTabIncomeData();
         } else if (this.selectMoudleBtnSty == 2) {
-          this.mainData.lineData.chartTitle = "余额支付";
+          this.mainData.lineData.chartTitle = "保证金支付";
           this.mainData.pieData.chartTitle = "商品支付分类";
           this.mainData.rankData.chartTitle = "用户支付排行榜";
           this.getTabIncomeData();

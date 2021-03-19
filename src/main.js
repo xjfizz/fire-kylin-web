@@ -22,7 +22,8 @@ import Pagination from "@/components/Pagination";
 import RightToolbar from "@/components/RightToolbar"
 // 打印插件
 import Print from 'vue-print-nb'
-import 'default-passive-events'
+// import 'default-passive-events'
+import {VueJsonp} from 'vue-jsonp'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -53,6 +54,7 @@ Vue.component('RightToolbar', RightToolbar)
 
 Vue.use(permission)
 Vue.use(Print);
+Vue.use(VueJsonp)
 
 /**
  * If you don't want to use mock-server
