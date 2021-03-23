@@ -122,7 +122,11 @@ export default {
       orderPrints(params).then(res => {
         if (res.code == 200) {
           this.tableData = res.data
-          this.loading = false;
+         
+          setTimeout(()=> {
+              this.handlePrint()
+              this.loading = false;
+          },500)
         }
       });
     },

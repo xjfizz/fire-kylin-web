@@ -115,8 +115,17 @@
       <el-col :span="1.5">
         <el-button icon="el-icon-printer" plain size="mini" type="info" @click="printOrders">批量打印</el-button>
       </el-col>
-       <el-col :span="1.5">
-        <el-button  icon="el-icon-s-operation" plain size="mini" type="success" @click="rosterOrders">批量分配</el-button>
+      <!-- <el-col :span="1.5">
+       <lodopPrint ref="lodopPrint" :icon="`el-icon-printer`" :size="`mini`"  :type="`info`"  :value="`确认并打印`" v-show="false"></lodopPrint>
+      </el-col> -->
+      <el-col :span="1.5">
+        <el-button
+          icon="el-icon-s-operation"
+          plain
+          size="mini"
+          type="success"
+          @click="rosterOrders"
+        >批量分配</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -136,9 +145,9 @@
       v-loading="loading"
       :data="orderList"
       @selection-change="handleSelectionChange"
-       :row-key="getRowKeys"
+      :row-key="getRowKeys"
     >
-      <el-table-column align="center" type="selection" width="55"  :reserve-selection="true"  />
+      <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
       <el-table-column align="center" label="订单编号" prop="orderNo" width="180" />
       <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
@@ -220,7 +229,8 @@
             type="text"
             @click="confirmOrderSingle(scope.row)"
           >确认</el-button>
-         <el-button
+          <!-- <lodopPrint :lodopPrintStyle="lodopPrintStyle" v-show="scope.row.orderStatus === '4'"  @click="confirmOrderSingle(scope.row)></lodopPrint> -->
+          <el-button
             v-show="[1,2,3,4,5,6].indexOf(Number(scope.row.orderStatus)) > -1"
             v-hasPermi="['oms:order:remove']"
             icon="el-icon-s-open"
@@ -237,7 +247,7 @@
             type="text"
             @click="rosterOrder(scope.row,1)"
           >分配生产</el-button>
-           <el-button
+          <el-button
             v-show=" scope.row.orderStatus === '6' && scope.row.assignProduceFlag == 1"
             icon="el-icon-s-operation"
             size="mini"
@@ -647,17 +657,22 @@
                   </div>
                 </el-tab-pane>
                 <el-tab-pane label="生产信息" name="producing">
-                    
-                    <div class="producting-content-main"> 
-                      <div class="producting-content-main-list">
-                        <div v-if="form.orderAssignTime" style="color:#888888;margin-bottom:30px;font-size:15px">
-                         <span style="">指派: {{ dataFormatSecond(new Date(form.orderAssignTime))}}</span>
-                         <span style="margin-left:30px;">设备: {{form.deviceAssignCode}}</span>
+                  <div class="producting-content-main">
+                    <div class="producting-content-main-list">
+                      <div
+                        v-if="form.orderAssignTime"
+                        style="color:#888888;margin-bottom:30px;font-size:15px"
+                      >
+                        <span style>指派: {{ dataFormatSecond(new Date(form.orderAssignTime))}}</span>
+                        <span style="margin-left:30px;">设备: {{form.deviceAssignCode}}</span>
                       </div>
-                      <div style="color:#888888;margin-bottom:30px;font-size:15px;display: flex;justify-content: center;" v-else>
+                      <div
+                        style="color:#888888;margin-bottom:30px;font-size:15px;display: flex;justify-content: center;"
+                        v-else
+                      >
                         <span>暂无指派信息</span>
                       </div>
-                     
+
                       <!-- <el-timeline v-if="form.produceRecordInfo && form.produceRecordInfo.length > 0">
                         <el-timeline-item v-for="(item,index) in form.produceRecordInfo" :key="index"  :color="index == 0 ? '#48aafd' : ''" :timestamp="item.orderOperateTime" placement="top">
                           <el-card>
@@ -670,18 +685,26 @@
                             </div>
                           </el-card>
                         </el-timeline-item>
-                      </el-timeline> -->
-                      <el-timeline v-if="form.produceRecordInfo && form.produceRecordInfo.length > 0">
-                        <el-timeline-item v-for="(item,index) in form.produceRecordInfo" :key="index" >
-                           <span style="color:#888888;font-weight:600;">{{productStatus[item.orderOperateStatus-1].value}}</span>
-                           <span style="color:#999999;margin-left:20px">{{item.assignProduceUserName}}</span>
-                           <span style="color:#999999;margin-left:20px">{{item.orderOperateTime}}</span>
+                      </el-timeline>-->
+                      <el-timeline
+                        v-if="form.produceRecordInfo && form.produceRecordInfo.length > 0"
+                      >
+                        <el-timeline-item
+                          v-for="(item,index) in form.produceRecordInfo"
+                          :key="index"
+                        >
+                          <span
+                            style="color:#888888;font-weight:600;"
+                          >{{productStatus[item.orderOperateStatus-1].value}}</span>
+                          <span
+                            style="color:#999999;margin-left:20px"
+                          >{{item.assignProduceUserName}}</span>
+                          <span style="color:#999999;margin-left:20px">{{item.orderOperateTime}}</span>
                         </el-timeline-item>
                       </el-timeline>
-                      <div v-else class="no-data-product" >暂无生产信息</div>
+                      <div v-else class="no-data-product">暂无生产信息</div>
                     </div>
-                      </div>
-                      
+                  </div>
                 </el-tab-pane>
               </el-tabs>
             </el-card>
@@ -863,16 +886,25 @@ import {
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
 import orderPrints from "@/components/Print/order-prints"; // 批量打印
+// import lodopPrint from "@/components/Print/lodop/lodopPrint"; // 自动打印
 
 export default {
   name: "Order",
   components: {
     isPickDialog,
     orderPrint,
-    orderPrints
+    orderPrints,
+    // lodopPrint
   },
   data() {
     return {
+      lodopPrintStyle: {
+        // lodop样式
+        icon: "el-icon-printer",
+        size: "mini",
+        type: "info",
+        value: "确认并打印"
+      },
       dialogTitle: "",
       printDialogTitle: "订单打印", //订单打印
       printDialogTitles: "批量打印", //订单打印
@@ -1009,21 +1041,58 @@ export default {
           { required: true, message: "运费金额不能为空", trigger: "blur" }
         ]
       },
-      productingList:[ // 生产信息列表
-        {productingTitle: '开始生产',productingStatus:1,user:'苏铭',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-        {productingTitle: '生产暂停',productingStatus:2,user:'苏铭',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-        {productingTitle: '继续生产',productingStatus:3,user:'张三',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-        {productingTitle: '生产暂停',productingStatus:2,user:'张三',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-        {productingTitle: '继续生产',productingStatus:3,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-        {productingTitle: '生产完成',productingStatus:4,user:'李四',deviceCode:'A001',createTime:'2021-03-12 12:23:54'},
-      ], 
-      productStatus:[
-        {key:1,value:'开始生产'},
-        {key:2,value:'暂停生产'},
-        {key:3,value:'继续生产'},
-        {key:4,value:'完成生产'},
+      productingList: [
+        // 生产信息列表
+        {
+          productingTitle: "开始生产",
+          productingStatus: 1,
+          user: "苏铭",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        },
+        {
+          productingTitle: "生产暂停",
+          productingStatus: 2,
+          user: "苏铭",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        },
+        {
+          productingTitle: "继续生产",
+          productingStatus: 3,
+          user: "张三",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        },
+        {
+          productingTitle: "生产暂停",
+          productingStatus: 2,
+          user: "张三",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        },
+        {
+          productingTitle: "继续生产",
+          productingStatus: 3,
+          user: "李四",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        },
+        {
+          productingTitle: "生产完成",
+          productingStatus: 4,
+          user: "李四",
+          deviceCode: "A001",
+          createTime: "2021-03-12 12:23:54"
+        }
       ],
-      rosterDeviceType:1,// 排班类型 1 排班 2 重新排班
+      productStatus: [
+        { key: 1, value: "开始生产" },
+        { key: 2, value: "暂停生产" },
+        { key: 3, value: "继续生产" },
+        { key: 4, value: "完成生产" }
+      ],
+      rosterDeviceType: 1 // 排班类型 1 排班 2 重新排班
     };
   },
   mounted() {
@@ -1080,7 +1149,17 @@ export default {
     dataFormatSecond(d) {
       console.log("d", d);
       let str =
-        d.getFullYear() +"-" +this.p(d.getMonth() + 1) +"-" + this.p(d.getDate()) + " " + this.p(d.getHours()) + ":" + this.p(d.getMinutes()) + ":" + this.p(d.getSeconds());
+        d.getFullYear() +
+        "-" +
+        this.p(d.getMonth() + 1) +
+        "-" +
+        this.p(d.getDate()) +
+        " " +
+        this.p(d.getHours()) +
+        ":" +
+        this.p(d.getMinutes()) +
+        ":" +
+        this.p(d.getSeconds());
       return str;
     },
     //创建补0函数
@@ -1110,8 +1189,8 @@ export default {
       this.reset();
     },
     // 分页记忆多选
-     getRowKeys(row) {
-      return row.pkid
+    getRowKeys(row) {
+      return row.pkid;
     },
     // 表单重置
     reset() {
@@ -1223,7 +1302,7 @@ export default {
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
-      this.selectOrderList = []
+      this.selectOrderList = [];
       this.getList();
     },
     /** 重置按钮操作 */
@@ -1404,7 +1483,7 @@ export default {
     },
     // 批量分配
     rosterOrders() {
-     if (this.queryParams.orderStatus != 5) {
+      if (this.queryParams.orderStatus != 5) {
         return this.$message({
           type: "warning",
           message: "请先筛选出待排单订单!"
@@ -1416,7 +1495,7 @@ export default {
           message: "请先选择订单!"
         });
       }
-      this.rosterOrder(null,1);
+      this.rosterOrder(null, 1);
     },
 
     // 取料单选
@@ -1589,7 +1668,7 @@ export default {
     // 取消生产员对话框
     cancelProducter() {
       this.producterVisible = false;
-      this.deviceSearchKey = ''
+      this.deviceSearchKey = "";
     },
     // 取消检测员对话框
     cancelChecker() {
@@ -1640,11 +1719,11 @@ export default {
           message: "请先选择设备!"
         });
       }
-      
-      if(this.rosterDeviceType == 1) {
+
+      if (this.rosterDeviceType == 1) {
         this.rosterOrderApi();
-      }else {
-         this.rosterOrderApiAgain();
+      } else {
+        this.rosterOrderApiAgain();
       }
     },
     // 确认配送弹框
@@ -1662,7 +1741,7 @@ export default {
     rosterOrderApi() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
-        orderPkids:orderPkids,
+        orderPkids: orderPkids,
         devicePkid: this.selelctDeviceId,
         workshopPkid: this.$store.state.user.userInfo.workshopId
       };
@@ -1678,18 +1757,18 @@ export default {
             message: "操作成功!"
           });
         } else {
-           this.$message({
+          this.$message({
             type: "warning",
             message: res.msg
           });
         }
       });
     },
-       // 单个重新排班api
+    // 单个重新排班api
     rosterOrderApiAgain() {
       let orderPkids = this.selectOrderList.map(item => item.pkid);
       let params = {
-        orderPkids:orderPkids,
+        orderPkids: orderPkids,
         devicePkid: this.selelctDeviceId,
         workshopPkid: this.$store.state.user.userInfo.workshopId
       };
@@ -1705,7 +1784,7 @@ export default {
             message: "操作成功!"
           });
         } else {
-           this.$message({
+          this.$message({
             type: "warning",
             message: res.msg
           });
@@ -1757,6 +1836,7 @@ export default {
             type: "success",
             message: "操作成功!"
           });
+          // this.$refs.lodopPrint.open(orderPkids)
           this.handleQuery();
         } else if (res.code == 422) {
           this.dialogTitle = "已确认订单";
@@ -1785,6 +1865,8 @@ export default {
             type: "success",
             message: "操作成功!"
           });
+          // this.$refs.lodopPrint.open(orderPkids)
+          // this.$refs.orderPrintRefs.open(orderPkids);
           this.handleQuery();
         }
       });
@@ -1792,12 +1874,14 @@ export default {
     // 单个确认订单按钮
     confirmOrderSingle(e) {
       this.$confirm(`是否确认此订单${e.orderNo}?`, "提示", {
-        confirmButtonText: "确定",
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() => {
           this.confirmOrderApiSingle([e]);
+          // this.$refs.lodopPrint.open([e.pkid])
+          //  this.$refs.orderPrintRefs.open(ids);
         })
         .catch(() => {
           this.$message({
@@ -1822,7 +1906,7 @@ export default {
       }
 
       this.$confirm(`是否确认订单?`, "提示", {
-        confirmButtonText: "确定",
+        confirmButtonText: "确认",
         cancelButtonText: "取消",
         type: "warning"
       })
@@ -1837,9 +1921,9 @@ export default {
         });
     },
     // 排班弹框
-    rosterOrder(e,type) {
+    rosterOrder(e, type) {
       this.selectOrderList = e ? [e] : this.selectOrderList;
-      this.rosterDeviceType = type
+      this.rosterDeviceType = type;
       this.getRosterList();
     },
 
@@ -1878,7 +1962,8 @@ export default {
         // 单个打印
         this.printDialogTitle = "订单打印";
         ids = [val.pkid];
-        this.$refs.orderPrintRefs.open(ids);
+         this.$refs.orderPrintRefs.open(ids);
+        // this.$refs.lodopPrint.open(ids)
       } else {
         // 多个打印
         this.printDialogTitle = "批量打印";
@@ -1889,7 +1974,8 @@ export default {
           });
         }
         let ids = this.selectOrderList.map(item => item.pkid);
-        this.$refs.orderPrintRefs.open(ids);
+        // this.$refs.lodopPrint.open(ids)
+         this.$refs.orderPrintRefs.open(ids);
       }
     },
     // 分配检测员
@@ -1944,7 +2030,7 @@ export default {
         }
       });
     },
-      /** 获取当天已排班设备*/
+    /** 获取当天已排班设备*/
     getListRosterDevice() {
       // this.loading = true;
       let params = {
@@ -1953,8 +2039,10 @@ export default {
       };
       listRosterDevice(params).then(res => {
         if (res.code == 200) {
-           this.devicerList = res.data;
-           this.selelctDeviceId = this.devicerList[0] ? this.devicerList[0].devicePkid : '' ;
+          this.devicerList = res.data;
+          this.selelctDeviceId = this.devicerList[0]
+            ? this.devicerList[0].devicePkid
+            : "";
         }
       });
     }
@@ -1962,39 +2050,35 @@ export default {
 };
 </script>
 <style lang="scss" rel="stylesheet/scss">
-.producting-content-main{
+.producting-content-main {
   height: 300px;
   padding: 20px;
-  overflow: auto; 
+  overflow: auto;
   // display: flex;
   // justify-content: center;
 }
-.producting-content-main-list{
-
+.producting-content-main-list {
 }
-.producting-content-main ul{
+.producting-content-main ul {
   padding-left: 0px;
 }
-.producting-content-main .el-card{
-     color: #48aafd;
+.producting-content-main .el-card {
+  color: #48aafd;
 }
-.no-data-product{
+.no-data-product {
   display: flex;
   justify-content: center;
   align-items: center;
   color: #999999;
   margin-top: 100px;
 }
-.producting-content{
- 
+.producting-content {
 }
-.producting-content-text{
-   margin: 10px 0 10px 0;
+.producting-content-text {
+  margin: 10px 0 10px 0;
 }
-.producting-content-step{
-
+.producting-content-step {
 }
-.producting-content-steps{
- 
+.producting-content-steps {
 }
 </style>
