@@ -20,7 +20,7 @@ export function getMaterial(pkid) {
 // 新增代裁材质管理
 export function addMaterial(data) {
   return request({
-    url: '/proxy/material',
+    url: '/proxy/material/save',
     method: 'post',
     data: data
   })
@@ -29,7 +29,7 @@ export function addMaterial(data) {
 // 修改代裁材质管理
 export function updateMaterial(data) {
   return request({
-    url: '/proxy/material',
+    url: '/proxy/material/update',
     method: 'put',
     data: data
   })
@@ -62,5 +62,14 @@ export function changeProxyMaterialStatus(pkid, proxyMaterialStatus) {
     url: '/proxy/material/changeProxyMaterialStatus',
     method: 'put',
     data: data
+  })
+}
+
+// 获取款式列表-不分页
+export function styleList(query) {
+  return request({
+    url: '/proxy/style/listStyle',
+    method: 'get',
+    params: query
   })
 }
