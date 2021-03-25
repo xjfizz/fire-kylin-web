@@ -1,6 +1,12 @@
 <template>
   <div class="app-container">
-    <el-form v-show="showSearch" ref="queryForm" :inline="true" :model="queryParams" label-width="68px">
+    <el-form
+      v-show="showSearch"
+      ref="queryForm"
+      :inline="true"
+      :model="queryParams"
+      label-width="68px"
+    >
       <el-form-item label="材质名称" prop="proxyMaterialName">
         <el-input
           v-model="queryParams.proxyMaterialName"
@@ -41,8 +47,7 @@
           size="mini"
           type="primary"
           @click="handleAdd"
-        >新增
-        </el-button>
+        >新增</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -53,8 +58,7 @@
           size="mini"
           type="success"
           @click="handleUpdate"
-        >修改
-        </el-button>
+        >修改</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -65,8 +69,7 @@
           size="mini"
           type="danger"
           @click="handleDelete"
-        >删除
-        </el-button>
+        >删除</el-button>
       </el-col>
       <el-col :span="1.5">
         <el-button
@@ -76,17 +79,17 @@
           size="mini"
           type="warning"
           @click="handleExport"
-        >导出
-        </el-button>
+        >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
     <el-table v-loading="loading" :data="materialList" @selection-change="handleSelectionChange">
-      <el-table-column align="center" type="selection" width="55"/>
-      <el-table-column align="center" label="材质ID" prop="pkid"/>
-      <el-table-column align="center" label="材质名称" prop="proxyMaterialName"/>
-      <el-table-column align="center" label="材质顺序" prop="proxyMaterialSort"/>
+      <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" label="材质ID" prop="pkid" />
+      <el-table-column align="center" label="款式ID" prop="stylePkid" />
+      <el-table-column align="center" label="材质名称" prop="proxyMaterialName" />
+      <el-table-column align="center" label="材质顺序" prop="proxyMaterialSort" />
       <el-table-column key="proxyMaterialStatus" align="center" label="材质状态">
         <template slot-scope="scope">
           <el-switch
@@ -110,16 +113,14 @@
             size="mini"
             type="text"
             @click="handleUpdate(scope.row)"
-          >修改
-          </el-button>
+          >修改</el-button>
           <el-button
             v-hasPermi="['proxy:material:remove']"
             icon="el-icon-delete"
             size="mini"
             type="text"
             @click="handleDelete(scope.row)"
-          >删除
-          </el-button>
+          >删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -136,11 +137,22 @@
     <el-dialog :title="title" :visible.sync="open" append-to-body width="500px">
       <el-card>
         <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-form-item label="款式类别" prop="stylePkids">
+            <el-select v-model="form.stylePkids" placeholder="请选择">
+              <el-option v-if="!form.pkid" key="all" label="全部" value="all" />
+              <el-option
+                v-for="dict in styleList"
+                :key="dict.pkid"
+                :label="dict.proxyStyleName"
+                :value="dict.pkid"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="材质名称" prop="proxyMaterialName">
-            <el-input v-model="form.proxyMaterialName" placeholder="请输入代裁材质名称"/>
+            <el-input v-model="form.proxyMaterialName" placeholder="请输入代裁材质名称" />
           </el-form-item>
           <el-form-item label="材质顺序" prop="proxyMaterialSort">
-            <el-input v-model="form.proxyMaterialSort" placeholder="请输入代裁材质顺序"/>
+            <el-input v-model="form.proxyMaterialSort" placeholder="请输入代裁材质顺序" />
           </el-form-item>
           <el-form-item label="材质状态">
             <el-radio-group v-model="form.proxyMaterialStatus">
@@ -148,12 +160,11 @@
                 v-for="dict in statusOptions"
                 :key="dict.dictValue"
                 :label="dict.dictValue"
-              >{{ dict.dictLabel }}
-              </el-radio>
+              >{{ dict.dictLabel }}</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="备注" prop="remark">
-            <el-input v-model="form.remark" placeholder="请输入内容" type="textarea"/>
+            <el-input v-model="form.remark" placeholder="请输入内容" type="textarea" />
           </el-form-item>
         </el-form>
       </el-card>
@@ -173,7 +184,8 @@ import {
   exportMaterial,
   getMaterial,
   listMaterial,
-  updateMaterial
+  updateMaterial,
+  styleList
 } from "@/api/garment/proxy/pms/material/material.js";
 
 export default {
@@ -205,28 +217,30 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        orderByColumn: 'createTime',
-        isAsc: 'desc',
+        orderByColumn: "createTime",
+        isAsc: "desc",
         workshopPkid: null,
         proxyMaterialName: null,
         proxyMaterialSort: null,
-        proxyMaterialStatus: null,
+        proxyMaterialStatus: null
       },
       // 表单参数
       form: {},
       // 表单校验
       rules: {
         proxyMaterialName: [
-          {required: true, message: "代裁材质名称不能为空", trigger: "blur"}
+          { required: true, message: "代裁材质名称不能为空", trigger: "blur" }
         ],
         proxyMaterialSort: [
-          {required: true, message: "代裁材质顺序不能为空", trigger: "blur"}
-        ],
-      }
+          { required: true, message: "代裁材质顺序不能为空", trigger: "blur" }
+        ]
+      },
+      styleList: [] // 款式类别列表
     };
   },
   created() {
     this.getList();
+    this.getStyleList();
     this.getDicts("sys_normal_disable").then(response => {
       this.statusOptions = response.data;
     });
@@ -241,6 +255,17 @@ export default {
         this.loading = false;
       });
     },
+    /** 查询代裁款式管理列表 */
+    getStyleList() {
+      let params = {
+        workshopPkid: this.$store.state.user.userInfo.workshopId
+      };
+      styleList(params).then(res => {
+        if (res.code == 200) {
+          this.styleList = res.data;
+        }
+      });
+    },
     // 订单支付类型格式化
     formatProxyMaterialStatus(value) {
       return this.selectDictLabel(this.statusOptions, value);
@@ -253,17 +278,24 @@ export default {
     // 代理材质状态修改
     handleProxyMaterialStatusChange(row) {
       let text = row.proxyMaterialStatus === "0" ? "启用" : "停用";
-      this.$confirm('确认要【' + text + '】 #' + row.proxyMaterialName + '# 材质吗?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return changeProxyMaterialStatus(row.pkid, row.proxyMaterialStatus);
-      }).then(() => {
-        this.msgSuccess("代裁材质" + text + "成功");
-      }).catch(function () {
-        row.proxyMaterialStatus = row.proxyMaterialStatus === "0" ? "1" : "0";
-      });
+      this.$confirm(
+        "确认要【" + text + "】 #" + row.proxyMaterialName + "# 材质吗?",
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(function() {
+          return changeProxyMaterialStatus(row.pkid, row.proxyMaterialStatus);
+        })
+        .then(() => {
+          this.msgSuccess("代裁材质" + text + "成功");
+        })
+        .catch(function() {
+          row.proxyMaterialStatus = row.proxyMaterialStatus === "0" ? "1" : "0";
+        });
     },
     // 表单重置
     reset() {
@@ -294,9 +326,9 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.pkid)
-      this.single = selection.length !== 1
-      this.multiple = !selection.length
+      this.ids = selection.map(item => item.pkid);
+      this.single = selection.length !== 1;
+      this.multiple = !selection.length;
     },
     /** 新增按钮操作 */
     handleAdd() {
@@ -307,7 +339,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const pkid = row.pkid || this.ids
+      const pkid = row.pkid || this.ids;
       getMaterial(pkid).then(response => {
         this.form = response.data;
         this.open = true;
@@ -316,16 +348,26 @@ export default {
     },
     /** 提交按钮 */
     submitForm() {
-      this.$refs["form"].validate(valid => {
+      this.form.workshopPkid = this.$store.state.user.userInfo.workshopId
+      // 款式类别处理
+      let form = JSON.parse(JSON.stringify(this.form))
+       if(form.stylePkids == 'all') {
+        form.stylePkids = this.styleList.map(item => {
+          return item.pkid
+        })
+      } else {
+        form.stylePkids = [form.stylePkids]
+      }
+       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.pkid != null) {
-            updateMaterial(this.form).then(response => {
+          if (form.pkid != null) {
+            updateMaterial(form).then(response => {
               this.msgSuccess("代裁材质-编辑成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addMaterial(this.form).then(response => {
+            addMaterial(form).then(response => {
               this.msgSuccess("代裁材质-新增成功");
               this.open = false;
               this.getList();
@@ -337,29 +379,37 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const pkids = row.pkid || this.ids;
-      this.$confirm('是否确认删除代裁材质管理编号为"' + pkids + '"的数据项?', "警告", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(function () {
-        return delMaterial(pkids);
-      }).then(() => {
-        this.getList();
-        this.msgSuccess("代裁材质-删除成功");
-      })
+      this.$confirm(
+        '是否确认删除代裁材质管理编号为"' + pkids + '"的数据项?',
+        "警告",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(function() {
+          return delMaterial(pkids);
+        })
+        .then(() => {
+          this.getList();
+          this.msgSuccess("代裁材质-删除成功");
+        });
     },
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有代裁材质管理数据项?', "警告", {
+      this.$confirm("是否确认导出所有代裁材质管理数据项?", "警告", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(function () {
-        return exportMaterial(queryParams);
-      }).then(response => {
-        this.download(response.msg);
       })
+        .then(function() {
+          return exportMaterial(queryParams);
+        })
+        .then(response => {
+          this.download(response.msg);
+        });
     }
   }
 };
