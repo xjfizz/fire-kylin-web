@@ -55,6 +55,10 @@ Vue.component('RightToolbar', RightToolbar)
 Vue.use(permission)
 Vue.use(Print);
 Vue.use(VueJsonp)
+// 校验为数字
+Vue.prototype.$num=(value)=>{
+  return value.replace(/\D/g,'')
+}
 
 /**
  * If you don't want to use mock-server

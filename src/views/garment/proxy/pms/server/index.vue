@@ -22,7 +22,7 @@
               <span>暂无款式</span>
             </div>
           </div>
-          <div v-if="false" class="top-add">点击添加</div>
+          <div v-if="styleList.length == 0" class="top-add" @click="goStyleAdd()">点击添加</div>
         </div>
         <div class="top-right">
           <div class="top-open">
@@ -42,9 +42,9 @@
             :index="index"
             @click="selectMaterial(item,index)"
           >{{item.proxyMaterialName}}</el-button>
-          <div v-if="materialList.length == 0" class="mid-content-noData">暂无数据</div>
+          <div v-if="materialList.length == 0" class="mid-content-noData">暂无材质</div>
         </div>
-        <div class="mid-add" v-if="false">点击添加</div>
+        <div class="mid-add" v-if="materialList.length == 0 "  @click="goMaterialAdd()">点击添加</div>
       </div>
       <div class="bottom">
         <div class="bottom-top">
@@ -71,10 +71,13 @@
                   <div class="left-value">
                     <el-input
                       size="mini"
+                      v-on:input="item.materialParameters[0].clothAmount=$num(item.materialParameters[0].clothAmount)"
                       v-model="item.materialParameters[0].clothAmount"
-                      style="width:80px"
+                      style="width:150px"
                       placeholder="输入价格"
-                    ></el-input>
+                    >
+                    <template slot="append" style="width:10px">元</template>
+                    </el-input>
                   </div>
                 </div>
                 <div class="item-right">
@@ -82,38 +85,62 @@
                   <div class="right-value">
                     <el-input
                       size="mini"
+                      v-on:input="item.materialParameters[0].colorSchemeAmount=$num(item.materialParameters[0].colorSchemeAmount)"
                       v-model="item.materialParameters[0].colorSchemeAmount"
-                      style="width:80px"
+                      style="width:150px"
                       placeholder="输入价格"
-                    ></el-input>
+                    >
+                    <template slot="append" style="width:10px">元</template>
+                    </el-input>
                   </div>
                 </div>
               </div>
 
               <div class="content-right-item">
-                <div class="item-left">
+                <!-- <div class="item-left">
                   <div class="left-title">长袖</div>
-                  <!-- <div class="left-value">
+                  </div> -->
+
+                 <div class="left-title">
+                    <span
+                      class="left-title-span"
+                      :title="item.materialParameters[0].sleeveName"
+                      v-if="!item.materialParameters[0].isEdit"
+                    >{{item.materialParameters[0].sleeveName}}</span>
                     <el-input
+                      v-focus
+                      v-if="item.materialParameters[0].isEdit"
                       size="mini"
-                      v-model="item.serverItem[0].sleeveAmount"
+                      v-model="item.materialParameters[0].sleeveName"
                       style="width:80px"
-                      placeholder="输入价格"
+                      placeholder="输入参数名"
+                      @blur="editTitleEditBlur(item.materialParameters[0])"
+                      @focus="editTitleEditFocus(item.materialParameters[0])"
+                      @keyup.enter.native="$event.target.blur"
                     ></el-input>
-                  </div>-->
-                </div>
-                <div class="item-right">
-                  <div class="right-title" style="width:120px;">
+                  </div>
+                  <div v-if="!item.materialParameters[0].isEdit" class="left-title-edit" @click="openEdit(item.materialParameters[0])">
+                    <i class="el-icon-edit-outline"></i>
+                  </div>
+                  
+
+
+                <div class="item-right" >
+                  <div class="right-title" style="width:120px;margin-left:100px">
                     <el-radio v-model="item.materialParameters[0].sleeveStatus" label="0">有</el-radio>
-                    <el-radio v-model="item.materialParameters[0].sleeveStatus" label="1">无</el-radio>
+                    <el-radio v-model="item.materialParameters[0].sleeveStatus" label="1" @change="priceNo(item)">无</el-radio>
                   </div>
                   <div class="right-value">
                     <el-input
                       size="mini"
+                      :disabled="item.materialParameters[0].sleeveStatus == '1'"
+                      v-on:input="item.materialParameters[0].sleeveAmount=$num(item.materialParameters[0].sleeveAmount)"
                       v-model="item.materialParameters[0].sleeveAmount"
-                      style="width:80px"
+                      style="width:150px"
                       placeholder="输入价格"
-                    ></el-input>
+                    >
+                    <template slot="append" style="width:10px">元</template>
+                    </el-input>
                   </div>
                 </div>
                 <div class="right-add-remove" v-if="item.materialParameters.length == 1">
@@ -154,7 +181,7 @@
                       size="mini"
                       v-model="item1.clothName"
                       style="width:80px"
-                      placeholder="输入价格"
+                      placeholder="输入参数名"
                       @blur="editTitleEditBlur(item1)"
                       @focus="editTitleEditFocus(item1)"
                       @keyup.enter.native="$event.target.blur"
@@ -166,10 +193,13 @@
                   <div class="left-value">
                     <el-input
                       size="mini"
+                      v-on:input="item1.clothAmount=$num(item1.clothAmount)"
                       v-model="item1.clothAmount"
-                      style="width:80px"
+                      style="width:150px"
                       placeholder="输入价格"
-                    ></el-input>
+                    >
+                    <template slot="append" style="width:10px">元</template>
+                    </el-input>
                   </div>
                 </div>
                 <div class="item-right">
@@ -177,10 +207,13 @@
                   <div class="right-value">
                     <el-input
                       size="mini"
+                       v-on:input="item1.colorSchemeAmount=$num(item1.colorSchemeAmount)"
                       v-model="item1.colorSchemeAmount"
-                      style="width:80px"
+                      style="width:150px"
                       placeholder="输入价格"
-                    ></el-input>
+                    >
+                    <template slot="append" style="width:10px">元</template>
+                    </el-input>
                   </div>
                   <div class="right-add-remove">
                     <i
@@ -213,31 +246,35 @@
       <el-dialog
         title="新增服务参数"
         :visible.sync="editDialogVisible"
-        width="30%"
+        width="600px"
         :before-close="handleClose"
       >
-        <el-form :model="titleForm" label-width="100px">
+        <el-form :model="titleForm" label-width="70px">
           <el-row>
             <el-col :span="12">
               <el-form-item label="参数名称">
-                <el-input v-model="titleForm.key1" autocomplete="off" style="width:150px;"></el-input>
+                <el-input placeholder="输入参数名称"  v-model="titleForm.key1" autocomplete="off" style="width:170px;"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="参数值">
-                <el-input v-model="titleForm.key2" autocomplete="off" style="width:150px;"></el-input>
+              <el-form-item label="参数价格">
+                <el-input placeholder="输入参数价格" v-on:input="titleForm.key2=$num(titleForm.key2)" v-model="titleForm.key2" autocomplete="off" style="width:170px;">
+                  <template slot="append" style="width:10px">元</template>
+               </el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row>
             <el-col :span="12">
               <el-form-item label="参数名称">
-                <el-input disabled v-model="titleForm.key3" autocomplete="off" style="width:150px;"></el-input>
+                <el-input disabled v-model="titleForm.key3" autocomplete="off" style="width:170px;"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="配色单价">
-                <el-input v-model="titleForm.key4" autocomplete="off" style="width:150px;"></el-input>
+                <el-input placeholder="输入配色单价" v-on:input="titleForm.key4=$num(titleForm.key4)" v-model="titleForm.key4" autocomplete="off" style="width:170px;">
+                   <template slot="append" style="width:10px">元</template>
+                </el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -382,7 +419,9 @@ export default {
       };
       getMaterialList(params).then(res => {
         if (res.code == 200) {
-          this.materialList = res.data.proxyMaterialResultInfo
+          this.materialList = res.data.proxyMaterialResultInfo.filter(item => {
+            return item.showFlag == '0' ||  item.showFlag == 'null'
+          })
           this.serverList =  res.data.proxyServerResultInfo
           
             this.isChangeCount = 0
@@ -644,7 +683,8 @@ export default {
             pkid: item1.pkid || null,
             sleeveAmount: item1.sleeveAmount,
             sleeveStatus: item1.sleeveStatus,
-            proxyServerStatus: item1.proxyServerStatus
+            proxyServerStatus: item1.proxyServerStatus,
+            sleeveName:item1.sleeveName,
           };
           parameterParamInfo.push(res);
         });
@@ -665,6 +705,19 @@ export default {
           });
         }
       });
+    },
+    // 跳转添加款式 
+    goStyleAdd() {
+      this.$router.push({path:'style'})
+    },
+     // 跳转添加材质 goMaterialAdd
+    goMaterialAdd() {
+      this.$router.push({path:'material'})
+    },
+    priceNo(item) {
+      console.log('item',item)
+      item.materialParameters[0].sleeveAmount = 0
+      this.$forceUpdate(); //强制刷新
     }
   }
 };
@@ -729,6 +782,12 @@ export default {
   color: #f1eded;
 }
 .server-main .top-add {
+  margin-left: 30px;
+  color: #1890ff;
+  font-size: 15px;
+}
+.server-main .top-add:hover{
+  cursor: pointer;
 }
 .server-main .top-right {
 }
@@ -745,17 +804,23 @@ export default {
   min-width: 30px;
 }
 .mid .mid-content {
-  width: 80%;
+  
   margin-left: 10px;
 }
 .mid .mid-content-noData {
-  width: 100%;
+  
   display: flex;
-  justify-content: center;
+  margin-left: 20px;
   align-items: center;
   color: #999999;
 }
 .mid .mid-add {
+  margin-left: 30px;
+  color: #1890ff;
+  font-size: 15px;
+}
+.mid .mid-add:hover {
+  cursor: pointer;
 }
 .bottom {
   margin-top: 10px;
@@ -858,7 +923,7 @@ export default {
 .content-right-item .item-right {
   display: flex;
   align-items: center;
-  margin-left: 30px;
+  margin-left: 80px;
 }
 .content-right-item .right-title {
   font-size: 15px;
