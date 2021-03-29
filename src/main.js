@@ -57,7 +57,8 @@ Vue.use(Print);
 Vue.use(VueJsonp)
 // 校验为数字
 Vue.prototype.$num=(value)=>{
-  return value.replace(/\D/g,'')
+  // return value.replace(/\D/g,'')
+  return value.replace(/[^\d.]/g,'')
 }
 
 /**

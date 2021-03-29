@@ -44,7 +44,7 @@
           >{{item.proxyMaterialName}}</el-button>
           <div v-if="materialList.length == 0" class="mid-content-noData">暂无材质</div>
         </div>
-        <div class="mid-add" v-if="materialList.length == 0 "  @click="goMaterialAdd()">点击添加</div>
+        <div class="mid-add" v-if="materialList.length == 0 " @click="goMaterialAdd()">点击添加</div>
       </div>
       <div class="bottom">
         <div class="bottom-top">
@@ -76,7 +76,7 @@
                       style="width:150px"
                       placeholder="输入价格"
                     >
-                    <template slot="append" style="width:10px">元</template>
+                      <template slot="append" style="width:10px">元</template>
                     </el-input>
                   </div>
                 </div>
@@ -90,7 +90,7 @@
                       style="width:150px"
                       placeholder="输入价格"
                     >
-                    <template slot="append" style="width:10px">元</template>
+                      <template slot="append" style="width:10px">元</template>
                     </el-input>
                   </div>
                 </div>
@@ -99,36 +99,42 @@
               <div class="content-right-item">
                 <!-- <div class="item-left">
                   <div class="left-title">长袖</div>
-                  </div> -->
+                </div>-->
 
-                 <div class="left-title">
-                    <span
-                      class="left-title-span"
-                      :title="item.materialParameters[0].sleeveName"
-                      v-if="!item.materialParameters[0].isEdit"
-                    >{{item.materialParameters[0].sleeveName}}</span>
-                    <el-input
-                      v-focus
-                      v-if="item.materialParameters[0].isEdit"
-                      size="mini"
-                      v-model="item.materialParameters[0].sleeveName"
-                      style="width:80px"
-                      placeholder="输入参数名"
-                      @blur="editTitleEditBlur(item.materialParameters[0])"
-                      @focus="editTitleEditFocus(item.materialParameters[0])"
-                      @keyup.enter.native="$event.target.blur"
-                    ></el-input>
-                  </div>
-                  <div v-if="!item.materialParameters[0].isEdit" class="left-title-edit" @click="openEdit(item.materialParameters[0])">
-                    <i class="el-icon-edit-outline"></i>
-                  </div>
-                  
+                <div class="left-title">
+                  <span
+                    class="left-title-span"
+                    :title="item.materialParameters[0].sleeveName"
+                    v-if="!item.materialParameters[0].isEdit"
+                  >{{item.materialParameters[0].sleeveName}}</span>
+                  <el-input
+                    v-focus
+                    v-if="item.materialParameters[0].isEdit"
+                    size="mini"
+                    v-model="item.materialParameters[0].sleeveName"
+                    style="width:80px"
+                    placeholder="输入参数名"
+                    @blur="editTitleEditBlur(item.materialParameters[0])"
+                    @focus="editTitleEditFocus(item.materialParameters[0])"
+                    @keyup.enter.native="$event.target.blur"
+                  ></el-input>
+                </div>
+                <div
+                  v-if="!item.materialParameters[0].isEdit"
+                  class="left-title-edit"
+                  @click="openEdit(item.materialParameters[0])"
+                >
+                  <i class="el-icon-edit-outline"></i>
+                </div>
 
-
-                <div class="item-right" >
+                <div class="item-right">
                   <div class="right-title" style="width:120px;margin-left:100px">
                     <el-radio v-model="item.materialParameters[0].sleeveStatus" label="0">有</el-radio>
-                    <el-radio v-model="item.materialParameters[0].sleeveStatus" label="1" @change="priceNo(item)">无</el-radio>
+                    <el-radio
+                      v-model="item.materialParameters[0].sleeveStatus"
+                      label="1"
+                      @change="priceNo(item)"
+                    >无</el-radio>
                   </div>
                   <div class="right-value">
                     <el-input
@@ -139,7 +145,7 @@
                       style="width:150px"
                       placeholder="输入价格"
                     >
-                    <template slot="append" style="width:10px">元</template>
+                      <template slot="append" style="width:10px">元</template>
                     </el-input>
                   </div>
                 </div>
@@ -148,8 +154,7 @@
                 </div>
               </div>
 
-            
-                         <div
+              <div
                 v-if="item.materialParameters.length > 1"
                 class="content-right-item"
                 v-for="(item1,index1) in (item.materialParameters).slice(1)"
@@ -198,7 +203,7 @@
                       style="width:150px"
                       placeholder="输入价格"
                     >
-                    <template slot="append" style="width:10px">元</template>
+                      <template slot="append" style="width:10px">元</template>
                     </el-input>
                   </div>
                 </div>
@@ -207,13 +212,27 @@
                   <div class="right-value">
                     <el-input
                       size="mini"
-                       v-on:input="item1.colorSchemeAmount=$num(item1.colorSchemeAmount)"
+                      v-on:input="item1.colorSchemeAmount=$num(item1.colorSchemeAmount)"
                       v-model="item1.colorSchemeAmount"
                       style="width:150px"
                       placeholder="输入价格"
                     >
-                    <template slot="append" style="width:10px">元</template>
+                      <template slot="append" style="width:10px">元</template>
                     </el-input>
+                  </div>
+                  <div class="colorSwitch">
+                    <el-switch
+                      class="color-switch-switch"
+                      v-model="item1.colorSchemeShowFlag"
+                      active-value="0"
+                      inactive-value="1"
+                      active-text="显示"
+                      inactive-text="隐藏"
+                       active-color="#0a89ff"
+                      inactive-color="#ff4949"
+                      disabled
+                      @click.native="switchColor(item1)"
+                    ></el-switch>
                   </div>
                   <div class="right-add-remove">
                     <i
@@ -226,10 +245,9 @@
                       @click="addParameterList(index,index1)"
                     ></i>
                   </div>
+                  
                 </div>
               </div>
-
- 
             </div>
           </div>
           <div v-if="serverList.length  == 0" class="bottom-content-noData">
@@ -253,14 +271,25 @@
           <el-row>
             <el-col :span="12">
               <el-form-item label="参数名称">
-                <el-input placeholder="输入参数名称"  v-model="titleForm.key1" autocomplete="off" style="width:170px;"></el-input>
+                <el-input
+                  placeholder="输入参数名称"
+                  v-model="titleForm.key1"
+                  autocomplete="off"
+                  style="width:170px;"
+                ></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="参数价格">
-                <el-input placeholder="输入参数价格" v-on:input="titleForm.key2=$num(titleForm.key2)" v-model="titleForm.key2" autocomplete="off" style="width:170px;">
+                <el-input
+                  placeholder="输入参数价格"
+                  v-on:input="titleForm.key2=$num(titleForm.key2)"
+                  v-model="titleForm.key2"
+                  autocomplete="off"
+                  style="width:170px;"
+                >
                   <template slot="append" style="width:10px">元</template>
-               </el-input>
+                </el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -272,8 +301,14 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="配色单价">
-                <el-input placeholder="输入配色单价" v-on:input="titleForm.key4=$num(titleForm.key4)" v-model="titleForm.key4" autocomplete="off" style="width:170px;">
-                   <template slot="append" style="width:10px">元</template>
+                <el-input
+                  placeholder="输入配色单价"
+                  v-on:input="titleForm.key4=$num(titleForm.key4)"
+                  v-model="titleForm.key4"
+                  autocomplete="off"
+                  style="width:170px;"
+                >
+                  <template slot="append" style="width:10px">元</template>
                 </el-input>
               </el-form-item>
             </el-col>
@@ -355,7 +390,7 @@ export default {
       insertIndex: 0,
       insertIndex1: 0,
       isChangeCount: 1, // 是否改变
-      leave: "", // 离开路径
+      leave: "" // 离开路径
     };
   },
   created() {
@@ -381,7 +416,6 @@ export default {
       next();
     }
   },
-
   methods: {
     // 初始化
     init() {
@@ -390,7 +424,7 @@ export default {
 
     // 刷新
     refresh() {
-      this.getMaterialListApi(this.styleListSelectedId)
+      this.getMaterialListApi(this.styleListSelectedId);
     },
     // 缓存数据重置
     initData() {
@@ -420,12 +454,12 @@ export default {
       getMaterialList(params).then(res => {
         if (res.code == 200) {
           this.materialList = res.data.proxyMaterialResultInfo.filter(item => {
-            return item.showFlag == '0' ||  item.showFlag == 'null'
-          })
-          this.serverList =  res.data.proxyServerResultInfo
-          
-            this.isChangeCount = 0
-         
+            return item.showFlag == "0" || item.showFlag == "null";
+          });
+          this.serverList = res.data.proxyServerResultInfo;
+
+          this.isChangeCount = 0;
+
           // this.loading = false;
         }
       });
@@ -439,7 +473,7 @@ export default {
       };
       getServerList(params).then(res => {
         if (res.code == 200) {
-            this.refresh()
+          this.refresh();
           // this.serverList.push(item);
         }
       });
@@ -473,13 +507,13 @@ export default {
     // 保存编辑标题
     saveEditTitle() {
       this.addServerList();
-      this.titleForm = {
+      (this.titleForm = {
         key1: "",
         key2: "",
         key3: "配色",
         key4: ""
-      },
-      this.editDialogVisible = false
+      }),
+        (this.editDialogVisible = false);
     },
     // 取消新增
     cancelEditTitle() {
@@ -519,7 +553,8 @@ export default {
     // 服务参数删除
     removeServerList(item1) {
       console.log("removeServerList", this.insertIndex, this.insertIndex1);
-      let listLength = this.serverList[this.insertIndex].materialParameters.length - 1;
+      let listLength =
+        this.serverList[this.insertIndex].materialParameters.length - 1;
       this.serverList[this.insertIndex].materialParameters.splice(
         this.insertIndex1 + 1,
         1
@@ -549,14 +584,13 @@ export default {
           cancelButtonText: "继续离开",
           type: "warning"
         })
-          .then(() => {
-          })
+          .then(() => {})
           .catch(() => {
-              this.isChangeCount = 0
-              this.selectStyleItemNext(item);
-           });
+            this.isChangeCount = 0;
+            this.selectStyleItemNext(item);
+          });
       } else {
-        this.isChangeCount = 0
+        this.isChangeCount = 0;
         this.selectStyleItemNext(item);
       }
     },
@@ -569,7 +603,7 @@ export default {
     },
     // 选择材质
     selectMaterial(item, index) {
-     // this.materialList.splice(index, 1);
+      // this.materialList.splice(index, 1);
       this.getServerListApi(item);
       this.materialListSelectedId = item.pkid;
       // this.serverList.push(item);
@@ -644,19 +678,19 @@ export default {
         }
       });
     },
-      // 删除接口api
+    // 删除接口api
     delServerListApiParameter(item1) {
-      console.log('item1',item1)
-      this.loading  = true
+      console.log("item1", item1);
+      this.loading = true;
       let params = {
         workshopPkid: this.$store.state.user.userInfo.workshopId,
         stylePkid: this.styleListSelectedId,
-        materialPkid:item1.proxyMaterialPkid
+        materialPkid: item1.proxyMaterialPkid
       };
       delServerListParameter(params).then(res => {
         if (res.code == 200) {
-          this.loading  = false
-          this.refresh()
+          this.loading = false;
+          this.refresh();
           this.$message({
             type: "success",
             message: "删除成功!"
@@ -684,7 +718,8 @@ export default {
             sleeveAmount: item1.sleeveAmount,
             sleeveStatus: item1.sleeveStatus,
             proxyServerStatus: item1.proxyServerStatus,
-            sleeveName:item1.sleeveName,
+            sleeveName: item1.sleeveName,
+            colorSchemeShowFlag: item1.colorSchemeShowFlag
           };
           parameterParamInfo.push(res);
         });
@@ -697,7 +732,7 @@ export default {
       };
       saveServerList(params).then(res => {
         if (res.code == 200) {
-          this.refresh()
+          this.refresh();
           this.loading = false;
           this.$message({
             type: "success",
@@ -706,18 +741,35 @@ export default {
         }
       });
     },
-    // 跳转添加款式 
+    // 跳转添加款式
     goStyleAdd() {
-      this.$router.push({path:'style'})
+      this.$router.push({ path: "style" });
     },
-     // 跳转添加材质 goMaterialAdd
+    // 跳转添加材质 goMaterialAdd
     goMaterialAdd() {
-      this.$router.push({path:'material'})
+      this.$router.push({ path: "material" });
     },
     priceNo(item) {
-      console.log('item',item)
-      item.materialParameters[0].sleeveAmount = 0
+      console.log("item", item);
+      item.materialParameters[0].sleeveAmount = 0;
       this.$forceUpdate(); //强制刷新
+    },
+    // 开关显示
+    switchColor(item1) {
+      console.log(item1.colorSchemeShowFlag)
+      let flag = item1.colorSchemeShowFlag
+      
+       // 弹窗显示
+        this.$confirm(`确认${flag == '0' ? '隐藏' : '显示'}配色?`, "提示", {
+          confirmButtonText: "确认",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+             item1.colorSchemeShowFlag = flag == 0 ? '1' : '0'
+          })
+          .catch(() => {
+          });
     }
   }
 };
@@ -786,7 +838,7 @@ export default {
   color: #1890ff;
   font-size: 15px;
 }
-.server-main .top-add:hover{
+.server-main .top-add:hover {
   cursor: pointer;
 }
 .server-main .top-right {
@@ -804,11 +856,9 @@ export default {
   min-width: 30px;
 }
 .mid .mid-content {
-  
   margin-left: 10px;
 }
 .mid .mid-content-noData {
-  
   display: flex;
   margin-left: 20px;
   align-items: center;
@@ -934,12 +984,25 @@ export default {
   margin-left: 20px;
   min-width: 40px;
 }
+.content-right-item .colorSwitch {
+  margin-left: 10px;
+}
+
+ .content-right-item .color-switch-span{
+    font-size: 15px;
+    color: #666666;
+ }
+.content-right-item .color-switch-switch{
+    margin-left: 10px;
+}
+
+
 // .el-input--mini .el-input__inner{
 //   height: 20px!important;
 //   line-height: 20px!important;
 // }
 .content-right-item .right-add-remove {
-  margin-left: 10px;
+  margin-left: 30px;
 }
 .right-add-remove .right-remove {
   color: #1890ff;
@@ -954,4 +1017,37 @@ export default {
 .right-add-remove .right-plus:hover {
   cursor: pointer;
 }
+</style>
+
+<style>
+.color-switch-switch .el-switch__label {
+    position: absolute;
+    display: none;
+    color: #fff;
+}
+/*打开时文字位置设置*/
+.color-switch-switch .el-switch__label--right {
+    z-index: 1;
+    right: -5px;    /*不同场景下可能不同，自行调整*/
+}
+/*关闭时文字位置设置*/
+.color-switch-switch .el-switch__label--left {
+    z-index: 1;
+    left: 20px;    /*不同场景下可能不同，自行调整*/
+}
+/*显示文字*/
+.color-switch-switch .el-switch__label.is-active {
+    display: block;
+}
+.color-switch-switch.el-switch .el-switch__core,
+.el-switch .el-switch__label {
+    width: 55px !important;    /*开关按钮的宽度大小*/
+}
+.color-switch-switch .el-switch.is-disabled {
+ opacity: 1;
+}
+.color-switch-switch .el-switch.is-disabled .el-switch__core, .el-switch.is-disabled .el-switch__label {
+  cursor: pointer !important;;
+}
+
 </style>

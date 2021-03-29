@@ -193,8 +193,8 @@ export default {
       this.workshopInfo.workshopCity = res.address_component.city
       this.workshopInfo.workshopRegion = res.address_component.district
       this.workshopInfo.workshopDetailAddress = res.address_component.street_number
-      this.workshopInfo.workshopLongitude = res.location.lat
-      this.workshopInfo.workshopLatitude = res.location.lng
+      this.workshopInfo.workshopLongitude = res.location.lng
+      this.workshopInfo.workshopLatitude = res.location.lat
     }
   }
 };
