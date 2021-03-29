@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-// 查询代裁订单列表
+// 查询代裁订单列表1
 export function listOrder(query) {
   return request({
     url: '/oms/web/proxy/order/list',
