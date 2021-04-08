@@ -117,7 +117,7 @@
       </el-col>
       <!-- <el-col :span="1.5">
        <lodopPrint ref="lodopPrint" :icon="`el-icon-printer`" :size="`mini`"  :type="`info`"  :value="`确认并打印`" v-show="false"></lodopPrint>
-      </el-col>-->
+      </el-col> -->
       <el-col :span="1.5">
         <el-button
           icon="el-icon-s-operation"
@@ -148,14 +148,12 @@
       :row-key="getRowKeys"
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
-      <el-table-column  fixed align="center" label="订单编号" prop="orderNo" width="180" />
-      <el-table-column align="center" label="用户名称" prop="userName" />
-      <!-- <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" /> -->
-      <el-table-column align="center" label="商品款式" prop="proxyStyleName" width="80" />
-      <el-table-column align="center" label="商品材质" prop="proxyMaterialName" width="80" />
-      <el-table-column align="center" label="商品参数" prop="orderDescribe" show-overflow-tooltip />
+      <el-table-column align="center" label="订单编号" prop="orderNo" width="180" />
+      <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
+      <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
+      <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
-      <el-table-column align="center" label="商品颜色" prop="orderColor" show-overflow-tooltip>
+      <el-table-column align="center" label="商品颜色" prop="orderColor">
         <template slot-scope="{row}">{{ row.orderColor || '暂无' }}</template>
       </el-table-column>
       <el-table-column align="center" label="商品规格" prop="orderSpecification">
@@ -186,25 +184,20 @@
         </template>
       </el-table-column>
       <!-- 图片 -->
-      <el-table-column
-        align="center"
-        header-align="center"
-        label="上传图片"
-        prop="omsProxyOrderAnnexes"
-      >
+      <el-table-column align="center" header-align="center" label="上传图片" prop="orderAnnexImageUrl">
         <template slot-scope="scope">
           <el-image
-            v-if="scope.row.omsProxyOrderAnnexes"
+            v-if="scope.row.orderAnnexImageUrl"
             style="width: 50px; height: 50px"
-            :src="scope.row.omsProxyOrderAnnexes[0].orderAnnexImageUrl"
-            :preview-src-list="previewList(scope.row.omsProxyOrderAnnexes)"
+            :src="scope.row.orderAnnexImageUrl"
+            :preview-src-list="[scope.row.orderAnnexImageUrl]"
           ></el-image>
 
           <span v-else>暂无图片</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
-      <el-table-column  fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
+      <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
           <el-button
             icon="el-icon-printer"
@@ -306,42 +299,44 @@
             <span>订单进度</span>
           </div>
           <div class="detail-container">
-               <div class="step-style" v-if="form.omsProxyOrder && form.omsProxyOrder.orderStatus != 0">
+
+            <div class="step-style" v-if="form.orderStatus != 0">
               <el-steps
-                :active="formatStepStatus(form.omsProxyOrder.orderStatus)"
+                :active="formatStepStatus(form.orderStatus)"
                 align-center
                 finish-status="success"
               >
-                <el-step  :description="form.omsProxyOrder.orderCreateTime" title="创建时间"></el-step>
-                <el-step  :description="form.omsProxyOrder.orderPayTime" title="支付时间"></el-step>
-                <el-step  :description="form.omsProxyOrder.productionStartTime" title="加工时间"></el-step>
-                <el-step   :description="form.omsProxyOrder.confirmReceiptTime" title="完成时间"></el-step>
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+                <el-step  :description="form.orderPayTime" title="支付时间"></el-step>
+                <el-step  :description="form.productionStartTime" title="加工时间"></el-step>
+                <el-step   :description="form.confirmReceiptTime" title="完成时间"></el-step>
               </el-steps>
             </div>
-            <div class="step-style" v-if="form.omsProxyOrder && form.omsProxyOrder.orderStatus == 0 && !form.omsProxyOrder.orderPayTime">
+            <div class="step-style" v-if="form.orderStatus == 0 && !form.orderPayTime">
               <el-steps
-                :active="formatStepStatus(form.omsProxyOrder.orderStatus)"
+                :active="formatStepStatus(form.orderStatus)"
                 align-center
                 finish-status="success"
               >
-                <el-step  :description="form.omsProxyOrder.orderCreateTime" title="创建时间"></el-step>
-                <el-step  :description="form.omsProxyOrder.orderCancelTime" title="取消时间"></el-step>
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+                <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
                 
               </el-steps>
             </div>
 
-             <div class="step-style" v-if="form.omsProxyOrder && form.omsProxyOrder.orderStatus == 0 && form.omsProxyOrder.orderPayTime">
+             <div class="step-style" v-if="form.orderStatus == 0 && form.orderPayTime">
               <el-steps
-                :active="formatStepStatus(form.omsProxyOrder.orderStatus)"
+                :active="formatStepStatus(form.orderStatus)"
                 align-center
                 finish-status="success"
               >
-                <el-step  :description="form.omsProxyOrder.orderCreateTime" title="创建时间"></el-step>
-               <el-step  :description="form.omsProxyOrder.orderPayTime" title="支付时间"></el-step>
-                <el-step  :description="form.omsProxyOrder.orderCancelTime" title="取消时间"></el-step>
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+               <el-step  :description="form.orderPayTime" title="支付时间"></el-step>
+                <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
                 
               </el-steps>
             </div>
+
           </div>
           <el-row style="margin-top: 10px">
             <el-card>
@@ -352,53 +347,46 @@
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
                     <tr>
-                     <td>
-                        <div class="cell">商品款式：</div>
+                      <td rowspan="2" >
+                        <div v-if="form.pmsServer">
+                          <el-popover placement="top-start" title trigger="hover">
+                            <img
+                              :src="form.pmsServer.serverImageUrl"
+                              alt="图片预览"
+                              style="width: 200px;height: 200px"
+                            />
+                            <img
+                              slot="reference"
+                              :src="form.pmsServer.serverImageUrl"
+                              style="width: 100px;height: 100px"
+                            />
+                          </el-popover>
+                        </div>
+                      </td>
+                      <td >
+                        <div class="cell">商品名称：</div>
                       </td>
                       <td>
-                        <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.proxyStyleName }}</div>
+                        <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverName }}</div>
                       </td>
-                      <td>
-                        <div class="cell">商品材质：</div>
-                      </td>
-                      <td>
-                        <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.proxyMaterialName }}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品参数：</div>
-                      </td>
-                      <td>
-                        <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.orderDescribe }}</div>
-                      </td>
-                    </tr>
-                    <!-- <tr>
-                      <td>
-                        <div class="cell">商品规格：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderSpecification }}</div>
-                      </td>
-                      <td>
+                       <td >
                         <div class="cell">商品价格：</div>
                       </td>
-                      <td>
-                        <div v-if="form" class="cell">￥{{ form.orderAmount | money}}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品数量：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderQuantity || 0 }}件</div>
+                      <td >
+                        <div v-if="form.pmsServer" class="cell">￥{{ form.pmsServer.serverAmount | money}}</div>
                       </td>
                     </tr>
                     <tr>
+                     
+                      <td >
+                        <div class="cell">商品单位：</div>
+                      </td>
                       <td>
-                        <div class="cell">备注信息：</div>
+                        <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverUnit}}</div>
                       </td>
-                      <td colspan="7">
-                        <div v-if="form" class="cell">{{ form.orderNote || '暂无备注'}}</div>
-                      </td>
-                    </tr> -->
+                     
+                    </tr>
+                   
                   </tbody>
                 </table>
               </div>
@@ -420,9 +408,9 @@
                           </td>
                           <td colspan="3">
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form.sysWorkshopInfo"
                               class="cell"
-                            >{{ form.omsProxyOrder.userName }}</div>
+                            >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
                           </td>
                         </tr>
                          <tr>
@@ -431,9 +419,9 @@
                           </td>
                           <td colspan="3">
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form.sysWorkshopInfo"
                               class="cell"
-                            >{{ form.omsProxyOrder.workshopName }}</div>
+                            >{{ form.sysWorkshopInfo.workshopName }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -441,49 +429,43 @@
                             <div class="cell">订单编号：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.orderNo }}</div>
+                            <div v-if="form" class="cell">{{ form.orderNo }}</div>
                           </td>
                           <td>
                             <div class="cell">订单状态：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">{{ formatOrderStatus(form.omsProxyOrder.orderStatus) }}</div>
+                            <div v-if="form" class="cell">{{ formatOrderStatus(form.orderStatus) }}</div>
                           </td>
                         </tr>
-                        <tr>
-                          <td>
-                            <div class="cell">商品规格：</div>
-                          </td>
-                          <td>
-                            <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.orderSpecification || '暂无规格' }}</div>
-                          </td>
-                          <td>
-                            <div class="cell">商品颜色：</div>
-                          </td>
-                          <td>
-                            <div
-                              v-if="form.omsProxyOrder"
-                              class="cell"
-                            >{{ form.omsProxyOrder.orderColor || '暂无颜色' }}</div>
-                          </td>
-                        </tr>
-                        <tr>
+                         <tr>
                           <td>
                             <div class="cell">商品数量：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.orderQuantity || '0' }}件</div>
+                            <div v-if="form.pmsServer" class="cell">{{ form.orderQuantity }}<span>{{form.pmsServer.serverUnit}}</span></div>
                           </td>
                           <td>
-                            <div class="cell">配送方式</div>
+                            <div class="cell">商品规格：</div>
                           </td>
                           <td>
-                            <div
-                              v-if="form.omsProxyOrder"
-                              class="cell"
-                            >
-                            <span v-if="form.omsProxyOrder.orderDeliveryType == 1">自送自取</span>
-                            <span v-if="form.omsProxyOrder.orderDeliveryType == 2">上门取料</span>
+                            <div v-if="form" class="cell">{{  form.orderSpecification || '暂无规格' }}</div>
+                          </td>
+                        </tr>
+                         <tr>
+                          <td>
+                            <div class="cell">商品颜色：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">{{ form.orderColor || '暂无颜色'}}</div>
+                          </td>
+                          <td>
+                            <div class="cell">配送方式：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">
+                              <span v-if="form.orderDeliveryType == 1">自送自取</span>
+                              <span v-if="form.orderDeliveryType == 2">上门取料</span>
                             </div>
                           </td>
                         </tr>
@@ -492,7 +474,7 @@
                             <div class="cell">订单备注：</div>
                           </td>
                           <td colspan="3">
-                            <div v-if="form.omsProxyOrder" class="cell">{{ form.omsProxyOrder.orderNote || '暂无备注' }}</div>
+                            <div v-if="form" class="cell">{{ form.orderNote || '暂无备注' }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -500,16 +482,16 @@
                             <div class="cell">加工费用：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">￥{{ form.omsProxyOrder.orderProcessAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderProcessAmount | money }}</div>
                           </td>
                           <td>
                             <div class="cell">加工税费：</div>
                           </td>
                           <td>
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form.pmsServer"
                               class="cell"
-                            >￥{{ form.omsProxyOrder.orderTaxAmount | money }}（税率{{ form.omsProxyOrder.serverTaxRate }}%）</div>
+                            >￥{{ form.orderTaxAmount | money }}（税率{{ form.pmsServer.serverTaxRate }}%）</div>
                           </td>
                         </tr>
                         <tr>
@@ -517,13 +499,13 @@
                             <div class="cell">物流费用：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">￥{{ form.omsProxyOrder.orderFreightAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderFreightAmount | money }}</div>
                           </td>
                           <td>
                             <div class="cell">实付金额：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">￥{{ form.omsProxyOrder.orderPayAmount | money }}</div>
+                            <div v-if="form" class="cell">￥{{ form.orderPayAmount | money }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -532,25 +514,25 @@
                           </td>
                           <td>
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form"
                               class="cell"
-                            >{{ formatOrderPayType(form.omsProxyOrder.orderPayType) || '暂未支付'}}</div>
+                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
                           </td>
                           <td>
                             <div class="cell">期望时间：</div>
                           </td>
                           <td>
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form"
                               class="cell"
-                            >{{ parseTime(form.omsProxyOrder.orderExpectTime, '{y}-{m}-{d}') }}</div>
+                            >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
                           </td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 </el-tab-pane>
-                <el-tab-pane v-if=" form.omsProxyOrder && form.omsProxyOrder.orderDeliveryType == 2" label="取送信息" name="pickup">
+                <el-tab-pane v-if="this.form.orderDeliveryType == 2" label="取送信息" name="pickup">
                   <el-row style="margin-top: 10px">
                     <el-card>
                       <div slot="header">
@@ -584,7 +566,7 @@
                                 <div
                                   v-if="form.wmsUser"
                                   class="cell"
-                                >{{ form.omsProxyOrder.userName }}（{{ form.omsProxyOrder.wxappPhone }})</div>
+                                >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }})</div>
                               </td>
                               <td>
                                 <div class="cell">取料时间：</div>
@@ -705,9 +687,9 @@
                           </td>
                           <td>
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form"
                               class="cell"
-                            >{{ formatOrderPayType(form.omsProxyOrder.orderPayType) }}</div>
+                            >{{ formatOrderPayType(form.orderPayType) }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -716,9 +698,9 @@
                           </td>
                           <td>
                             <div
-                              v-if="form.omsProxyOrder"
+                              v-if="form"
                               class="cell"
-                            >{{ parseTime(form.omsProxyOrder.orderExpectTime, '{y}-{m}-{d}') }}</div>
+                            >{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
                           </td>
                         </tr>
                       </tbody>
@@ -932,26 +914,29 @@
 
 <script>
 import {
-  listOrder,
-  getOrder,
-  delOrder,
   addOrder,
-  updateOrder,
-  exportOrder,
+  cancelOrder,
   confirmOrder,
+  exportOrder,
+  getCheckerListApi,
+  getOrder,
+  getPickers,
+  getProducters,
+  listOrder,
   listRoster,
+  mergeOrder,
+  orderAssignChecker,
+  orderAssignSender,
+  orderPicked,
+  orderRosterProduct,
+  updateOrder,
   listRosterDevice,
   orderAssignDevice,
-  orderAssignDeviceAgain,
-  mergeOrder,
-  orderAssignSender,
-  orderAssignChecker,
-  getPickers,
-  
-} from "@/api/garment/proxy/oms/order/order.js";
+  orderAssignDeviceAgain
+} from "@/api/module/production/oms/order/order";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
-import orderPrints from "@/components/Print/wait-cut-order-prints"; // 批量打印
+import orderPrints from "@/components/Print/order-prints"; // 批量打印
 // import lodopPrint from "@/components/Print/lodop/lodopPrint"; // 自动打印
 
 export default {
@@ -959,7 +944,7 @@ export default {
   components: {
     isPickDialog,
     orderPrint,
-    orderPrints
+    orderPrints,
     // lodopPrint
   },
   data() {
@@ -1308,7 +1293,7 @@ export default {
     // 步骤条状态激活
     formatStepStatus(value) {
       value = Number(value);
-      if (this.form.omsProxyOrder.orderDeliveryType == 1) {
+      if (this.form.orderDeliveryType == 1) {
         if (value >= 4 && value < 7) {
           // 订单已支付
           return 2;
@@ -1319,13 +1304,13 @@ export default {
           // 订单已完成
           return 4;
         } else {
-         // 其他
-          if(value == 0 && this.form.omsProxyOrder.orderPayTime) {
+          // 其他
+          if(value == 0 && this.form.orderPayTime) {
             return 3;
-          } else if(value == 0 && !this.form.omsProxyOrder.orderPayTime) {
+          } else if(value == 0 && !this.form.orderPayTime) {
              return 2;
           }
-          return 1;
+         return 1;
         }
       } else {
         if (value >= 2 && value < 7) {
@@ -1338,10 +1323,10 @@ export default {
           // 订单已完成
           return 4;
         } else {
-         // 其他
-          if(value == 0 && this.form.omsProxyOrder.orderPayTime) {
+          // 其他
+           if(value == 0 && this.form.orderPayTime) {
             return 3;
-          } else if(value == 0 && !this.form.omsProxyOrder.orderPayTime) {
+          } else if(value == 0 && !this.form.orderPayTime) {
              return 2;
           }
           return 1;
@@ -1375,19 +1360,6 @@ export default {
         row.orderDeliveryType
       );
     },
-    // 预览图片list
-    previewList(res) {
-      console.log("imgList", res);
-      if (!res) {
-        return;
-      }
-      let imgList = res.map(item => {
-        return item.orderAnnexImageUrl;
-      });
-      console.log("imgList", imgList);
-      return imgList;
-    },
-
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
@@ -1601,8 +1573,7 @@ export default {
           this.selelctPickerId = "";
           this.selectOrderList = [];
           this.pickerVisible = false;
-          //this.handleQuery();
-          this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1638,8 +1609,7 @@ export default {
           this.selelctPickerId = "";
           this.selectOrderList = [];
           this.pickerVisible = false;
-          // this.handleQuery();
-          this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1678,8 +1648,7 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-          // this.handleQuery();
-          this.getList()
+          this.handleQuery();
         } else if (res.code == 422) {
           this.dialogTitle = "已取料订单";
           let orderList = res.msg.split(",");
@@ -1717,8 +1686,7 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
         } else if (res.code == 422) {
           this.dialogTitle = "已配送订单";
           let orderList = res.msg.split(",");
@@ -1844,8 +1812,7 @@ export default {
           this.producterVisible = false;
           this.selelctDeviceId = "";
           this.selectOrderList = [];
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1872,8 +1839,7 @@ export default {
           this.producterVisible = false;
           this.selelctDeviceId = "";
           this.selectOrderList = [];
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1900,8 +1866,7 @@ export default {
           this.checkerVisible = false;
           this.selelctCheckerId = "";
           this.selectOrderList = [];
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1933,8 +1898,7 @@ export default {
             message: "操作成功!"
           });
           // this.$refs.lodopPrint.open(orderPkids)
-          // this.handleQuery();
-          this.getList()
+          this.handleQuery();
         } else if (res.code == 422) {
           this.dialogTitle = "已确认订单";
           let orderList = res.msg.split(",");
@@ -1964,8 +1928,7 @@ export default {
           });
           // this.$refs.lodopPrint.open(orderPkids)
           // this.$refs.orderPrintRefs.open(orderPkids);
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
         }
       });
     },
@@ -2060,7 +2023,7 @@ export default {
         // 单个打印
         this.printDialogTitle = "订单打印";
         ids = [val.pkid];
-        this.$refs.orderPrintRefs.open(ids);
+         this.$refs.orderPrintRefs.open(ids);
         // this.$refs.lodopPrint.open(ids)
       } else {
         // 多个打印
@@ -2073,7 +2036,7 @@ export default {
         }
         let ids = this.selectOrderList.map(item => item.pkid);
         // this.$refs.lodopPrint.open(ids)
-        this.$refs.orderPrintRefs.open(ids);
+         this.$refs.orderPrintRefs.open(ids);
       }
     },
     // 分配检测员
@@ -2120,8 +2083,7 @@ export default {
       };
       orderPicked(params).then(res => {
         if (res.code == 200) {
-         // this.handleQuery();
-         this.getList()
+          this.handleQuery();
           this.$message({
             type: "success",
             message: "操作成功!"

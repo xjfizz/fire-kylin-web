@@ -148,7 +148,7 @@
       :row-key="getRowKeys"
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
-      <el-table-column align="center" label="订单编号" prop="orderNo" width="180" />
+      <el-table-column fixed align="center" label="订单编号" prop="orderNo" width="180" />
       <el-table-column align="center" label="用户名称" prop="wmsUser.userName" />
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
@@ -197,7 +197,7 @@
         </template>
       </el-table-column>
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
-      <el-table-column align="left" class-name="small-padding fixed-width" label="操作" width="250">
+      <el-table-column fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
           <el-button
             icon="el-icon-printer"
@@ -299,30 +299,56 @@
             <span>订单进度</span>
           </div>
           <div class="detail-container">
-            <div class="step-style">
+
+            <div class="step-style" v-if="form.orderStatus != 0">
               <el-steps
                 :active="formatStepStatus(form.orderStatus)"
                 align-center
                 finish-status="success"
               >
-                <el-step :description="form.orderCreateTime" title="创建时间"></el-step>
-                <el-step :description="form.orderPayTime" title="支付时间"></el-step>
-                <el-step :description="form.productionStartTime" title="加工时间"></el-step>
-                <el-step :description="form.confirmReceiptTime" title="完成时间"></el-step>
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+                <el-step  :description="form.orderPayTime" title="支付时间"></el-step>
+                <el-step  :description="form.productionStartTime" title="加工时间"></el-step>
+                <el-step   :description="form.confirmReceiptTime" title="完成时间"></el-step>
               </el-steps>
             </div>
+            <div class="step-style" v-if="form.orderStatus == 0 && !form.orderPayTime">
+              <el-steps
+                :active="formatStepStatus(form.orderStatus)"
+                align-center
+                finish-status="success"
+              >
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+                <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
+                
+              </el-steps>
+            </div>
+
+             <div class="step-style" v-if="form.orderStatus == 0 && form.orderPayTime">
+              <el-steps
+                :active="formatStepStatus(form.orderStatus)"
+                align-center
+                finish-status="success"
+              >
+                <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
+               <el-step  :description="form.orderPayTime" title="支付时间"></el-step>
+                <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
+                
+              </el-steps>
+            </div>
+
           </div>
           <el-row style="margin-top: 10px">
             <el-card>
               <div slot="header">
-                <el-tag effect="plain" type="danger">商品信息</el-tag>
+                <el-tag effect="plain" type="danger">服务信息</el-tag>
               </div>
               <div class="el-table el-table--enable-row-hover el-table--medium">
                 <table cellspacing="0" style="width: 100%;">
                   <tbody>
                     <tr>
-                      <td rowspan="3">
-                        <div v-if="form.pmsServer" class="cell">
+                      <td rowspan="2" >
+                        <div v-if="form.pmsServer">
                           <el-popover placement="top-start" title trigger="hover">
                             <img
                               :src="form.pmsServer.serverImageUrl"
@@ -337,47 +363,30 @@
                           </el-popover>
                         </div>
                       </td>
-                      <td>
+                      <td >
                         <div class="cell">商品名称：</div>
                       </td>
-                      <td colspan="7">
+                      <td>
                         <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverName }}</div>
                       </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="cell">商品规格：</div>
+                       <td >
+                        <div class="cell">商品单价：</div>
                       </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderSpecification }}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品价格：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">￥{{ form.orderAmount | money}}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品数量：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderQuantity }}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品线数：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderLineQuantity }}</div>
+                      <td >
+                        <div v-if="form.pmsServer" class="cell">￥{{ form.pmsServer.serverAmount | money}}</div>
                       </td>
                     </tr>
                     <tr>
+                     
+                      <td >
+                        <div class="cell">商品单位：</div>
+                      </td>
                       <td>
-                        <div class="cell">备注信息：</div>
+                        <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverUnit}}</div>
                       </td>
-                      <td colspan="7">
-                        <div v-if="form" class="cell">{{ form.remark }}</div>
-                      </td>
+                     
                     </tr>
+                   
                   </tbody>
                 </table>
               </div>
@@ -385,9 +394,9 @@
           </el-row>
           <el-row style="margin-top: 10px">
             <el-card>
-              <div slot="header">
+              <!-- <div slot="header">
                 <el-tag effect="plain" type="danger">订单信息</el-tag>
-              </div>
+              </div> -->
               <el-tabs v-model="activeName" @tab-click>
                 <el-tab-pane label="订单信息" name="order">
                   <div class="el-table el-table--enable-row-hover el-table--medium">
@@ -399,9 +408,20 @@
                           </td>
                           <td colspan="3">
                             <div
-                              v-if="form.wmsUser"
+                              v-if="form.sysWorkshopInfo"
                               class="cell"
                             >{{ form.wmsUser.userName }}（{{ form.wmsUser.wxappPhone }}）</div>
+                          </td>
+                        </tr>
+                         <tr>
+                          <td>
+                            <div class="cell">工场名称：</div>
+                          </td>
+                          <td colspan="3">
+                            <div
+                              v-if="form.sysWorkshopInfo"
+                              class="cell"
+                            >{{ form.sysWorkshopInfo.workshopName }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -418,12 +438,43 @@
                             <div v-if="form" class="cell">{{ formatOrderStatus(form.orderStatus) }}</div>
                           </td>
                         </tr>
+                         <tr>
+                          <td>
+                            <div class="cell">商品数量：</div>
+                          </td>
+                          <td>
+                            <div v-if="form.pmsServer" class="cell">{{ form.orderQuantity }}<span>{{form.pmsServer.serverUnit}}</span></div>
+                          </td>
+                          <td>
+                            <div class="cell">商品规格：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">{{  form.orderSpecification || '暂无规格' }}</div>
+                          </td>
+                        </tr>
+                         <tr>
+                          <td>
+                            <div class="cell">商品颜色：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">{{ form.orderColor || '暂无颜色'}}</div>
+                          </td>
+                          <td>
+                            <div class="cell">配送方式：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">
+                              <span v-if="form.orderDeliveryType == 1">自送自取</span>
+                              <span v-if="form.orderDeliveryType == 2">上门取料</span>
+                            </div>
+                          </td>
+                        </tr>
                         <tr>
                           <td>
                             <div class="cell">订单备注：</div>
                           </td>
                           <td colspan="3">
-                            <div v-if="form" class="cell">{{ form.orderNote }}</div>
+                            <div v-if="form" class="cell">{{ form.orderNote || '暂无备注' }}</div>
                           </td>
                         </tr>
                         <tr>
@@ -465,7 +516,7 @@
                             <div
                               v-if="form"
                               class="cell"
-                            >{{ formatOrderPayType(form.orderPayType) }}</div>
+                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
                           </td>
                           <td>
                             <div class="cell">期望时间：</div>
@@ -1254,7 +1305,12 @@ export default {
           return 4;
         } else {
           // 其他
-          return 1;
+          if(value == 0 && this.form.orderPayTime) {
+            return 3;
+          } else if(value == 0 && !this.form.orderPayTime) {
+             return 2;
+          }
+         return 1;
         }
       } else {
         if (value >= 2 && value < 7) {
@@ -1268,6 +1324,11 @@ export default {
           return 4;
         } else {
           // 其他
+           if(value == 0 && this.form.orderPayTime) {
+            return 3;
+          } else if(value == 0 && !this.form.orderPayTime) {
+             return 2;
+          }
           return 1;
         }
       }
@@ -1512,7 +1573,8 @@ export default {
           this.selelctPickerId = "";
           this.selectOrderList = [];
           this.pickerVisible = false;
-          this.handleQuery();
+          //this.handleQuery();
+          this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1548,7 +1610,8 @@ export default {
           this.selelctPickerId = "";
           this.selectOrderList = [];
           this.pickerVisible = false;
-          this.handleQuery();
+          //this.handleQuery();
+          this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1587,7 +1650,8 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-          this.handleQuery();
+          // this.handleQuery();
+          this.getList()
         } else if (res.code == 422) {
           this.dialogTitle = "已取料订单";
           let orderList = res.msg.split(",");
@@ -1625,7 +1689,8 @@ export default {
             type: "success",
             message: "操作成功!"
           });
-          this.handleQuery();
+          // this.handleQuery();
+          this.getList()
         } else if (res.code == 422) {
           this.dialogTitle = "已配送订单";
           let orderList = res.msg.split(",");
@@ -1751,7 +1816,8 @@ export default {
           this.producterVisible = false;
           this.selelctDeviceId = "";
           this.selectOrderList = [];
-          this.handleQuery();
+         // this.handleQuery();
+         this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1778,7 +1844,8 @@ export default {
           this.producterVisible = false;
           this.selelctDeviceId = "";
           this.selectOrderList = [];
-          this.handleQuery();
+         // this.handleQuery();
+         this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1805,7 +1872,8 @@ export default {
           this.checkerVisible = false;
           this.selelctCheckerId = "";
           this.selectOrderList = [];
-          this.handleQuery();
+          //this.handleQuery();
+          this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
@@ -1837,7 +1905,8 @@ export default {
             message: "操作成功!"
           });
           // this.$refs.lodopPrint.open(orderPkids)
-          this.handleQuery();
+         // this.handleQuery();
+         this.getList()
         } else if (res.code == 422) {
           this.dialogTitle = "已确认订单";
           let orderList = res.msg.split(",");
@@ -1867,7 +1936,8 @@ export default {
           });
           // this.$refs.lodopPrint.open(orderPkids)
           // this.$refs.orderPrintRefs.open(orderPkids);
-          this.handleQuery();
+          // this.handleQuery();
+          this.getList()
         }
       });
     },
@@ -2022,7 +2092,8 @@ export default {
       };
       orderPicked(params).then(res => {
         if (res.code == 200) {
-          this.handleQuery();
+         // this.handleQuery();
+         this.getList()
           this.$message({
             type: "success",
             message: "操作成功!"
