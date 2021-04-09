@@ -149,7 +149,7 @@
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
       <el-table-column  fixed align="center" label="订单编号" prop="orderNo" width="180" />
-      <el-table-column align="center" label="用户名称" prop="userName" />
+      <el-table-column fixed align="center" label="用户名称" prop="userName" />
       <!-- <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" /> -->
       <el-table-column align="center" label="商品款式" prop="proxyStyleName" width="80" />
       <el-table-column align="center" label="商品材质" prop="proxyMaterialName" width="80" />
@@ -164,6 +164,24 @@
       <el-table-column align="center" label="订单价格" prop="orderAmount">
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
+        </template>
+      </el-table-column>
+       <!-- 图片 -->
+      <el-table-column
+        align="center"
+        header-align="center"
+        label="上传图片"
+        prop="omsProxyOrderAnnexes"
+      >
+        <template slot-scope="scope">
+          <el-image
+            v-if="scope.row.omsProxyOrderAnnexes"
+            style="width: 50px; height: 50px"
+            :src="scope.row.omsProxyOrderAnnexes[0].orderAnnexImageUrl"
+            :preview-src-list="previewList(scope.row.omsProxyOrderAnnexes)"
+          ></el-image>
+
+          <span v-else>暂无图片</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -185,24 +203,7 @@
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-      <!-- 图片 -->
-      <el-table-column
-        align="center"
-        header-align="center"
-        label="上传图片"
-        prop="omsProxyOrderAnnexes"
-      >
-        <template slot-scope="scope">
-          <el-image
-            v-if="scope.row.omsProxyOrderAnnexes"
-            style="width: 50px; height: 50px"
-            :src="scope.row.omsProxyOrderAnnexes[0].orderAnnexImageUrl"
-            :preview-src-list="previewList(scope.row.omsProxyOrderAnnexes)"
-          ></el-image>
-
-          <span v-else>暂无图片</span>
-        </template>
-      </el-table-column>
+     
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
       <el-table-column  fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
@@ -1350,11 +1351,23 @@ export default {
     },
     // 订单状态字典翻译
     orderStatusFormat(row, column) {
-      return row.orderDeliveryType == 1
+      if(row.orderStatus == 8) {
+        if(!row.assignInspectionFlag) {
+          return '待分配检测'
+        } else{
+           return row.orderDeliveryType == 1
         ? row.orderStatus == 12
           ? "待取货"
           : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
         : this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
+        }
+      } else{
+         return row.orderDeliveryType == 1
+        ? row.orderStatus == 12
+          ? "待取货"
+          : this.selectDictLabel(this.orderStatusOptions, row.orderStatus)
+        : this.selectDictLabel(this.orderStatusOptions, row.orderStatus);
+      }
     },
     // 运单状态格式化
     formatOrderStatus(value) {
