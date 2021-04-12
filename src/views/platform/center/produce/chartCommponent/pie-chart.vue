@@ -98,15 +98,15 @@ export default {
             saveAsImage: {}
           }
         },
-        color: [
-          "#dc3545",
-          "#17a2b8",
-          "#007bff",
-          "#dc3545",
-          "blue",
-          "indigo",
-          "purple"
-        ],
+        // color: [
+        //   "#dc3545",
+        //   "#17a2b8",
+        //   "#007bff",
+        //   "#dc3545",
+        //   "blue",
+        //   "indigo",
+        //   "purple"
+        // ],
         series: [
           {
             name: "服务分类",

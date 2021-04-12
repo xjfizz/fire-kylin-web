@@ -17,16 +17,16 @@
                         <div class="item-row-left">客户</div>
                         <div class="item-row-right" style="margin-left:10px">
                             <div class="row-right-item">{{item.wmsUser.userName || '暂无'}}</div>
-                            <div class="row-right-item">{{item.wmsUser.wxappPhone || '暂无'}}</div>
+                            <div class="row-right-item">{{ phoneHide(item.wmsUser.wxappPhone) || '暂无'}}</div>
                         </div>
                     </div>
                      <div class="item-row" style="display:flex;">
-                        <div class="item-row-left">产品</div>
+                        <div class="item-row-left">服务</div>
                         <div class="item-row-right" style="margin-left:10px">
                             <div class="row-right-item">{{item.serverName || '暂无服务名称'}}</div>
-                            <div class="row-right-item">{{item.omsOrder.orderSpecification || '暂无规格'}}</div>
-                            <div class="row-right-item">{{item.omsOrder.orderQuantity || '暂无数量'}}打</div>
-                            <div class="row-right-item">{{item.omsOrder.orderColor || '暂无颜色'}}</div>
+                            <div class="row-right-item" style="margin-top:5px">{{item.omsOrder.orderSpecification || '暂无规格'}}</div>
+                            <div class="row-right-item" style="margin-top:5px">{{item.omsOrder.orderQuantity || '暂无数量'}}打</div>
+                            <div class="row-right-item" style="margin-top:5px">{{item.omsOrder.orderColor || '暂无颜色'}}</div>
                         </div>
                     </div>
                      <!-- <div class="item-row" style="display:flex; align-items: center;">
@@ -37,18 +37,21 @@
                         <div class="item-row-left">颜色</div>
                         <div class="item-row-right" >黄色，绿色，蓝色</div>
                     </div> -->
-                     <div class="item-row" style="display:flex; align-items: center;">
-                        <div class="item-row-left">经理</div>
-                        <div class="item-row-right" style="margin-left:10px"> {{item.productionManager || '暂无'}}</div>
+                     <div class="item-row" style="display:flex; align-items: center;margin-top:5px">
+                        <div class="item-row-left">备注</div>
+                        <div class="item-row-right" style="margin-left:10px;width:220px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{item.omsOrder.orderNote || '暂无备注'}}</div>
                     </div>
-                      <div class="item-row-bottom" style="display:flex;  align-items: center;">
+                      <div class="item-row-bottom" style="display:flex;  align-items: center;margin-top:5px">
                           <div class="row-left" style="display:flex;  align-items: center;">
                                <div class="row-left-title">时间</div>
                               <div class="row-left-value" style="margin-left:10px"> {{item.printDateTime || '暂无'}}</div>
                           </div>
                           <div class="row-right">
-                               <div class="item-row-img" style="margin-top:-70px;margin-left:20px">
+                               <!-- <div class="item-row-img" style="margin-top:-70px;margin-left:20px">
                                    <img width="80" height="80" :src="item.orderQrcode"></img>
+                               </div> -->
+                               <div class="item-row-img" style="margin-top:-180px;margin-left:30px">
+                                   <img width="70" height="70" :src="item.orderQrcode"></img>
                                </div>
                           </div>
                        
@@ -134,6 +137,10 @@ export default {
     // 取消
     cancel() {
       this.visible = false;
+    },
+     phoneHide(phone) {
+        let reg = /^(.{3}).*(.{4})$/
+      return phone.replace(reg,'$1****$2')
     },
      handlePrint() {
                 var newWin = window.open(""); //新打开一个空窗口

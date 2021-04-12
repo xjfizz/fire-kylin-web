@@ -123,6 +123,14 @@ export function orderAssignChecker(data) {
     data: data
   })
 }
+// 获取检测员
+export function getCheckerListApi(query) {
+  return request({
+    url: '/system/user/queryListIpUser',
+    method: 'get',
+    params: query
+  })
+}
 
 
 // 分配配送员

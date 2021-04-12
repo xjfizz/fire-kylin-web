@@ -948,6 +948,7 @@ import {
   orderAssignSender,
   orderAssignChecker,
   getPickers,
+  getCheckerListApi 
   
 } from "@/api/garment/proxy/oms/order/order.js";
 import isPickDialog from "./components/isPickDialog";
