@@ -13,9 +13,7 @@
               <div class="collapse-title-sty">
                 <span class="collapse-title">查询</span>
                 <span class="collapse-des">请输入查询日期进行检索</span>
-                <span class="collapse-tips"
-                  >※：请选择年月日进行查询，默认查询时间范围为：当月(例如：2020-09)</span
-                >
+                <span class="collapse-tips">※：请选择年月日进行查询，默认查询时间范围为：当月(例如：2020-09)</span>
               </div>
             </template>
             <!-- 查询筛选条件 -->
@@ -35,11 +33,7 @@
                   ></el-date-picker>
                 </div>
                 <div class="search-key">
-                  <el-select
-                    v-model="searchDateType"
-                    placeholder="请选择"
-                    @change="selectKeyClick"
-                  >
+                  <el-select v-model="searchDateType" placeholder="请选择" @change="selectKeyClick">
                     <el-option
                       v-for="item in searchKeyList"
                       :key="item.value"
@@ -49,12 +43,7 @@
                   </el-select>
                 </div>
                 <div class="search-btn">
-                  <el-button
-                    icon="el-icon-search"
-                    type="primary"
-                    @click="search"
-                    >查询</el-button
-                  >
+                  <el-button icon="el-icon-search" type="primary" @click="search">查询</el-button>
                 </div>
               </div>
             </div>
@@ -73,30 +62,21 @@
             <!-- 统计 -->
             <div class="produce-mid-main">
               <div class="select-moudle">
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="统计查询时间范围内；订单"
-                  placement="bottom"
-                >
+                <el-tooltip class="item" effect="dark" content="统计查询时间范围内；订单" placement="bottom">
                   <div
                     class="select-moudle-item"
-                    :class="
-                      selectMoudleItem == 1 ? 'select-moudle-item-active' : ''
-                    "
+                    :class="selectMoudleItem == 1 ? 'select-moudle-item-active' : ''"
                     @click="selectMoudle(1)"
                   >
                     <div class="item-left">
                       <div class="left-top">订单</div>
                       <div class="left-mid">
                         <div class="mid-title">新增订单:</div>
-                        <div class="mid-value">{{ tabData.newOrderNum }}单</div>
+                        <div class="mid-value">{{tabData.newOrderNum}}单</div>
                       </div>
                       <div class="left-bottom">
                         <div class="mid-title">订单总额:</div>
-                        <div class="mid-value">
-                          {{ tabData.newOrderAmount }}
-                        </div>
+                        <div class="mid-value">{{tabData.newOrderAmount}}</div>
                       </div>
                     </div>
                     <div class="item-right">
@@ -105,32 +85,21 @@
                   </div>
                 </el-tooltip>
 
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="统计查询时间范围内；用户"
-                  placement="bottom"
-                >
+                <el-tooltip class="item" effect="dark" content="统计查询时间范围内；用户" placement="bottom">
                   <div
                     class="select-moudle-item"
-                    :class="
-                      selectMoudleItem == 2 ? 'select-moudle-item-active' : ''
-                    "
+                    :class="selectMoudleItem == 2 ? 'select-moudle-item-active' : ''"
                     @click="selectMoudle(2)"
                   >
                     <div class="item-left">
                       <div class="left-top">用户</div>
                       <div class="left-mid">
                         <div class="mid-title">活跃用户:</div>
-                        <div class="mid-value">
-                          {{ tabData.activeUserNum }}人
-                        </div>
+                        <div class="mid-value">{{tabData.activeUserNum}}人</div>
                       </div>
                       <div class="left-bottom">
                         <div class="mid-title">用户总数:</div>
-                        <div class="mid-value">
-                          {{ tabData.totalUserNum }}人
-                        </div>
+                        <div class="mid-value">{{tabData.totalUserNum}}人</div>
                       </div>
                     </div>
                     <div class="item-right">
@@ -148,24 +117,18 @@
                 >
                   <div
                     class="select-moudle-item"
-                    :class="
-                      selectMoudleItem == 3 ? 'select-moudle-item-active' : ''
-                    "
+                    :class="selectMoudleItem == 3 ? 'select-moudle-item-active' : ''"
                     @click="selectMoudle(3)"
                   >
                     <div class="item-left">
                       <div class="left-top">实收</div>
                       <div class="left-mid">
                         <div class="mid-title">支付订单:</div>
-                        <div class="mid-value">
-                          {{ tabData.incomeOrderNum }}单
-                        </div>
+                        <div class="mid-value">{{tabData.incomeOrderNum}}单</div>
                       </div>
                       <div class="left-bottom">
                         <div class="mid-title">支付金额:</div>
-                        <div class="mid-value">
-                          {{ tabData.incomeOrderAmount }}元
-                        </div>
+                        <div class="mid-value">{{tabData.incomeOrderAmount}}元</div>
                       </div>
                     </div>
                     <div class="item-right">
@@ -174,32 +137,21 @@
                   </div>
                 </el-tooltip>
 
-                <el-tooltip
-                  class="item"
-                  effect="dark"
-                  content="统计查询时间范围内；产量"
-                  placement="bottom"
-                >
+                <el-tooltip class="item" effect="dark" content="统计查询时间范围内；产量" placement="bottom">
                   <div
                     class="select-moudle-item"
-                    :class="
-                      selectMoudleItem == 4 ? 'select-moudle-item-active' : ''
-                    "
+                    :class="selectMoudleItem == 4 ? 'select-moudle-item-active' : ''"
                     @click="selectMoudle(4)"
                   >
                     <div class="item-left">
                       <div class="left-top">产量</div>
                       <div class="left-mid">
                         <div class="mid-title">当前产量:</div>
-                        <div class="mid-value">
-                          {{ tabData.currentOutputNum }}件
-                        </div>
+                        <div class="mid-value">{{tabData.currentOutputNum}}件</div>
                       </div>
                       <div class="left-bottom">
                         <div class="mid-title">总生产量:</div>
-                        <div class="mid-value">
-                          {{ tabData.totalOutputNum }}件
-                        </div>
+                        <div class="mid-value">{{tabData.totalOutputNum}}件</div>
                       </div>
                     </div>
                     <div class="item-right">
@@ -219,18 +171,15 @@
           <el-button
             :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
             @click="selectMoudleBtn(1)"
-            >新增订单</el-button
-          >
+          >新增订单</el-button>
           <el-button
             :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
             @click="selectMoudleBtn(2)"
-            >生产完成</el-button
-          >
+          >生产完成</el-button>
           <el-button
             :type="selectMoudleBtnSty == 3 ? 'primary' : ''"
             @click="selectMoudleBtn(3)"
-            >支付完成</el-button
-          >
+          >支付完成</el-button>
         </el-button-group>
 
         <el-button-group v-if="selectMoudleItem == 2">
@@ -238,30 +187,23 @@
           <el-button
             :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
             @click="selectMoudleBtn(1)"
-            >活跃用户</el-button
-          >
+          >活跃用户</el-button>
         </el-button-group>
 
         <el-button-group v-if="selectMoudleItem == 3">
           <el-button
             :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
             @click="selectMoudleBtn(1)"
-            >微信支付</el-button
-          >
+          >微信支付</el-button>
           <el-button
             :type="selectMoudleBtnSty == 2 ? 'primary' : ''"
             @click="selectMoudleBtn(2)"
-            >保证金支付</el-button
-          >
+          >保证金支付</el-button>
         </el-button-group>
 
         <el-button-group v-if="selectMoudleItem == 4">
           <!-- 产量-->
-          <el-button
-            :type="selectMoudleBtnSty == 1 ? 'primary' : ''"
-            @click="selectMoudleBtn(1)"
-            >产量</el-button
-          >
+          <el-button :type="selectMoudleBtnSty == 1 ? 'primary' : ''" @click="selectMoudleBtn(1)">产量</el-button>
         </el-button-group>
       </div>
 
@@ -270,9 +212,7 @@
           <el-collapse-item name="1">
             <template slot="title">
               <div class="collapse-title-sty">
-                <span class="collapse-title">{{
-                  mainData.lineData.chartTitle
-                }}</span>
+                <span class="collapse-title">{{ mainData.lineData.chartTitle}}</span>
               </div>
             </template>
 
@@ -294,7 +234,7 @@
       <!-- 底部表格 -->
       <!-- v-show="[1,2,3].indexOf(selectMoudleItem) > 0" -->
       <div
-        v-show="[1, 2, 3].indexOf(selectMoudleItem) > -1 && queryType == 1"
+        v-show="[1,2,3].indexOf(selectMoudleItem) > -1 && queryType == 1"
         class="produce-bottom-chart"
       >
         <div class="bottom-content-left">
@@ -303,31 +243,12 @@
               <el-collapse-item name="1">
                 <template slot="title">
                   <div class="collapse-title-sty">
-                    <span class="collapse-title">{{
-                      mainData.pieData.chartTitle
-                    }}</span>
+                    <span class="collapse-title">{{ mainData.pieData.chartTitle}}</span>
                   </div>
                 </template>
 
                 <!-- 统计 -->
                 <div class="produce-bottom-main">
-                  <!-- 饼图切换 -->
-                  <div class="produce-bottom-main-btns" v-if="selectMoudleItem == 1 || selectMoudleItem == 3">
-                    <el-button-group>
-                      <!-- 订单 -->
-                      <el-button
-                        :type="pieType == 1 ? 'primary' : ''"
-                        @click="selectPieType(1)"
-                        >款式</el-button
-                      >
-                      <el-button
-                        :type="pieType == 2 ? 'primary' : ''"
-                        @click="selectPieType(2)"
-                        >材质</el-button
-                      >
-                    </el-button-group>
-                  </div>
-
                   <pieChart
                     ref="pieChart"
                     :chartTitle="mainData.pieData.chartTitle"
@@ -345,9 +266,7 @@
               <el-collapse-item name="1">
                 <template slot="title">
                   <div class="collapse-title-sty">
-                    <span class="collapse-title"
-                      >{{ mainData.rankData.chartTitle }} (Top:前五名)</span
-                    >
+                    <span class="collapse-title">{{ mainData.rankData.chartTitle}} (Top:前五名)</span>
                     <div class="collapse-title-right-icon" @click.stop="openPh">
                       <i class="el-icon-tickets"></i>
                     </div>
@@ -370,10 +289,7 @@
     </div>
 
     <!-- 弹出框 -->
-    <el-dialog
-      :title="mainData.rankData.chartTitle + '(总榜)'"
-      :visible.sync="dialogPhVisible"
-    >
+    <el-dialog :title="mainData.rankData.chartTitle + '(总榜)'" :visible.sync="dialogPhVisible">
       <div class="dialogp-content">
         <div
           v-if="mainData.rankData && mainData.rankData.data.length > 0"
@@ -385,38 +301,30 @@
               <img :src="item.userAvatar" />
             </div>
             <div class="dialogp-left-right">
-              <div class="dialogp-left-top">{{ item.userName || "暂无" }}</div>
+              <div class="dialogp-left-top">{{item.userName || '暂无'}}</div>
               <div class="dialogp-left-bottom">
                 <!-- <div class="bottom-icon"></div>
                           <div class="bottom-title">统计日期:</div>
                 <div class="bottom-time">2020</div>-->
                 <blockquote class="dialogp-left-bottom-message">
                   统计日期:
-                  <span v-if="item.orderDayDate">{{ item.orderDayDate }}</span>
-                  <span v-if="item.orderMonthDate">{{
-                    item.orderMonthDate
-                  }}</span>
-                  <span v-if="item.orderYearDate">{{
-                    item.orderYearDate
-                  }}</span>
+                  <span v-if="item.orderDayDate">{{item.orderDayDate}}</span>
+                  <span v-if="item.orderMonthDate">{{item.orderMonthDate}}</span>
+                  <span v-if="item.orderYearDate">{{item.orderYearDate}}</span>
                 </blockquote>
               </div>
             </div>
           </div>
-          <div class="dialogp-right">{{ item.orderNum || 0 }}单</div>
+          <div class="dialogp-right">{{item.orderNum || 0}}单</div>
         </div>
         <div
           v-if="mainData.rankData && mainData.rankData.data.length == 0"
           class="dialogp-no-data"
-        >
-          暂无数据
-        </div>
+        >暂无数据</div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogPhVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogPhVisible = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="dialogPhVisible = false">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -427,12 +335,13 @@ import lineChart from "./chartCommponent/line-chart";
 import pieChart from "./chartCommponent/pie-chart";
 import phChart from "./chartCommponent/ph-chart";
 
-import produceApi from "@/api/platform/center/produceProxy";
+import produceApi from "@/api/platform/center/produce";
 
 import timeFormat from "./unit/timeFormat";
 
+
 export default {
-  name: "dispatch",
+  name: "produce",
   components: { lineChart, pieChart, phChart },
   data() {
     return {
@@ -448,16 +357,16 @@ export default {
       searchKeyList: [
         {
           value: "date",
-          label: "日份",
+          label: "日份"
         },
         {
           value: "month",
-          label: "月份",
+          label: "月份"
         },
         {
           value: "year",
-          label: "年份",
-        },
+          label: "年份"
+        }
       ],
       searchKey: "month",
       searchDateType: "month",
@@ -471,25 +380,24 @@ export default {
           chartTitle: "", // 折线图标题
           dataNum: "", // 折线图数量总数
           dataX: [], // 折线图X轴
-          dataY: [], // 折线图Y轴
+          dataY: [] // 折线图Y轴
         },
         pieData: {
           chartTitle: "", // 饼图标题
-          data: [],
+          data: []
         },
         rankData: {
           chartTitle: "", // 排行榜标题
-          data: [],
-        },
+          data: []
+        }
       },
       queryType: 1, // 查询类型，1 新版订单，2 旧版订单，
       queryTypeDate: {
         // 查询类型截止日期
         date: "2021-03-10",
         month: "2021-03",
-        year: "2021",
-      },
-      pieType:1, //1 款式1 材质2
+        year: "2021"
+      }
     };
   },
   watch: {},
@@ -497,10 +405,10 @@ export default {
     this.init();
   },
   mounted() {
-    this.init();
+     this.init();
   },
   methods: {
-    // 初始化
+   // 初始化
     init() {
       this.searchDate = this.dataFormat();
       this.search();
@@ -594,10 +502,10 @@ export default {
         queryDateType:
           this.searchDateType == "date" ? "day" : this.searchDateType,
         workshopPkid: this.userInfo.workshopId,
-        queryType: this.queryType,
+        queryType: this.queryType
       };
       console.log("params", params);
-      produceApi.getObtainTabList(params).then((res) => {
+      produceApi.getObtainTabList(params).then(res => {
         if (res.code == 200) {
           this.tabData = res.data;
           this.loading = false;
@@ -615,10 +523,10 @@ export default {
         queryDateType:
           this.searchDateType == "date" ? "day" : this.searchDateType,
         workshopPkid: this.userInfo.workshopId,
-        queryType: this.queryType,
+        queryType: this.queryType
       };
       console.log("params", params);
-      produceApi.getObtainOrderTabList(params).then((res) => {
+      produceApi.getObtainOrderTabList(params).then(res => {
         if (res.code == 200) {
           /* 折线图 */
           if (this.selectMoudleBtnSty == 1) {
@@ -649,11 +557,7 @@ export default {
           }
           if (this.queryType == 1) {
             /* 饼图 */
-            if(this.pieType == 1) { // 款式
-              this.mainData.pieData.data = res.data.orderStyleTabPieChartInfo;
-            } else if(this.pieType == 2) { // 材质
-              this.mainData.pieData.data = res.data.orderMaterialTabPieChartInfo;
-            }
+            this.mainData.pieData.data = res.data.orderTabPieChartInfo;
             /* 排行榜 */
             this.mainData.rankData.data = res.data.orderTabRankUserInfo;
           }
@@ -681,10 +585,10 @@ export default {
         queryDateType:
           this.searchDateType == "date" ? "day" : this.searchDateType,
         workshopPkid: this.userInfo.workshopId,
-        queryType: this.queryType,
+        queryType: this.queryType
       };
       console.log("params", params);
-      produceApi.getObtainUserTabList(params).then((res) => {
+      produceApi.getObtainUserTabList(params).then(res => {
         if (res.code == 200) {
           if (this.selectMoudleBtnSty == 1) {
             /* 折线图 */
@@ -726,10 +630,10 @@ export default {
         queryDateType:
           this.searchDateType == "date" ? "day" : this.searchDateType,
         workshopPkid: this.userInfo.workshopId,
-        queryType: this.queryType,
+        queryType: this.queryType
       };
       console.log("params", params);
-      produceApi.getObtainProduceTabList(params).then((res) => {
+      produceApi.getObtainProduceTabList(params).then(res => {
         if (res.code == 200) {
           /* 折线图 */
           if (this.selectMoudleBtnSty == 1) {
@@ -765,10 +669,10 @@ export default {
         queryDateType:
           this.searchDateType == "date" ? "day" : this.searchDateType,
         workshopPkid: this.userInfo.workshopId,
-        queryType: this.queryType,
+        queryType: this.queryType
       };
       console.log("params", params);
-      produceApi.getObtainIncomeTabList(params).then((res) => {
+      produceApi.getObtainIncomeTabList(params).then(res => {
         if (res.code == 200) {
           if (this.selectMoudleBtnSty == 1) {
             /* 折线图 */
@@ -782,11 +686,6 @@ export default {
             if (this.queryType == 1) {
               /* 饼图 */
               this.mainData.pieData.data = res.data.incomeTabWxappPieChartInfo;
-                if(this.pieType == 1) { // 款式
-              this.mainData.pieData.data = res.data.incomeTabMarginStylePieChartInfo;
-            } else if(this.pieType == 2) { // 材质
-              this.mainData.pieData.data = res.data.incomeTabMarginMaterialPieChartInfo;
-            }
               /* 排行榜 */
               this.mainData.rankData.data = res.data.incomeTabWxappRankUserInfo;
             }
@@ -901,11 +800,6 @@ export default {
         this.getTabProduceData();
       }
     },
-    // 切换饼图
-    selectPieType(e) {
-      this.pieType = e
-      this.search()
-    },
     // 切换图表按钮
     selectMoudleBtn(e) {
       this.selectMoudleBtnSty = e;
@@ -951,8 +845,8 @@ export default {
     // 打开排行榜
     openPh() {
       this.dialogPhVisible = true;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -1194,10 +1088,6 @@ export default {
           .produce-bottom-main {
             margin-top: 25px;
             margin-bottom: 10px;
-          }
-          .produce-bottom-main-btns {
-            margin-top: 25px;
-            margin-bottom: 20px;
           }
         }
       }
