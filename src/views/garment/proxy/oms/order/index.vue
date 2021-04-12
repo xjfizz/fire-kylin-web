@@ -148,7 +148,7 @@
       :row-key="getRowKeys"
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
-      <el-table-column  fixed align="center" label="订单编号" prop="orderNo" width="180" />
+      <el-table-column  fixed align="center" label="订单编号" prop="orderNo" width="150" />
       <el-table-column fixed align="center" label="用户名称" prop="userName" />
       <!-- <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" /> -->
       <el-table-column align="center" label="商品款式" prop="proxyStyleName" width="80" />
@@ -198,7 +198,7 @@
         prop="orderStatus"
         width="100"
       />
-      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="180">
+      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
@@ -948,7 +948,7 @@ import {
   orderAssignSender,
   orderAssignChecker,
   getPickers,
-  getCheckerListApi 
+  getCheckerListApi
 
 } from "@/api/garment/proxy/oms/order/order.js";
 import isPickDialog from "./components/isPickDialog";

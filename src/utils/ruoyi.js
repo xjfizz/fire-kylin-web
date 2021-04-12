@@ -132,21 +132,45 @@ export function praseStrEmpty(str) {
  * @param {*} rootId 根Id 默认 0
  */
 export function handleTree(data, id, parentId, children, rootId) {
-	id = id || 'id'
-	parentId = parentId || 'parentId'
-	children = children || 'children'
-	rootId = rootId || Math.min.apply(Math, data.map(item => { return item[parentId] })) || 0
-	//对源数据深度克隆
-	const cloneData = JSON.parse(JSON.stringify(data))
-	//循环所有项
-	const treeData = cloneData.filter(father => {
-		let branchArr = cloneData.filter(child => {
-			//返回每一项的子级数组
-			return father[id] === child[parentId]
-		});
-		branchArr.length > 0 ? father.children = branchArr : '';
-		//返回第一层
-		return father[parentId] === rootId;
-	});
-	return treeData != '' ? treeData : data;
+  let config = {
+    id: id || 'id',
+    parentId: parentId || 'parentId',
+    childrenList: children || 'children'
+  };
+
+  var childrenListMap = {};
+  var nodeIds = {};
+  var tree = [];
+
+  for (let d of data) {
+    let parentId = d[config.parentId];
+    if (childrenListMap[parentId] == null) {
+      childrenListMap[parentId] = [];
+    }
+    nodeIds[d[config.id]] = d;
+    childrenListMap[parentId].push(d);
+  }
+
+  for (let d of data) {
+    let parentId = d[config.parentId];
+    if (nodeIds[parentId] == null) {
+      tree.push(d);
+    }
+  }
+
+  for (let t of tree) {
+    adaptToChildrenList(t);
+  }
+
+  function adaptToChildrenList(o) {
+    if (childrenListMap[o[config.id]] !== null) {
+      o[config.childrenList] = childrenListMap[o[config.id]];
+    }
+    if (o[config.childrenList]) {
+      for (let c of o[config.childrenList]) {
+        adaptToChildrenList(c);
+      }
+    }
+  }
+  return tree;
 }

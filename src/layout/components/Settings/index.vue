@@ -43,6 +43,11 @@
       <h3 class="drawer-title">系统布局配置</h3>
 
       <div class="drawer-item">
+        <span>开启 TopNav</span>
+        <el-switch v-model="topNav" class="drawer-switch" />
+      </div>
+
+      <div class="drawer-item">
         <span>开启 Tags-Views</span>
         <el-switch v-model="tagsView" class="drawer-switch" />
       </div>
@@ -85,6 +90,20 @@ export default {
           key: 'fixedHeader',
           value: val
         })
+      }
+    },
+    topNav: {
+      get() {
+        return this.$store.state.settings.topNav
+      },
+      set(val) {
+        this.$store.dispatch('settings/changeSetting', {
+          key: 'topNav',
+          value: val
+        })
+        if (!val) {
+          this.$store.commit("SET_SIDEBAR_ROUTERS", this.$store.state.permission.defaultRoutes);
+        }
       }
     },
     tagsView: {

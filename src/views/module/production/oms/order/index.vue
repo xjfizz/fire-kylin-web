@@ -148,10 +148,10 @@
       :row-key="getRowKeys"
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
-      <el-table-column fixed align="center" label="订单编号" prop="orderNo" width="180" />
+      <el-table-column fixed align="center" label="订单编号" prop="orderNo" width="150" />
       <el-table-column fixed align="center" label="用户名称" prop="wmsUser.userName" />
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
-      <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" />
+      <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" show-overflow-tooltip />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
       <el-table-column align="center" label="商品颜色" prop="orderColor">
         <template slot-scope="{row}">{{ row.orderColor || '暂无' }}</template>
@@ -191,12 +191,12 @@
         prop="orderStatus"
         width="120"
       />
-      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="180">
+      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-     
+
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
       <el-table-column fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
@@ -321,7 +321,7 @@
               >
                 <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
                 <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
-                
+
               </el-steps>
             </div>
 
@@ -334,7 +334,7 @@
                 <el-step  :description="form.orderCreateTime" title="创建时间"></el-step>
                <el-step  :description="form.orderPayTime" title="支付时间"></el-step>
                 <el-step  :description="form.orderCancelTime" title="取消时间"></el-step>
-                
+
               </el-steps>
             </div>
 
@@ -378,16 +378,16 @@
                       </td>
                     </tr>
                     <tr>
-                     
+
                       <td >
                         <div class="cell">商品单位：</div>
                       </td>
                       <td>
                         <div v-if="form.pmsServer" class="cell">{{ form.pmsServer.serverUnit}}</div>
                       </td>
-                     
+
                     </tr>
-                   
+
                   </tbody>
                 </table>
               </div>

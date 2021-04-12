@@ -17,6 +17,11 @@ module.exports = {
   tagsView: true,
 
   /**
+   * 是否显示顶部导航
+   */
+  topNav: false,
+
+  /**
    * 是否固定头部
    */
   fixedHeader: false,
