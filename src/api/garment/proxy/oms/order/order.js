@@ -136,7 +136,7 @@ export function getCheckerListApi(query) {
 // 分配配送员
 export function orderAssignSender(data) {
   return request({
-    url: '​​/oms​/web​/proxy​/order​/assignOrderDelivery',
+    url: '/oms/web/proxy/order/assignOrderDelivery',
     method: 'post',
     data: data
   })

@@ -129,7 +129,7 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
-          v-hasPermi="['oms:order:export']"
+          v-hasPermi="['proxy:order:export']"
           icon="el-icon-download"
           plain
           size="mini"
@@ -203,7 +203,7 @@
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
-     
+
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
       <el-table-column  fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
         <template slot-scope="scope">
@@ -214,7 +214,7 @@
             @click="printOrder(scope.row)"
           >打印</el-button>
           <el-button
-            v-hasPermi="['oms:order:edit']"
+            v-hasPermi="['proxy:order:edit']"
             icon="el-icon-edit"
             size="mini"
             type="text"
@@ -222,7 +222,7 @@
           >详情</el-button>
           <el-button
             v-show="scope.row.orderStatus === '2'"
-            v-hasPermi="['oms:order:remove']"
+            v-hasPermi="['proxy:order:remove']"
             icon="el-icon-s-help"
             size="mini"
             style="color: #008489"
@@ -240,7 +240,7 @@
           <!-- <lodopPrint :lodopPrintStyle="lodopPrintStyle" v-show="scope.row.orderStatus === '4'"  @click="confirmOrderSingle(scope.row)></lodopPrint> -->
           <el-button
             v-show="[1,2,3,4,5,6].indexOf(Number(scope.row.orderStatus)) > -1"
-            v-hasPermi="['oms:order:remove']"
+            v-hasPermi="['proxy:order:remove']"
             icon="el-icon-s-open"
             size="mini"
             style="color: #C03639"
@@ -327,7 +327,7 @@
               >
                 <el-step  :description="form.omsProxyOrder.orderCreateTime" title="创建时间"></el-step>
                 <el-step  :description="form.omsProxyOrder.orderCancelTime" title="取消时间"></el-step>
-                
+
               </el-steps>
             </div>
 
@@ -340,7 +340,7 @@
                 <el-step  :description="form.omsProxyOrder.orderCreateTime" title="创建时间"></el-step>
                <el-step  :description="form.omsProxyOrder.orderPayTime" title="支付时间"></el-step>
                 <el-step  :description="form.omsProxyOrder.orderCancelTime" title="取消时间"></el-step>
-                
+
               </el-steps>
             </div>
           </div>
@@ -948,8 +948,7 @@ import {
   orderAssignSender,
   orderAssignChecker,
   getPickers,
-  getCheckerListApi 
-  
+
 } from "@/api/garment/proxy/oms/order/order.js";
 import isPickDialog from "./components/isPickDialog";
 import orderPrint from "@/components/Print/order-print";
