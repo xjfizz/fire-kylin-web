@@ -781,11 +781,10 @@ export default {
             );
             if (this.queryType == 1) {
               /* 饼图 */
-              this.mainData.pieData.data = res.data.incomeTabWxappPieChartInfo;
-                if(this.pieType == 1) { // 款式
-              this.mainData.pieData.data = res.data.incomeTabMarginStylePieChartInfo;
+              if(this.pieType == 1) { // 款式
+              this.mainData.pieData.data = res.data.incomeTabWxappStylePieChartInfo;
             } else if(this.pieType == 2) { // 材质
-              this.mainData.pieData.data = res.data.incomeTabMarginMaterialPieChartInfo;
+              this.mainData.pieData.data = res.data.incomeTabWxappMaterialPieChartInfo;
             }
               /* 排行榜 */
               this.mainData.rankData.data = res.data.incomeTabWxappRankUserInfo;
@@ -801,7 +800,11 @@ export default {
             );
             if (this.queryType == 1) {
               /* 饼图 */
-              this.mainData.pieData.data = res.data.incomeTabMarginPieChartInfo;
+              if(this.pieType == 1) { // 款式
+              this.mainData.pieData.data = res.data.incomeTabMarginStylePieChartInfo;
+            } else if(this.pieType == 2) { // 材质
+              this.mainData.pieData.data = res.data.incomeTabMarginMaterialPieChartInfo;
+            }
               /* 排行榜 */
               this.mainData.rankData.data =
                 res.data.incomeTabMarginRankUserInfo;
