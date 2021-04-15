@@ -543,7 +543,6 @@ export default {
         transform: scale(1.2);
       }
       .item-stop {
-        // background: #f56c6c;
         background: #ff4949;
         color: #ffffff;
       }
