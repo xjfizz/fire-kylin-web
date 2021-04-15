@@ -10,7 +10,7 @@
       <div class="item-f">
        <div
           class="item"
-          :class="item.deviceStatus == 1 ? 'item-stop' : '' "
+          :class="item.deviceStatus == 1 ? 'item-stop' : (item.dmsDeviceRelationRecord ? '' : 'item-no-relation') "
           v-for="(item,index) in deviceList"
           :key="index"
           @click="selectItem(item)"
@@ -393,7 +393,10 @@ export default {
         transform: scale(1.2);
       }
       .item-stop {
-        // background: #f56c6c;
+        background: #ff4949;
+        color: #ffffff;
+      }
+       .item-no-relation {
         background: #ffba00;
         color: #ffffff;
       }
