@@ -453,10 +453,20 @@ export default {
       };
       getMaterialList(params).then(res => {
         if (res.code == 200) {
-          this.materialList = res.data.proxyMaterialResultInfo.filter(item => {
+          if(res.data.proxyMaterialResultInfo) {
+            this.materialList = res.data.proxyMaterialResultInfo.filter(item => {
             return item.showFlag == "0" || item.showFlag == "null";
-          });
-          this.serverList = res.data.proxyServerResultInfo;
+            });
+           
+          } else {
+            this.materialList = []
+           }
+          if(res.data.proxyServerResultInfo) {
+             this.serverList = res.data.proxyServerResultInfo;
+          } else {
+            this.serverList = []
+          }
+          
 
           this.isChangeCount = 0;
 
