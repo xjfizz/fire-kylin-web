@@ -5,7 +5,7 @@
     @select="handleSelect"
   >
     <template v-for="(item, index) in topMenus">
-      <el-menu-item :index="item.path" :key="index" v-if="index < visibleNumber"
+      <el-menu-item :style="{'--theme': theme}"  :index="item.path" :key="index" v-if="index < visibleNumber"
       ><svg-icon :icon-class="item.meta.icon" />
         {{ item.meta.title }}</el-menu-item
       >
@@ -30,7 +30,7 @@
 <script>
 import { constantRoutes } from "@/router";
 // 不需要激活的路由
-const noactiveList = ["/user/profile", "/dict/type", "/gen/edit", "/job/log"];
+// const noactiveList = ["/user/profile", "/dict/type", "/gen/edit", "/job/log"];
 
 export default {
   data() {
@@ -38,16 +38,26 @@ export default {
       // 顶部栏初始数
       visibleNumber: 5,
       // 是否为首次加载
-      isFrist: false,
+      isFirst: false,
+      // 当前激活菜单的 index
+      currentIndex: undefined
     };
   },
   computed: {
+    theme() {
+      return this.$store.state.settings.theme;
+    },
     // 顶部显示菜单
     topMenus() {
       let topMenus = [];
       this.routers.map((menu) => {
         if (menu.hidden !== true) {
-          topMenus.push(menu);
+          // 兼容顶部栏一级菜单内部跳转
+          if (menu.path === "/") {
+            topMenus.push(menu.children[0]);
+          } else {
+            topMenus.push(menu);
+          }
         }
       });
       return topMenus;
@@ -62,7 +72,11 @@ export default {
       this.routers.map((router) => {
         for (var item in router.children) {
           if (router.children[item].parentPath === undefined) {
-            router.children[item].path = router.path + "/" + router.children[item].path;
+            if(router.path === "/") {
+              router.children[item].path = "/redirect/" + router.children[item].path;
+            } else {
+              router.children[item].path = router.path + "/" + router.children[item].path;
+            }
             router.children[item].parentPath = router.path;
           }
           childrenMenus.push(router.children[item]);
@@ -74,23 +88,21 @@ export default {
     activeMenu() {
       const path = this.$route.path;
       let activePath = this.routers[0].path;
-      var noactive = noactiveList.some(function (item) {
-        return path.indexOf(item) !== -1;
-      });
-      if (noactive) {
-        return;
-      }
       if (path.lastIndexOf("/") > 0) {
         const tmpPath = path.substring(1, path.length);
         activePath = "/" + tmpPath.substring(0, tmpPath.indexOf("/"));
       } else if ("/index" == path || "" == path) {
-        if (!this.isFrist) {
-          this.isFrist = true;
+        if (!this.isFirst) {
+          this.isFirst = true;
         } else {
           activePath = "index";
         }
       }
-      this.activeRoutes(activePath);
+      var routes = this.activeRoutes(activePath);
+      if (routes.length === 0) {
+        activePath = this.currentIndex || this.routers[0].path
+        this.activeRoutes(activePath);
+      }
       return activePath;
     },
   },
@@ -120,10 +132,15 @@ export default {
     },
     // 菜单选择事件
     handleSelect(key, keyPath) {
+      this.currentIndex = key;
       if (key.indexOf("http://") !== -1 || key.indexOf("https://") !== -1) {
         // http(s):// 路径新窗口打开
         window.open(key, "_blank");
+      } else if (key.indexOf("/redirect") !== -1) {
+        // /redirect 路径内部打开
+        this.$router.push({ path: key.replace("/redirect", "") });
       } else {
+        // 显示左侧联动菜单
         this.activeRoutes(key);
       }
     },
@@ -137,13 +154,16 @@ export default {
           }
         });
       }
-      this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
+      if(routes.length > 0) {
+        this.$store.commit("SET_SIDEBAR_ROUTERS", routes);
+      }
+      return routes;
     }
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .el-menu--horizontal > .el-menu-item {
   float: left;
   height: 50px;
@@ -156,7 +176,13 @@ export default {
 }
 
 .el-menu--horizontal > .el-menu-item.is-active {
-  border-bottom: 3px solid #409eff;
+  border-bottom: 3px solid #{'var(--theme)'};
   color: #303133;
+}
+
+/* submenu item */
+.el-menu--horizontal > .el-submenu .el-submenu__title {
+  height: 50px !important;
+  line-height: 50px !important;
 }
 </style>
