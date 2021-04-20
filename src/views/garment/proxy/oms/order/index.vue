@@ -278,7 +278,7 @@
             style="color: #f8ac59"
             type="text"
             @click="pickedGoods(scope.row)"
-          >已取货</el-button>
+          >确认已取货</el-button>
           <el-button
             v-show="scope.row.orderStatus === '10' && scope.row.orderDeliveryType == 2"
             icon="el-icon-s-promotion"
@@ -948,7 +948,8 @@ import {
   orderAssignSender,
   orderAssignChecker,
   getPickers,
-  getCheckerListApi
+  getCheckerListApi,
+  orderPicked
 
 } from "@/api/garment/proxy/oms/order/order.js";
 import isPickDialog from "./components/isPickDialog";
