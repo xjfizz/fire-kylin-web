@@ -559,7 +559,7 @@
                             <div v-if="form.omsProxyOrder" class="cell">￥{{ form.omsProxyOrder.orderPayAmount | money }}</div>
                           </td>
                         </tr>
-                         <tr v-if="form.omsProxyOrder && (form.omsProxyOrder.orderStatus == 12 || form.omsProxyOrder.orderStatus == 9) ">
+                         <tr v-if="form.fixRecord">
                           <td>
                             <div class="cell">实际数量：</div>
                           </td>
@@ -570,12 +570,12 @@
                             >{{ form.fixRecord.orderActualProduceQuantity || '0'}}件</div>
                           </td>
                           <td v-if="form.omsProxyOrder">
-                            <div class="cell" v-if="form.omsProxyOrder.orderStatus == 12">已退差额</div>
-                            <div class="cell" v-if="form.omsProxyOrder.orderStatus == 9">待补差额</div>
+                            <div class="cell" v-if="form.fixRecord.orderOperateType == 1">已退差额</div>
+                            <div class="cell" v-if="form.fixRecord.orderOperateType == 2 && form.fixRecord.orderOperateStatus == 2">待补差额</div>
+                            <div class="cell" v-if="form.fixRecord.orderOperateType == 2 && form.fixRecord.orderOperateStatus == 1">已付差额</div>
                           </td>
                           <td>
-                            <div v-if="form.wmsUserWalletRecord" class="cell">￥{{ form.wmsUserWalletRecord.recordAmount || '0'}}</div>
-                            <div v-if="form.orderStatus == 9" class="cell">￥{{ form.fixRecord.orderOperateAmount || '0'}}</div>
+                            <div v-if="form.fixRecord" class="cell">￥{{ form.fixRecord.orderOperateAmount || '0'}}</div>
                           </td>
                         </tr>
                         <tr>
