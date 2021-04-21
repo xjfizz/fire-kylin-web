@@ -168,3 +168,23 @@ export function orderPicked(data) {
     data: data
   })
 }
+// 编辑订单
+export function orderEdit(data) {
+  return request({
+    url: '/oms/web/proxy/order',
+    method: 'put',
+    data: data
+  })
+}
+// 上传文件
+export function uploadFile(data) {
+  return request({
+    url: '/oms/web/proxy/order/uploadProxyOrderAnnex',
+    method: 'post',
+    data: data,
+    headers:{
+      'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'     
+    },
+    
+  })
+}

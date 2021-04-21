@@ -198,6 +198,14 @@
         prop="orderStatus"
         width="100"
       />
+        <el-table-column align="center" label="上传代裁文件" prop="orderAnnexImageUrl" width="150">
+        <template slot-scope="scope">
+          <span style="cursor: pointer" v-if="scope.row.orderAnnexImageUrl" @click="downFile(scope.row)"><i class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff;"   ></i>
+          </span>
+          <span v-else>暂未上传</span>
+        </template>
+      </el-table-column>
+
       <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="150">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -205,7 +213,7 @@
       </el-table-column>
 
       <el-table-column align="center" label="备注" prop="orderNote" show-overflow-tooltip />
-      <el-table-column  fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="250">
+      <el-table-column  fixed="right" align="left" class-name="small-padding fixed-width" label="操作" width="340">
         <template slot-scope="scope">
           <el-button
             icon="el-icon-printer"
@@ -287,6 +295,30 @@
             type="text"
             @click="sendOrder(scope.row)"
           >配送</el-button>
+           <el-upload
+            class="upload-demo inline-block"
+            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+             multiple
+            :limit="3"
+            :on-exceed="bsHandleExceed"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="bsHandleChange">
+          <el-button
+            icon="el-icon-upload2"
+            size="mini"
+            style="color: indianred"
+            type="text"
+            @click="selectLocalRow(scope.row)"
+           >上传</el-button>
+           </el-upload>
+            <el-button
+            icon="el-icon-download"
+            size="mini"
+            style="color: indianred"
+            type="text"
+            @click="downFile(scope.row)"
+           >下载</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -525,6 +557,25 @@
                           </td>
                           <td>
                             <div v-if="form.omsProxyOrder" class="cell">￥{{ form.omsProxyOrder.orderPayAmount | money }}</div>
+                          </td>
+                        </tr>
+                         <tr v-if="form.omsProxyOrder && (form.omsProxyOrder.orderStatus == 12 || form.omsProxyOrder.orderStatus == 9) ">
+                          <td>
+                            <div class="cell">实际数量：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="form.fixRecord"
+                              class="cell"
+                            >{{ form.fixRecord.orderActualProduceQuantity || '0'}}件</div>
+                          </td>
+                          <td v-if="form.omsProxyOrder">
+                            <div class="cell" v-if="form.omsProxyOrder.orderStatus == 12">已退差额</div>
+                            <div class="cell" v-if="form.omsProxyOrder.orderStatus == 9">待补差额</div>
+                          </td>
+                          <td>
+                            <div v-if="form.wmsUserWalletRecord" class="cell">￥{{ form.wmsUserWalletRecord.recordAmount || '0'}}</div>
+                            <div v-if="form.orderStatus == 9" class="cell">￥{{ form.fixRecord.orderOperateAmount || '0'}}</div>
                           </td>
                         </tr>
                         <tr>
@@ -949,7 +1000,9 @@ import {
   orderAssignChecker,
   getPickers,
   getCheckerListApi,
-  orderPicked
+  orderPicked,
+  uploadFile,
+  orderEdit
 
 } from "@/api/garment/proxy/oms/order/order.js";
 import isPickDialog from "./components/isPickDialog";
@@ -1161,7 +1214,8 @@ export default {
         { key: 3, value: "继续生产" },
         { key: 4, value: "完成生产" }
       ],
-      rosterDeviceType: 1 // 排班类型 1 排班 2 重新排班
+      rosterDeviceType: 1, // 排班类型 1 排班 2 重新排班
+      localRow:{}
     };
   },
   mounted() {
@@ -2159,7 +2213,61 @@ export default {
             : "";
         }
       });
-    }
+    },
+    // 版式预览
+    bsHandlePreview(file) {
+        console.log(file);
+      },
+      // 版式预览
+      bsHandleExceed(files, fileList) {
+       console.log("===========")
+        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      },
+      selectLocalRow(row) {
+        this.localRow = row
+      },
+        bsHandleChange(file, fileList) {//上传文件变化时
+          console.log('bsHandleChange',file,fileList)
+          this.uploadStyleFile(file)
+        },
+      // 上传文件-版式
+      uploadStyleFile(file) {
+      let formData = new FormData()
+      formData.append('file', file.raw)
+      uploadFile(formData).then(res => {
+        if (res.code == 200) {
+          this.editOrder(res.data.name)
+        }
+      });
+      },
+      // 编辑订单
+     editOrder(res) {
+      let params = {
+       orderAnnexImageUrl:res,
+       pkid:this.localRow.pkid
+      };
+      orderEdit(params).then(res => {
+        if (res.code == 200) {
+           this.getList()
+          this.$message({
+            type: "success",
+            message: "上传成功!"
+          });
+        }
+      });
+    },
+      // 下载文件
+    downFile(row) {
+      this.downs(row)
+    },
+    // 下载图片
+    downs(e) {
+      console.log('downs',e)
+      var alink = document.createElement("a");
+      alink.href = e.orderAnnexImageUrl;
+     // alink.download =`${e.orderNo}`; //图片名
+      alink.click();
+   }
   }
 };
 </script>
@@ -2195,4 +2303,10 @@ export default {
 }
 .producting-content-steps {
 }
+
+  /* 解决 上传下载按钮 不能再一行显示 */
+  .inline-block {
+    display: inline-block;
+  }
+
 </style>

@@ -234,7 +234,7 @@
       <!-- 底部表格 -->
       <!-- v-show="[1,2,3].indexOf(selectMoudleItem) > 0" -->
       <div
-        v-show="[1,2,3].indexOf(selectMoudleItem) > -1 && queryType == 1"
+        v-show="[1,2,3,4].indexOf(selectMoudleItem) > -1 && queryType == 1"
         class="produce-bottom-chart"
       >
         <div class="bottom-content-left">
@@ -458,6 +458,7 @@ export default {
         }
       } else if (this.selectMoudleItem == 4) {
         this.mainData.lineData.chartTitle = "产量";
+        this.mainData.pieData.chartTitle = "产量分类";
       }
     },
 
@@ -797,6 +798,7 @@ export default {
       } else if (e == 4) {
         // 产量
         this.mainData.lineData.chartTitle = "产量";
+         this.mainData.pieData.chartTitle = "产量分类";
         this.getTabProduceData();
       }
     },
@@ -839,6 +841,7 @@ export default {
         }
       } else if (this.selectMoudleItem == 4) {
         this.mainData.lineData.chartTitle = "产量";
+         this.mainData.pieData.chartTitle = "产量分类";
         this.getTabProduceData();
       }
     },
