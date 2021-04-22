@@ -813,6 +813,32 @@
                             </div>
                           </td>
                         </tr>
+                         <tr  v-if=" form.fixRecord && form.fixRecord.orderOperateType == 1">
+                          <td>
+                            <div class="cell">退款类型：</div>
+                          </td>
+                          <td>
+                            <div v-if="form.wmsUserWalletRecord" class="cell">
+                              {{
+                                form.wmsUserWalletRecord.recordName || ""
+                              }}
+                            </div>
+                          </td>
+                          <td v-if="form.fixRecord">
+                            <div
+                              class="cell"
+                              v-if="form.fixRecord"
+                            >
+                              退款时间
+                            </div>
+                           
+                          </td>
+                          <td>
+                            <div v-if="form.fixRecord" class="cell">
+                              {{ form.fixRecord.createTime || "" }}
+                            </div>
+                          </td>
+                        </tr>
                         <tr>
                           <td>
                             <div class="cell">支付方式：</div>
