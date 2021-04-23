@@ -264,64 +264,9 @@
         prop="orderStatus"
         width="100"
       />
-      <el-table-column
+             <el-table-column
         align="left"
-        label="上传排版"
-        prop="orderAnnexImageUrl"
-        width="150"
-      >
-        <template slot-scope="scope">
-          <!-- <el-popover
-            v-if="scope.row.orderAnnexImageUrl"
-           
-            trigger="hover"
-            placement="bottom"
-          >
-            <div style=" display: flex; justify-content: center;" size="medium">点击下载</div>
-            <div slot="reference" class="name-wrapper"  @click="downFile(scope.row)">
-              <span style="cursor: pointer"
-                ><i
-                  class="el-icon-folder-opened"
-                  style="font-size: 20px; color: #1890ff"
-                ></i>
-              </span>
-            </div>
-          </el-popover>
-
-          <span v-else>暂未上传</span> -->
-          <div style="display: flex; align-items: center">
-           <i v-if="scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
-            <i v-if="!scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
-            
-             <el-upload
-             v-if="!scope.row.orderAnnexImageUrl"
-            class="upload-demo inline-block"
-            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
-            multiple
-            :limit="3"
-            :on-exceed="bsHandleExceed"
-            :auto-upload="false"
-            :show-file-list="false"
-            :on-change="bsHandleChange"
-            style="margin-left: 10px;margin-right:10px"
-          >
-            <el-button
-              size="mini"
-              type="text"
-              @click="selectLocalRow(scope.row,1)"
-              >上传</el-button
-            >
-          </el-upload>
-            <el-button  style="margin-left: 10px;" v-if="scope.row.orderAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,1)">下载</el-button>
-            <el-button  v-if="scope.row.orderAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,1)">删除</el-button>
-          </div>
-        </template>
-      </el-table-column>
-
-
-       <el-table-column
-        align="left"
-        label="上传版式"
+        label="版式文件"
         prop="orderStyleAnnexImageUrl"
         width="150"
       >
@@ -352,6 +297,44 @@
           </div>
         </template>
       </el-table-column>
+
+      <el-table-column
+        align="left"
+        label="排版文件"
+        prop="orderAnnexImageUrl"
+        width="150"
+      >
+        <template slot-scope="scope">
+       <div style="display: flex; align-items: center">
+           <i v-if="scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
+            <i v-if="!scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
+            
+             <el-upload
+             v-if="!scope.row.orderAnnexImageUrl"
+            class="upload-demo inline-block"
+            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+            multiple
+            :limit="3"
+            :on-exceed="bsHandleExceed"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="bsHandleChange"
+            style="margin-left: 10px;margin-right:10px"
+          >
+            <el-button
+              size="mini"
+              type="text"
+              @click="selectLocalRow(scope.row,1)"
+              >上传</el-button
+            >
+          </el-upload>
+            <el-button  style="margin-left: 10px;" v-if="scope.row.orderAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,1)">下载</el-button>
+            <el-button  v-if="scope.row.orderAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,1)">删除</el-button>
+          </div>
+        </template>
+      </el-table-column>
+
+
 
       <el-table-column
         align="center"
