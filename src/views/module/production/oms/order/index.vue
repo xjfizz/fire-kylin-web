@@ -148,7 +148,7 @@
       :row-key="getRowKeys"
     >
       <el-table-column align="center" type="selection" width="55" :reserve-selection="true" />
-      <el-table-column fixed align="center" label="订单编号" prop="orderNo" width="150" />
+      <el-table-column fixed align="center" label="订单编号" prop="orderNo" width="170" />
       <el-table-column fixed align="center" label="用户名称" prop="wmsUser.userName" />
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" show-overflow-tooltip />
@@ -191,7 +191,7 @@
         prop="orderStatus"
         width="120"
       />
-      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="150">
+      <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="200">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
