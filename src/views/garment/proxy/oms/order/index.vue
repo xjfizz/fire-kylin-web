@@ -6,7 +6,6 @@
       :inline="true"
       :model="queryParams"
       label-width="68px"
-      
     >
       <el-form-item label="订单状态" prop="orderStatus">
         <el-select
@@ -266,13 +265,13 @@
         width="100"
       />
       <el-table-column
-        align="center"
-        label="上传代裁文件"
+        align="left"
+        label="上传排版"
         prop="orderAnnexImageUrl"
         width="150"
       >
         <template slot-scope="scope">
-          <el-popover
+          <!-- <el-popover
             v-if="scope.row.orderAnnexImageUrl"
            
             trigger="hover"
@@ -289,7 +288,68 @@
             </div>
           </el-popover>
 
-          <span v-else>暂未上传</span>
+          <span v-else>暂未上传</span> -->
+          <div style="display: flex; align-items: center">
+           <i v-if="scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
+            <i v-if="!scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
+            
+             <el-upload
+             v-if="!scope.row.orderAnnexImageUrl"
+            class="upload-demo inline-block"
+            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+            multiple
+            :limit="3"
+            :on-exceed="bsHandleExceed"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="bsHandleChange"
+            style="margin-left: 10px;margin-right:10px"
+          >
+            <el-button
+              size="mini"
+              type="text"
+              @click="selectLocalRow(scope.row,1)"
+              >上传</el-button
+            >
+          </el-upload>
+            <el-button  style="margin-left: 10px;" v-if="scope.row.orderAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,1)">下载</el-button>
+            <el-button  v-if="scope.row.orderAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,1)">删除</el-button>
+          </div>
+        </template>
+      </el-table-column>
+
+
+       <el-table-column
+        align="left"
+        label="上传版式"
+        prop="orderStyleAnnexImageUrl"
+        width="150"
+      >
+        <template slot-scope="scope">
+          <div style="display: flex; align-items: center">
+            <i v-if="scope.row.orderStyleAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
+            <i v-if="!scope.row.orderStyleAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
+             <el-upload
+             v-if="!scope.row.orderStyleAnnexImageUrl"
+            class="upload-demo inline-block"
+            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+            multiple
+            :limit="3"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="bsHandleChange"
+            style="margin-left: 10px;margin-right:10px"
+          >
+            <el-button
+              size="mini"
+              type="text"
+              @click="selectLocalRow(scope.row,2)"
+              >上传</el-button
+            >
+          </el-upload>
+            <el-button  style="margin-left: 10px;" v-if="scope.row.orderStyleAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,2)">下载</el-button>
+            <el-button  v-if="scope.row.orderStyleAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,2)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
 
@@ -418,7 +478,7 @@
             @click="sendOrder(scope.row)"
             >配送</el-button
           >
-          <el-upload
+          <!-- <el-upload
             class="upload-demo inline-block"
             action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
             multiple
@@ -427,7 +487,7 @@
             :auto-upload="false"
             :show-file-list="false"
             :on-change="bsHandleChange"
-            style="margin-left:10px"
+            style="margin-left: 10px"
           >
             <el-button
               icon="el-icon-upload2"
@@ -437,7 +497,7 @@
               @click="selectLocalRow(scope.row)"
               >上传</el-button
             >
-          </el-upload>
+          </el-upload> -->
           <!-- <el-button
              v-if="scope.row.orderAnnexImageUrl"
             icon="el-icon-download"
@@ -813,25 +873,24 @@
                             </div>
                           </td>
                         </tr>
-                         <tr  v-if=" form.fixRecord && form.fixRecord.orderOperateType == 1">
+                        <tr
+                          v-if="
+                            form.fixRecord &&
+                            form.fixRecord.orderOperateType == 1
+                          "
+                        >
                           <td>
                             <div class="cell">退款类型：</div>
                           </td>
                           <td>
                             <div v-if="form.wmsUserWalletRecord" class="cell">
-                              {{
-                                form.wmsUserWalletRecord.recordName || ""
-                              }}
+                              {{ form.wmsUserWalletRecord.recordName || "" }}
                             </div>
                           </td>
                           <td v-if="form.fixRecord">
-                            <div
-                              class="cell"
-                              v-if="form.fixRecord"
-                            >
+                            <div class="cell" v-if="form.fixRecord">
                               退款时间
                             </div>
-                           
                           </td>
                           <td>
                             <div v-if="form.fixRecord" class="cell">
@@ -1615,6 +1674,7 @@ export default {
       ],
       rosterDeviceType: 1, // 排班类型 1 排班 2 重新排班
       localRow: {},
+      uploadType:1,// 1排版，2版式
     };
   },
   mounted() {
@@ -2626,13 +2686,14 @@ export default {
         } 个文件`
       );
     },
-    selectLocalRow(row) {
+    selectLocalRow(row,type) {
       this.localRow = row;
+      this.uploadType = type
     },
     bsHandleChange(file, fileList) {
       //上传文件变化时
       console.log("bsHandleChange", file, fileList);
-      this.loading = true
+      this.loading = true;
       this.uploadStyleFile(file);
     },
     // 上传文件-版式
@@ -2645,34 +2706,62 @@ export default {
         }
       });
     },
+    delFile(row,type) {
+      this.uploadType = type
+      this.$confirm(`确认删除当前${this.uploadType == 1 ? '排版文件' : '版式文件'}?`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+            this.localRow = row;
+            this.editOrder('')
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消操作",
+          });
+        });
+    },
     // 编辑订单
     editOrder(res) {
-      let params = {
-        orderAnnexImageUrl: res,
-        pkid: this.localRow.pkid,
-      };
+      let params;
+      if(this.uploadType == 1) {
+         params = {
+          orderAnnexImageUrl: res,
+          pkid: this.localRow.pkid,
+        }
+      } else {
+         params = {
+          orderStyleAnnexImageUrl: res,
+          pkid: this.localRow.pkid,
+        }
+      }
       orderEdit(params).then((res) => {
         if (res.code == 200) {
-          this.loading = false
+          this.loading = false;
           this.getList();
           this.$message({
             type: "success",
-            message: "上传成功!",
+            message: "操作成功!",
           });
         }
       });
     },
     // 下载文件
-    downFile(row) {
+    downFile(row,type) {
+       this.uploadType = type
       this.downs(row);
     },
     // 下载图片
     downs(e) {
-      console.log("downs", e);
+       console.log("downs", e);
       var alink = document.createElement("a");
-      alink.href = e.orderAnnexImageUrl;
-      // alink.download =`${e.orderNo}`; //图片名
-      alink.click();
+       alink.href =  this.uploadType == 1 ? e.orderAnnexImageUrl : e.orderStyleAnnexImageUrl;
+       alink.download = this.uploadType == 1 ? `代裁排版-${e.orderNo}` : `代裁版式-${e.orderNo}` ; //图片名
+       // alink.download = '4444' ; //图片名
+       alink.click();
     },
   },
 };
@@ -2714,5 +2803,4 @@ export default {
 .inline-block {
   display: inline-block;
 }
-
 </style>
