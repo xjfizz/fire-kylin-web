@@ -15,6 +15,7 @@
 
 <script>
 import { getCodeImg } from "@/api/login";
+import { getToken } from '@/utils/auth'
 
 
 export default {
@@ -32,9 +33,25 @@ export default {
     }
   },
   created() {
+    console.log('getToken',getToken())
     if(this.$route.query.jumpSource == 'jxBigScreen') {
       // 清除token
       this.goLogin()
+    } else {
+      if(!getToken()) {
+         this.$confirm('登录状态已过期，请重新登录', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           this.$router.push('/login')
+          // this.store.dispatch('LogOut').then(() => {
+          //   this.$router.push('/login')
+          // })
+        }).catch(() => {
+                   
+        });
+      }
     }
   },
   methods: {
