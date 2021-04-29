@@ -159,6 +159,7 @@ export default {
               color: "#000000"
             }
           },
+         
           axisLine: {
             lineStyle: {
               color: "#999999",
@@ -187,6 +188,7 @@ export default {
                 { type: "min", name: "最小值" }
               ]
             },
+             itemStyle : { normal: {label : {show: true}}},
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
