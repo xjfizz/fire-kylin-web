@@ -1,184 +1,186 @@
 <template>
-<el-card shadow="never"  class="waitInfo-card">
-
   <div class="waitInfo-main">
-      <!-- 制帽业务中心 -->
-      <div class="wait-item">
-          <div class="top">
-              <div class="top-title top-title-color1">制帽业务中心</div>
+  <!-- 制帽代裁业务 -->
+    <div class="waitInfo-main-item">
+      <div v-if="workShopType == 1" class="waitInfo-main-item-title">制帽订单业务</div>
+      <div v-if="workShopType == 2" class="waitInfo-main-item-title">代裁订单业务</div>
+      <div class="waitInfo-main-item-name">我的待办</div>
+      <div class="waitInfo-main-content">
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty1"></div>
+            <span>待取料</span>
           </div>
-          <div class="mid">我的待办</div>
-          <div class="bottom">
-              <div class="bottom-item">
-                  <div class="item-title">待取料</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待确认</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待生产</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待检测</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待配送</div>
-                  <div class="item-value">20</div>
-              </div>
+          <div class="main-content-item-bottom">{{homeMainData.dcReclaimedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty2"></div>
+            <span>待确认</span>
           </div>
+          <div class="main-content-item-bottom">{{homeMainData.dcConfirmedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty3"></div>
+            <span>待分配生产</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.dcProducedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty4"></div>
+            <span>待检测</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.dcTestedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty5"></div>
+            <span>待配送</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.dcDeliveredNum}}</div>
+        </div>
       </div>
-      <!-- 裁剪业务中心 -->
-       <div class="wait-item">
-          <div class="top">
-              <div class="top-title top-title-color2">裁剪业务中心</div>
+    </div>
+    <!-- 派单业务 -->
+    <div class="waitInfo-main-item">
+      <div class="waitInfo-main-item-title">派单订单业务</div>
+      <div class="waitInfo-main-item-name">我的待办</div>
+      <div class="waitInfo-main-content">
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty1"></div>
+            <span>待取料</span>
           </div>
-          <div class="mid">我的待办</div>
-          <div class="bottom">
-              <div class="bottom-item">
-                  <div class="item-title">待取料</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待确认</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待生产</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待检测</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待配送</div>
-                  <div class="item-value">20</div>
-              </div>
+          <div class="main-content-item-bottom">{{homeMainData.pdReclaimedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty2"></div>
+            <span>待确认</span>
           </div>
+          <div class="main-content-item-bottom">{{homeMainData.pdConfirmedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty3"></div>
+            <span>待分配生产</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.pdProducedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty4"></div>
+            <span>待检测</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.pdTestedNum}}</div>
+        </div>
+        <div class="main-content-item">
+          <div class="main-content-item-top">
+            <div class="status-text status-text-sty5"></div>
+            <span>待配送</span>
+          </div>
+          <div class="main-content-item-bottom">{{homeMainData.pdDeliveredNum}}</div>
+        </div>
       </div>
-
-      <!-- 派单业务中心 -->
-       <div class="wait-item">
-          <div class="top">
-              <div class="top-title top-title-color3">派单业务中心</div>
-          </div>
-          <div class="mid">我的待办</div>
-          <div class="bottom">
-              <div class="bottom-item">
-                  <div class="item-title">待取料</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待确认</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待生产</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待检测</div>
-                  <div class="item-value">20</div>
-              </div>
-               <div class="bottom-item">
-                  <div class="item-title">待配送</div>
-                  <div class="item-value">20</div>
-              </div>
-          </div>
-      </div>
+    </div>
   </div>
-</el-card>
-
 </template>
 
 <script>
 export default {
   name: "waitInfo",
+  
   props: {
-   
+      homeMainData:{
+          type:Object,
+          default:() => {
+              return {}
+          }
+      }
   },
   components: {},
   data() {
     return {
-      visible: false,
-      orderList: [] // 选择的已取料订单
+      workShopType:this.$store.state.user.userInfo.workShopType || 2
     };
   },
   computed: {},
-  watch: {
-    
-  },
+  watch: {},
   mounted() {},
 
-  methods: {
-   
-  }
+  methods: {},
 };
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-.waitInfo-card{
-        
-        .waitInfo-main{
-             background-color: #f9f9f9;
-             padding-top: 1px;
-        .wait-item{
-            margin-top: 20px;
-            .top{
-                padding: 10px;
-            .top-title{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: #bf81e6;
-                color: #ffffff;
-                font-size: 14px;
-                width: 120px;
-                padding: 3px;
-            }
-            .top-title-color1{
-                 background-color: #bf81e6;
-            }
-            .top-title-color2{
-                 background-color: #b7e011;
-            }
-            .top-title-color3{
-                 background-color: #826df9;
-            }
+.waitInfo-main {
+  // width: 1076px;
+  .waitInfo-main-item {
+    height: 206px;
+    background: #ffffff;
+    box-shadow: 0px 2px 12px 0px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 21px 24px 24px 24px;
+    margin-bottom: 32px;
+    .waitInfo-main-item-title {
+      font-size: 18px;
+      color: #333333;
+    }
+    .waitInfo-main-item-name {
+      margin-top: 16px;
+      font-size: 16px;
+      color: #888888;
+    }
+    .waitInfo-main-content {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      .main-content-item:last-child {
+        border: none;
+      }
+      .main-content-item {
+       width: 18%;
+        border-right:  1px solid #E5E5E5;
+        .main-content-item-top {
+          display: flex;
+          align-items: center;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.65);
+          .status-text {
+            width: 4px;
+            height: 4px;
+            margin-right: 8px;
+          }
+          .status-text-sty1 {
+            background: #1990ff;
+            border: 2px solid rgba(25, 144, 255, 0.2);
+          }
+          .status-text-sty2 {
+            background: #ff5400;
+            border: 2px solid rgba(255, 84, 0, 0.2);
+          }
+          .status-text-sty3 {
+            background: #00d889;
+            border: 2px solid rgba(0, 218, 134, 0.2);
+          }
+          .status-text-sty4 {
+            background: #ffbf19;
+            border: 2px solid rgba(255, 191, 25, 0.2);
+          }
+          .status-text-sty5 {
+            background: #ff1919;
+            border: 2px solid rgba(255, 25, 25, 0.2);
+          }
         }
-        .mid{
-            padding: 10px; 
-            font-size: 14px;
+        .main-content-item-bottom {
+          margin-top: 10px;
+          font-size: 30px;
+          color: rgba(0, 0, 0, 0.85);
         }
-        .bottom{
-            background-color: #ffffff;
-             padding: 20px 10px; 
-             display: flex;
-             justify-content: space-between;
-             .bottom-item{
-                 display: flex;
-                 align-items: center;
-                
-                 .item-title{
-                   font-size: 14px;  
-                 }
-                 .item-value{
-                     margin-left: 20px;
-                     font-size: 40px;
-                     color: #fb734e;
-                 }
-             }
-
-        }
-        }
-        .border-bottom1{
-            border-bottom: 1px solid #e5e5e5;
-        }
-   }
+      }
+    }
+  }
 }
-
 </style>

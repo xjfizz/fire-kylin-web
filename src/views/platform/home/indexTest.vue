@@ -2,14 +2,14 @@
   <div class="app-container">
       <div class="platform-home-content">
           <div class="platform-content-left">
-              <waitInfo :homeMainData="homeMainData"></waitInfo>
+              <waitInfo></waitInfo>
           </div>
           <div class="platform-content-right">
               <div class="platform-top">
-                  <message  :homeMainData="homeMainData"></message>
+                  <message></message>
               </div>
               <div class="platform-bottom">
-                  <produceData ref="produceData" :homeMainData="homeMainData"></produceData>
+                  <produceData></produceData>
               </div>
           </div>
       </div>
@@ -18,16 +18,15 @@
 
 <script>
 
-// import waitInfo from './commponents/waitInfo'
-import waitInfo from './commponents/waitInfo/index'
+
+import waitInfo from './commponents/waitInfo/indexTest'
 import message from './commponents/message'
 import produceData from './commponents/produce-data'
-import homeApi from "@/api/platform/home";
 export default {
   name: "roster",
   data() {
     return {
-      homeMainData:{}
+ 
     };
   },
   components: {
@@ -45,27 +44,7 @@ export default {
   methods: {
     // 初始化
     init() {
-      this.getMainData()
-    },
-    /** 获取首页数据 */
-    getMainData() {
-      console.log('homeApi',homeApi)      
-      let params = {}
-      homeApi.homeData(params).then(res => {
-        if(res.code == 200) {
-         this.homeMainData = res.data
-          this.homeMainData.chartData = this.homeMainData.productionAmountPieChartData
-        this.$nextTick( ()=> {
-          this.$refs.produceData.$refs.pieChart.initChart()
-        })
-         
-          } else {
-          this.$message({
-            type:'warning',
-            message:res.msg
-          })
-        }
-      });
+      
     },
   
   }

@@ -11,7 +11,9 @@ const state = {
   topNav:  storageSetting.topNav === undefined ? topNav : storageSetting.topNav,
   tagsView: storageSetting.tagsView === undefined ? tagsView : storageSetting.tagsView,
   fixedHeader: storageSetting.fixedHeader === undefined ? fixedHeader : storageSetting.fixedHeader,
-  sidebarLogo: storageSetting.sidebarLogo === undefined ? sidebarLogo : storageSetting.sidebarLogo
+  sidebarLogo: storageSetting.sidebarLogo === undefined ? sidebarLogo : storageSetting.sidebarLogo,
+  isRouterAlive:true
+
 }
 
 const mutations = {
@@ -19,13 +21,22 @@ const mutations = {
     if (state.hasOwnProperty(key)) {
       state[key] = value
     }
-  }
+  },
+  SET_ISROUTERALIVE_TRUE: (state) => {
+    state.isRouterAlive = false
+    setTimeout(()=> {
+      state.isRouterAlive = true
+    },10)
+},
 }
 
 const actions = {
   changeSetting({ commit }, data) {
     commit('CHANGE_SETTING', data)
-  }
+  },
+  SET_ISROUTERALIVE_TRUE({ commit }) {
+    commit('SET_ISROUTERALIVE_TRUE')
+  },
 }
 
 export default {
