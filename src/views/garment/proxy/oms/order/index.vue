@@ -190,7 +190,7 @@
         width="170"
       />
       <el-table-column fixed align="center" label="用户名称" prop="userName" />
-      <!-- <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" /> -->
+      <el-table-column fixed align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column
         align="center"
         label="商品款式"
@@ -1544,7 +1544,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        orderByColumn: "orderCreateTime",
+        orderByColumn: "pkid",
         isAsc: "desc",
         orderStatus: null,
         orderDeliveryType: "1", // 自送自取 1  上门取料2

@@ -1033,7 +1033,7 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
-        orderByColumn: "orderCreateTime",
+        orderByColumn: "pkid",
         isAsc: "desc",
         orderStatus: null,
         orderDeliveryType: "1", // 自送自取 1  上门取料2
