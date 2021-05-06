@@ -2,16 +2,31 @@
   <div class="calendar-main">
     <div class="calendar-top" v-if="copyDate">
       <span>系统检测:</span>
-      <span>已复制{{copyDate}}计划</span>
-      <el-button class="insert-btn" size="mini" @click="insertRoster()">插入</el-button>
+      <span>已复制{{ copyDate }}计划</span>
+      <el-button class="insert-btn" size="mini" @click="insertRoster()"
+        >插入</el-button
+      >
     </div>
     <div class="calendar-main-mid">
-      <Calendar v-on:choseDay="clickDay" v-on:changeMonth="changeDate" v-on:isToday="clickToday"></Calendar>
+      <Calendar
+        :markDate="markDateList"
+        v-on:choseDay="clickDay"
+        v-on:changeMonth="changeDate"
+        v-on:isToday="clickToday"
+      ></Calendar>
       <!--   :markDate="[copyDate]" -->
     </div>
     <div class="bottom">
-      <el-button class="opt-button" size="medium" @click="cancelPlan()">取消</el-button>
-      <el-button class="opt-button" type="primary" size="medium" @click="confirmPlan()">确认</el-button>
+      <el-button class="opt-button" size="medium" @click="cancelPlan()"
+        >取消</el-button
+      >
+      <el-button
+        class="opt-button"
+        type="primary"
+        size="medium"
+        @click="confirmPlan()"
+        >排班</el-button
+      >
     </div>
   </div>
 </template>
@@ -24,28 +39,29 @@ export default {
   props: {
     value: {
       type: String,
-      default: ""
+      default: "",
     },
     copyDate: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
   components: {
-    Calendar
+    Calendar,
   },
   data() {
     return {
       // arr: [copyDate],
-      insertDate: ""
+      insertDate: "",
+      markDateList: [],
     };
   },
   computed: {},
   watch: {
     value: {
       handler(val) {},
-      immediate: true
-    }
+      immediate: true,
+    },
   },
   mounted() {},
 
@@ -54,6 +70,13 @@ export default {
       console.log(data); //选中某天
       // this.insertDate = data.replace(/\//g, "-");
       this.insertDate = this.dataFormat(new Date(data));
+    },
+    insertDateInit(value) {
+      console.log("value", value);
+      if (value) {
+        this.markDateList = [value];
+        this.insertDate = value;
+      }
     },
     dataFormat(d) {
       console.log("d", d);
@@ -89,24 +112,24 @@ export default {
       if (!this.insertDate) {
         return this.$message({
           type: "warning",
-          message: "请选择插入的日期"
+          message: "请选择插入的日期",
         });
       }
       let params = {
-        copyRosterDate:this.copyDate, // this.insertDate,
-        insertRosterDate: this.insertDate
+        copyRosterDate: this.copyDate, // this.insertDate,
+        insertRosterDate: this.insertDate,
       };
-      copyRoster(params).then(res => {
+      copyRoster(params).then((res) => {
         if (res.code == 200) {
-            this.$message({
+          this.$message({
             type: "success",
-            message: "插入成功!"
+            message: "插入成功!",
           });
-           this.$parent.$parent.cancelPlanForm(this.insertDate);
+          this.$parent.$parent.cancelPlanForm(this.insertDate);
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -146,58 +169,58 @@ export default {
 }
 </style>
 <style>
-    .calendar-main-mid .wh_item_date:hover {
-    background: #ffffff !important;
-    color: #1890ff !important;
-    cursor: pointer !important;
-  }
-  .calendar-main-mid .wh_content_all {
-    background-color: #ffffff !important;
-    color: #606266 !important;
-  }
-  .calendar-main-mid .wh_content:first-child .wh_content_item_tag,
-  .calendar-main-mid .wh_content:first-child .wh_content_item {
-    color: #606266 !important;
-  }
-  .calendar-main-mid .wh_content_item,
-  wh_content_item_tag {
-    color: #606266 !important;
-  }
+.calendar-main-mid .wh_item_date:hover {
+  background: #ffffff !important;
+  color: #1890ff !important;
+  cursor: pointer !important;
+}
+.calendar-main-mid .wh_content_all {
+  background-color: #ffffff !important;
+  color: #606266 !important;
+}
+.calendar-main-mid .wh_content:first-child .wh_content_item_tag,
+.calendar-main-mid .wh_content:first-child .wh_content_item {
+  color: #606266 !important;
+}
+.calendar-main-mid .wh_content_item,
+wh_content_item_tag {
+  color: #606266 !important;
+}
 
-  .calendar-main-mid .wh_jiantou1 {
-    border-top: 2px solid #606266 !important;
-    border-left: 2px solid #606266 !important;
-  }
+.calendar-main-mid .wh_jiantou1 {
+  border-top: 2px solid #606266 !important;
+  border-left: 2px solid #606266 !important;
+}
 
-  .calendar-main-mid .wh_jiantou1:active,
-  .calendar-main-mid .wh_jiantou2:active {
-    border-color: #606266 !important;
-  }
+.calendar-main-mid .wh_jiantou1:active,
+.calendar-main-mid .wh_jiantou2:active {
+  border-color: #606266 !important;
+}
 
-  .calendar-main-mid .wh_jiantou2 {
-    border-top: 2px solid #606266 !important;
-    border-right: 2px solid #606266 !important;
-  }
-  .calendar-main-mid .wh_content_item > .wh_isMark {
-    background: #1890ff !important;
-    color: #ffffff !important;
-  }
-  .calendar-main-mid .wh_content_item .wh_other_dayhide {
-    color: #c0c4cc !important;
-  }
-  .calendar-main-mid .wh_content_item .wh_want_dayhide {
-    color: #c0c4cc !important;
-  }
-  .calendar-main-mid .wh_content_item .wh_isToday {
-    background: #ffffff !important;
-    color: #1890ff !important;
-  }
-  .calendar-main-mid .wh_content_item .wh_chose_day {
-    background: #1890ff !important;
-    color: #fff !important;
-  }
+.calendar-main-mid .wh_jiantou2 {
+  border-top: 2px solid #606266 !important;
+  border-right: 2px solid #606266 !important;
+}
+.calendar-main-mid .wh_content_item > .wh_isMark {
+  background: #1890ff !important;
+  color: #ffffff !important;
+}
+.calendar-main-mid .wh_content_item .wh_other_dayhide {
+  color: #c0c4cc !important;
+}
+.calendar-main-mid .wh_content_item .wh_want_dayhide {
+  color: #c0c4cc !important;
+}
+.calendar-main-mid .wh_content_item .wh_isToday {
+  background: #ffffff !important;
+  color: #1890ff !important;
+}
+.calendar-main-mid .wh_content_item .wh_chose_day {
+  background: #1890ff !important;
+  color: #fff !important;
+}
 
-  .calendar-main-mid .wh_top_changge li {
-    color: #606266 !important;
-  }
+.calendar-main-mid .wh_top_changge li {
+  color: #606266 !important;
+}
 </style>

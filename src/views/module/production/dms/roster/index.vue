@@ -21,7 +21,7 @@
         >查询</el-button>
         <el-button class="search-btn" icon="el-icon-refresh" size="medium" @click="refresh()">刷新</el-button>
       </div>
-      <div class="right">
+      <div class="right" v-if="isAbleCopy">
         <el-button
           class="copy-btn"
           type="success"
@@ -32,7 +32,7 @@
       </div>
     </div>
     <div class="content">
-      <rosterPlan :copyDate="copyDate" ref="rosterPlan" v-if="rosterPlanShow"></rosterPlan>
+      <rosterPlan @showCopyBtn="showCopyBtn" :copyDate="copyDate" ref="rosterPlan" v-if="rosterPlanShow"></rosterPlan>
       <rosterOptions ref="rosterOptions" v-if="!rosterPlanShow"></rosterOptions>
     </div>
   </div>
@@ -46,6 +46,7 @@ export default {
   data() {
     return {
       rosterPlanShow: true,
+      isAbleCopy:false,
       pickerOptions: {
         // disabledDate(time) {
         //   return time.getTime() > Date.now();
@@ -113,6 +114,7 @@ export default {
     // 选择日期
     search(e) {
       console.log(e, this.searchDate);
+      this.searchList()
     },
     // 点击查询日期按钮
     searchList() {
@@ -144,6 +146,9 @@ export default {
         type:'success',
         message: `已复制${this.copyDate}的排班计划!`
       })
+    },
+    showCopyBtn(value) {
+      this.isAbleCopy = value
     },
 
     // 切换plan options 组件

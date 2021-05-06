@@ -157,7 +157,7 @@
 
       <!-- 日期对话框 -->
       <el-dialog title="插入排班计划" :visible.sync="calendarVisible" width="25%" center>
-        <calendar :copyDate="copyDate"></calendar>
+        <calendar ref="calendar" :copyDate="copyDate"></calendar>
       </el-dialog>
     </div>
     <!-- 对话框-end -->
@@ -253,6 +253,9 @@ export default {
           if (res.data) {
             if (this.rosterList.length > 0) {
               this.getDeviceList();
+              this.$emit('showCopyBtn',true)
+            } else {
+              this.$emit('showCopyBtn',false)
             }
           }
         }
@@ -292,6 +295,10 @@ export default {
     // 插入排班计划
     insertPlan() {
       this.calendarVisible = true;
+       this.$nextTick( () => {
+       this.$refs.calendar.insertDateInit(this.searchDate) // => 'updated'
+      })
+      
     },
     // 取消插入排班计划
     cancelPlanForm(date) {

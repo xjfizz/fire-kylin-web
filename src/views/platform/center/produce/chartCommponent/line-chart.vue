@@ -188,7 +188,7 @@ export default {
                 { type: "min", name: "最小值" }
               ]
             },
-             itemStyle : { normal: {label : {show: true}}},
+            itemStyle : { normal: {label : {show: true}}},
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
