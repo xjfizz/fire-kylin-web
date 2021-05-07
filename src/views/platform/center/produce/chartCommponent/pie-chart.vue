@@ -56,7 +56,12 @@ export default {
     initChart() {
       this.chart = echarts.init(this.$el, "macarons");
       let _this = this;
-      this.chart.setOption({
+      if(this.type != 2) {
+         this.data.forEach(item => {
+        item.name = `${item.categoryName}-${item.name}`
+      })
+      }
+     this.chart.setOption({
         // title: {
         //   text: "某站点用户访问来源",
         //   subtext: "纯属虚构",
@@ -120,8 +125,10 @@ export default {
               formatter: function(item) {
                 if (_this.type == 2) {
                   return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) `;
+                } else if(_this.type ==  1) {
+                  return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.money} <br /> 服务产量:${item.data.orderQuantity}`;
                 } else {
-                  return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.money} `;
+                  return `${_this.chartTitle} <br /> ${item.data.name}:${item.data.value} (${item.percent}%) <br /> 订单金额:${item.data.money}`;
                 }
               }
             },
