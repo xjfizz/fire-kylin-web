@@ -34,7 +34,7 @@ export default {
   },
   created() {
     console.log('getToken',getToken())
-    if(this.$route.query.jumpSource == 'jxBigScreen') {
+    if(this.$route.query.jumpSource == 'bigScreen') {
       // 清除token
       this.goLogin()
     } else {
@@ -57,8 +57,18 @@ export default {
   methods: {
     // 登陆操作
     goLogin() {
-      this.$store.dispatch("Login", this.loginForm).then(() => {
+      let params = {
+         password: this.$route.query.password, //  "qdzyds2021", // decrypt('qdzyds2021')
+         username: this.$route.query.username,
+         loginSource:1, // 登陆来源
+      }
+      this.$store.dispatch("Login", params).then(() => {
+        if(this.$route.query.username == 'qdzyds') {
            this.$router.replace({name:'Produce'})
+          
+        } else if(this.$route.query.username == 'hzzlds') {
+          this.$router.replace({name:'Dispatch'})
+        }
           }).catch(() => {
             
           });
