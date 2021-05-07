@@ -509,6 +509,77 @@
                             <div v-if="form" class="cell">￥{{ form.orderPayAmount | money }}</div>
                           </td>
                         </tr>
+
+                        <!-- 补差额 -->
+                                                <tr v-if="form.fixRecord">
+                          <td>
+                            <div class="cell">实际数量：</div>
+                          </td>
+                          <td>
+                            <div v-if="form.fixRecord" class="cell">
+                              {{
+                                form.fixRecord.orderActualProduceQuantity ||
+                                "0"
+                              }}打
+                            </div>
+                          </td>
+                          <td v-if="form.fixRecord">
+                            <div
+                              class="cell"
+                              v-if="form.fixRecord.orderOperateType == 1"
+                            >
+                              已退差额
+                            </div>
+                            <div
+                              class="cell"
+                              v-if="
+                                form.fixRecord.orderOperateType == 2 &&
+                                form.fixRecord.orderOperateStatus == 2
+                              "
+                            >
+                              待补差额
+                            </div>
+                            <div
+                              class="cell"
+                              v-if="
+                                form.fixRecord.orderOperateType == 2 &&
+                                form.fixRecord.orderOperateStatus == 1
+                              "
+                            >
+                              已付差额
+                            </div>
+                          </td>
+                          <td>
+                            <div v-if="form.fixRecord" class="cell">
+                              ￥{{ form.fixRecord.orderOperateAmount || "0" }}
+                            </div>
+                          </td>
+                        </tr>
+                        <tr
+                          v-if="
+                            form.fixRecord &&
+                            form.fixRecord.orderOperateType == 1
+                          "
+                        >
+                          <td>
+                            <div class="cell">退款类型：</div>
+                          </td>
+                          <td>
+                            <div v-if="form.wmsUserWalletRecord" class="cell">
+                              {{ form.wmsUserWalletRecord.recordName || "" }}
+                            </div>
+                          </td>
+                          <td v-if="form.fixRecord">
+                            <div class="cell" v-if="form.fixRecord">
+                              退款时间
+                            </div>
+                          </td>
+                          <td>
+                            <div v-if="form.fixRecord" class="cell">
+                              {{ form.fixRecord.createTime || "" }}
+                            </div>
+                          </td>
+                        </tr>
                         <tr>
                           <td>
                             <div class="cell">支付方式：</div>
