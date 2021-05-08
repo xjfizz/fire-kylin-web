@@ -11,35 +11,35 @@
             <div class="status-text status-text-sty1"></div>
             <span>待取料</span>
           </div>
-          <div class="main-content-item-bottom">{{homeMainData.dcReclaimedNum}}</div>
+          <div class="main-content-item-bottom">{{homeMainData.reclaimedNum}}</div>
         </div>
         <div class="main-content-item">
           <div class="main-content-item-top">
             <div class="status-text status-text-sty2"></div>
             <span>待确认</span>
           </div>
-          <div class="main-content-item-bottom">{{homeMainData.dcConfirmedNum}}</div>
+          <div class="main-content-item-bottom">{{homeMainData.confirmedNum}}</div>
         </div>
         <div class="main-content-item">
           <div class="main-content-item-top">
             <div class="status-text status-text-sty3"></div>
             <span>待分配生产</span>
           </div>
-          <div class="main-content-item-bottom">{{homeMainData.dcProducedNum}}</div>
+          <div class="main-content-item-bottom">{{homeMainData.producedNum}}</div>
         </div>
         <div class="main-content-item">
           <div class="main-content-item-top">
             <div class="status-text status-text-sty4"></div>
             <span>待检测</span>
           </div>
-          <div class="main-content-item-bottom">{{homeMainData.dcTestedNum}}</div>
+          <div class="main-content-item-bottom">{{homeMainData.testedNum}}</div>
         </div>
         <div class="main-content-item">
           <div class="main-content-item-top">
             <div class="status-text status-text-sty5"></div>
             <span>待配送</span>
           </div>
-          <div class="main-content-item-bottom">{{homeMainData.dcDeliveredNum}}</div>
+          <div class="main-content-item-bottom">{{homeMainData.deliveredNum}}</div>
         </div>
       </div>
     </div>
@@ -103,10 +103,13 @@ export default {
   components: {},
   data() {
     return {
-      workShopType:this.$store.state.user.userInfo.workShopType || 2
     };
   },
-  computed: {},
+  computed: {
+    workShopType() {
+      return this.$store.state.user.workshopInfo.workshopType
+    }
+  },
   watch: {},
   mounted() {},
 

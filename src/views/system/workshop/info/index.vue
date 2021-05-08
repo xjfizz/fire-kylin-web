@@ -129,6 +129,7 @@ export default {
     getWorkshopInfo() {
       getWorkshopInfoDetail().then(response => {
         this.workshopInfo = response.data;
+        this.$store.commit('SET_WORKSHOPINFO',this.workshopInfo)
       });
     },
     // 客服状态字典翻译

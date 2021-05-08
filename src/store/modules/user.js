@@ -17,7 +17,8 @@ const user = {
     avatar: '',
     roles: [],
     permissions: [],
-    userInfo: {}
+    userInfo: {},
+    workshopInfo:{}
   },
 
   mutations: {
@@ -32,6 +33,9 @@ const user = {
     },
     SET_USERINFO: (state, userInfo) => {
       state.userInfo = userInfo
+    },
+    SET_WORKSHOPINFO: (state, userInfo) => {
+      state.workshopInfo = userInfo
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles

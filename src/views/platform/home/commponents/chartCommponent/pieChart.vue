@@ -86,7 +86,7 @@ export default {
                 } else if (_this.activeName == 3) {
                   return `${item.seriesName} <br /> ${item.data.name}:${item.data.value}个 (${item.percent}%) `;
                 } else if (_this.activeName == 4) {
-                  return `${item.seriesName} <br /> ${item.data.name}:${item.data.value}家 (${item.percent}%) `;
+                  return `${item.seriesName} <br /> ${item.data.name}:${item.data.value}个 (${item.percent}%) `;
                 }
               },
             },

@@ -4,7 +4,7 @@ let homeApi = {
   // 工场首页数据
   homeData:(params)=> {
     return request({
-      url: '/wkp/proxy/home/info/obtainWkpHomeData',
+      url: '/wkp/home/info/obtainWkpHomeData',
       method: 'get',
       params: params
     })

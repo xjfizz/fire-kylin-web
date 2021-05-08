@@ -23,6 +23,7 @@ import waitInfo from './commponents/waitInfo/index'
 import message from './commponents/message'
 import produceData from './commponents/produce-data'
 import homeApi from "@/api/platform/home";
+import {getWorkshopInfoDetail} from "@/api/system/workshop/info/info";
 export default {
   name: "roster",
   data() {
@@ -46,6 +47,7 @@ export default {
     // 初始化
     init() {
       this.getMainData()
+      this.getWorkshopInfo()
     },
     /** 获取首页数据 */
     getMainData() {
@@ -67,6 +69,15 @@ export default {
         }
       });
     },
+    // 获取工场信息
+    getWorkshopInfo() {
+      getWorkshopInfoDetail().then(response => {
+        if(response.code == 200) {
+            this.$store.commit('SET_WORKSHOPINFO',response.data)
+        }
+      });
+    },
+    
   
   }
 };

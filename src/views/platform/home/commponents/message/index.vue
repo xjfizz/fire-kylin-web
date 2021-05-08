@@ -190,8 +190,7 @@ export default {
   components: {},
   data() {
     return {
-      workShopType: this.$store.state.user.userInfo.workShopType || 2,
-      activeName: "first",
+     activeName: "first",
       count: 1,
       loading: false,
       dialogVisible: false,
@@ -209,6 +208,11 @@ export default {
     disabled() {
       return this.loading || this.noMore;
     },
+    
+    workShopType() {
+      return this.$store.state.user.workshopInfo.workshopType
+    }
+  
   },
   watch: {},
   mounted() {},
