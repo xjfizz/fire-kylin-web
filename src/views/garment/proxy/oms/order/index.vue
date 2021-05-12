@@ -1431,6 +1431,7 @@ import {
   delOrder,
   addOrder,
   updateOrder,
+  cancelOrder,
   exportOrder,
   confirmOrder,
   listRoster,

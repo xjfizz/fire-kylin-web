@@ -46,7 +46,7 @@ export function delOrder(pkid) {
 // 取消订单
 export function cancelOrder(pkid) {
   return request({
-    url: '/oms/web/order/cancel/' + pkid,
+    url: '/oms/web/proxy/order/cancel/' + pkid,
     method: 'put'
   })
 }
