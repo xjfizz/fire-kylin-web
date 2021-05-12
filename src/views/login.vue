@@ -130,7 +130,13 @@ export default {
             Cookies.remove('rememberMe');
           }
           this.$store.dispatch("Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+            // 登录失效恢复路由处理
+            if(sessionStorage.routerHistory) {
+              this.$router.push({ path: sessionStorage.routerHistory || "/" }).catch(()=>{});
+              sessionStorage.removeItem('routerHistory')
+            } else {
+              this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+           }
           }).catch(() => {
             this.loading = false;
             this.getCode();

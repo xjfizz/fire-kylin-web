@@ -109,7 +109,7 @@
       <el-table-column align="center" type="selection" width="55"/>
       <el-table-column label="编号" prop="roleId" width="120"/>
       <el-table-column :show-overflow-tooltip="true" label="客户名称" prop="roleName" width="150"/>
-      <el-table-column :show-overflow-tooltip="true" label="角色" prop="roleName" width="150"/>
+      <!-- <el-table-column :show-overflow-tooltip="true" label="角色" prop="roleName" width="150"/> -->
       <el-table-column :show-overflow-tooltip="true" label="昵称" prop="roleName" width="150"/>
       <el-table-column :show-overflow-tooltip="true" label="头像" prop="roleKey" width="150"/>
       <el-table-column :show-overflow-tooltip="true" label="手机号码" prop="roleKey" width="150"/>
@@ -124,8 +124,6 @@
       <el-table-column align="center" class-name="small-padding fixed-width" label="操作">
         <template slot-scope="scope">
          <el-button
-            v-hasPermi="['system:role:remove']"
-            icon="el-icon-delete"
             size="mini"
             type="text"
             @click="handleDelete(scope.row)"
@@ -595,6 +593,7 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
+      return
       const roleIds = row.roleId || this.ids;
       this.$confirm('是否确认删除角色编号为"' + roleIds + '"的数据项?', "警告", {
           confirmButtonText: "确定",
