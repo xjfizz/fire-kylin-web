@@ -170,12 +170,12 @@
         width="200"
       >
         <template slot-scope="scope">
-          <el-button size="mini" type="text" icon="el-icon-s-custom" @click="handleAssign(scope.row)">
+          <el-button v-hasPermi="['wkp:customer:edit']" size="mini" type="text" icon="el-icon-s-custom" @click="handleAssign(scope.row)">
             <span v-if="!scope.row.salesUserPkid">分配销售</span>
             <span v-else>重新分配</span>
           </el-button>
 
-           <el-button  v-if="scope.row.salesUserPkid" size="mini" type="text" icon="el-icon-delete-solid" @click="handleRemove(scope.row)">
+           <el-button  v-hasPermi="['wkp:customer:remove']"  v-if="scope.row.salesUserPkid" size="mini" type="text" icon="el-icon-delete-solid" @click="handleRemove(scope.row)">
             <span>移除销售</span>
           </el-button>
         </template>
