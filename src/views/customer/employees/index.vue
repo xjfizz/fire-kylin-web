@@ -26,7 +26,18 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="行业" prop="status">
+       <el-form-item label="关联销售" prop="userName">
+        <el-input
+          v-model="queryParams.salesUserName"
+          clearable
+          placeholder="请输入销售员名称"
+          size="small"
+          style="width: 240px"
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <br/>
+      <el-form-item label="用户行业" prop="status">
         <el-select
           v-model="queryParams.userIndustry"
           clearable
@@ -288,8 +299,10 @@ export default {
       queryParams: {
         pageNum: 1,
         pageSize: 10,
+        salesUserName:'',
         userName: undefined,
         userPhone: undefined,
+        salesUserPkid:this.$store.state.user.roles.indexOf('SE') > -1 ? this.$store.state.user.userInfo.userId : '',
         userIndustry: undefined,
       },
       selectUserList: [],
@@ -308,7 +321,7 @@ export default {
       this.statusOptions = response.data;
     });
   },
-  methods: {
+   methods: {
     /** 查询客户列表 */
     getList() {
       this.loading = true;
@@ -355,8 +368,10 @@ export default {
       (this.queryParams = {
         pageNum: 1,
         pageSize: 10,
+        salesUserName:'',
         userName: undefined,
         userPhone: undefined,
+        salesUserPkid:this.$store.state.user.roles.indexOf('SE') > -1 ? this.$store.state.user.userInfo.userId : '',
         userIndustry: undefined,
       }),
         this.handleQuery();
