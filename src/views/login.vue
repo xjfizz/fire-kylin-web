@@ -156,6 +156,7 @@ export default {
   height: 100%;
   background-image: url("../assets/images/kylin_login_background.jpg");
   background-size: cover;
+  background-position: center;
 }
 .title {
   margin: 0px auto 30px auto;
