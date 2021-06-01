@@ -43,7 +43,8 @@ export const constantRoutes = [
   },
   {
     path: '/404',
-    component: (resolve) => require(['@/views/error/404'], resolve),
+    // component: (resolve) => require(['@/views/error/404'], resolve),
+    redirect:'/',
     hidden: true
   },
   {
