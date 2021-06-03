@@ -564,7 +564,7 @@
                           </td>
                           <td>
                             <div
-                              v-if="form.omsOrderPayRecords"
+                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[0]"
                               class="cell"
                             >
                             <span v-if="form.omsOrderPayRecords[0].payType == 2">{{form.omsOrderPayRecords[0].walletNo}}</span>
@@ -572,7 +572,7 @@
                             </div>
                           </td>
                         </tr>
-                         <tr>
+                         <tr v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]">
                           <td>
                             <div class="cell">补差价支付：</div>
                           </td>
@@ -587,7 +587,7 @@
                           </td>
                           <td>
                             <div
-                              v-if="form.omsOrderPayRecords"
+                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]"
                               class="cell"
                             >
                             <span v-if="form.omsOrderPayRecords[1].payType == 2">{{form.omsOrderPayRecords[1].walletNo}}</span>
@@ -595,7 +595,7 @@
                             </div>
                           </td>
                         </tr>
-                          <tr>
+                          <tr v-if="form.fixRecord">
                            <td v-if="form.fixRecord">
                             <div
                               class="cell"
