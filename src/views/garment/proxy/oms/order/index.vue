@@ -45,6 +45,23 @@
           />
         </el-select>
       </el-form-item>
+
+      <el-form-item label="支付方式" prop="orderPayType">
+        <el-select
+          v-model="queryParams.orderPayType"
+          placeholder="请选择支付方式"
+          size="small"
+          style="width: 240px"
+        >
+          <el-option
+            v-for="dict in orderPayTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
+
       <el-form-item label="订单编号" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
@@ -190,7 +207,13 @@
         width="170"
       />
       <el-table-column fixed align="center" label="用户名称" prop="userName" />
-      <el-table-column fixed align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
+      <el-table-column
+        fixed
+        align="center"
+        label="手机号码"
+        prop="wmsUser.wxappPhone"
+        width="150"
+      />
       <el-table-column
         align="center"
         label="商品款式"
@@ -209,7 +232,12 @@
         prop="orderDescribe"
         show-overflow-tooltip
       />
-      <el-table-column align="center" label="商品数量" prop="orderQuantity" />
+      <el-table-column
+        align="center"
+        label="商品数量"
+        prop="orderQuantity"
+        show-overflow-tooltip
+      />
       <el-table-column
         align="center"
         label="商品颜色"
@@ -227,7 +255,12 @@
           row.orderSpecification || "暂无"
         }}</template>
       </el-table-column>
-      <el-table-column align="center" label="订单价格" prop="orderAmount">
+      <el-table-column
+        align="center"
+        label="订单价格"
+        prop="orderAmount"
+        width="100"
+      >
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
         </template>
@@ -264,7 +297,7 @@
         prop="orderStatus"
         width="100"
       />
-             <el-table-column
+      <el-table-column
         align="left"
         label="版式文件"
         prop="orderStyleAnnexImageUrl"
@@ -272,28 +305,49 @@
       >
         <template slot-scope="scope">
           <div style="display: flex; align-items: center">
-            <i v-if="scope.row.orderStyleAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
-            <i v-if="!scope.row.orderStyleAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
-             <el-upload
-             v-if="!scope.row.orderStyleAnnexImageUrl"
-            class="upload-demo inline-block"
-            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
-            multiple
-            :limit="3"
-            :auto-upload="false"
-            :show-file-list="false"
-            :on-change="bsHandleChange"
-            style="margin-left: 10px;margin-right:10px"
-          >
+            <i
+              v-if="scope.row.orderStyleAnnexImageUrl"
+              class="el-icon-folder-opened"
+              style="font-size: 20px; color: #1890ff"
+            ></i>
+            <i
+              v-if="!scope.row.orderStyleAnnexImageUrl"
+              class="el-icon-folder-opened"
+              style="font-size: 20px; color: #b5b0ae"
+            ></i>
+            <el-upload
+              v-if="!scope.row.orderStyleAnnexImageUrl"
+              class="upload-demo inline-block"
+              action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+              multiple
+              :limit="3"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="bsHandleChange"
+              style="margin-left: 10px; margin-right: 10px"
+            >
+              <el-button
+                size="mini"
+                type="text"
+                @click="selectLocalRow(scope.row, 2)"
+                >上传</el-button
+              >
+            </el-upload>
             <el-button
+              style="margin-left: 10px"
+              v-if="scope.row.orderStyleAnnexImageUrl"
               size="mini"
               type="text"
-              @click="selectLocalRow(scope.row,2)"
-              >上传</el-button
+              @click="downFile(scope.row, 2)"
+              >下载</el-button
             >
-          </el-upload>
-            <el-button  style="margin-left: 10px;" v-if="scope.row.orderStyleAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,2)">下载</el-button>
-            <el-button  v-if="scope.row.orderStyleAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,2)">删除</el-button>
+            <el-button
+              v-if="scope.row.orderStyleAnnexImageUrl"
+              size="mini"
+              type="text"
+              @click="delFile(scope.row, 2)"
+              >删除</el-button
+            >
           </div>
         </template>
       </el-table-column>
@@ -305,36 +359,55 @@
         width="150"
       >
         <template slot-scope="scope">
-       <div style="display: flex; align-items: center">
-           <i v-if="scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #1890ff"></i>
-            <i v-if="!scope.row.orderAnnexImageUrl" class="el-icon-folder-opened" style="font-size: 20px; color: #b5b0ae"></i>
-            
-             <el-upload
-             v-if="!scope.row.orderAnnexImageUrl"
-            class="upload-demo inline-block"
-            action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
-            multiple
-            :limit="3"
-            :on-exceed="bsHandleExceed"
-            :auto-upload="false"
-            :show-file-list="false"
-            :on-change="bsHandleChange"
-            style="margin-left: 10px;margin-right:10px"
-          >
+          <div style="display: flex; align-items: center">
+            <i
+              v-if="scope.row.orderAnnexImageUrl"
+              class="el-icon-folder-opened"
+              style="font-size: 20px; color: #1890ff"
+            ></i>
+            <i
+              v-if="!scope.row.orderAnnexImageUrl"
+              class="el-icon-folder-opened"
+              style="font-size: 20px; color: #b5b0ae"
+            ></i>
+
+            <el-upload
+              v-if="!scope.row.orderAnnexImageUrl"
+              class="upload-demo inline-block"
+              action="/dev-api/oms/proxy/order/uploadProxyOrderAnnex"
+              multiple
+              :limit="3"
+              :on-exceed="bsHandleExceed"
+              :auto-upload="false"
+              :show-file-list="false"
+              :on-change="bsHandleChange"
+              style="margin-left: 10px; margin-right: 10px"
+            >
+              <el-button
+                size="mini"
+                type="text"
+                @click="selectLocalRow(scope.row, 1)"
+                >上传</el-button
+              >
+            </el-upload>
             <el-button
+              style="margin-left: 10px"
+              v-if="scope.row.orderAnnexImageUrl"
               size="mini"
               type="text"
-              @click="selectLocalRow(scope.row,1)"
-              >上传</el-button
+              @click="downFile(scope.row, 1)"
+              >下载</el-button
             >
-          </el-upload>
-            <el-button  style="margin-left: 10px;" v-if="scope.row.orderAnnexImageUrl"  size="mini" type="text" @click="downFile(scope.row,1)">下载</el-button>
-            <el-button  v-if="scope.row.orderAnnexImageUrl" size="mini" type="text" @click="delFile(scope.row,1)">删除</el-button>
+            <el-button
+              v-if="scope.row.orderAnnexImageUrl"
+              size="mini"
+              type="text"
+              @click="delFile(scope.row, 1)"
+              >删除</el-button
+            >
           </div>
         </template>
       </el-table-column>
-
-
 
       <el-table-column
         align="center"
@@ -881,19 +954,102 @@
                             </div>
                           </td>
                         </tr>
+
                         <tr>
                           <td>
-                            <div class="cell">支付方式：</div>
+                            <div class="cell">下单支付：</div>
                           </td>
                           <td>
-                            <div v-if="form.omsProxyOrder" class="cell">
+                            <div
+                              v-if="
+                                form.omsOrderPayRecords &&
+                                form.omsOrderPayRecords[0]
+                              "
+                              class="cell"
+                            >
                               {{
                                 formatOrderPayType(
-                                  form.omsProxyOrder.orderPayType
+                                  form.omsOrderPayRecords[0].payType
+                                ) || "暂未支付"
+                              }}
+                            </div>
+                            <div v-else class="cell">
+                              <span>暂未支付</span>
+                            </div>
+                          </td>
+                          <td>
+                            <div class="cell">支付流水号：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="
+                                form.omsOrderPayRecords &&
+                                form.omsOrderPayRecords[0]
+                              "
+                              class="cell"
+                            >
+                              <span
+                                v-if="form.omsOrderPayRecords[0].payType == 2"
+                                >{{ form.omsOrderPayRecords[0].walletNo }}</span
+                              >
+                              <span
+                                v-if="form.omsOrderPayRecords[0].payType == 1"
+                                >{{
+                                  form.omsOrderPayRecords[0].transactionNo
+                                }}</span
+                              >
+                            </div>
+                            <div v-else class="cell">
+                              <span>暂无流水号</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr
+                          v-if="
+                            form.omsOrderPayRecords &&
+                            form.omsOrderPayRecords[1]
+                          "
+                        >
+                          <td>
+                            <div class="cell">补差价支付：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">
+                              {{
+                                formatOrderPayType(
+                                  form.omsOrderPayRecords[1].payType
                                 ) || "暂未支付"
                               }}
                             </div>
                           </td>
+                          <td>
+                            <div class="cell">支付流水号：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="
+                                form.omsOrderPayRecords &&
+                                form.omsOrderPayRecords[1]
+                              "
+                              class="cell"
+                            >
+                              <span
+                                v-if="form.omsOrderPayRecords[1].payType == 2"
+                                >{{ form.omsOrderPayRecords[1].walletNo }}</span
+                              >
+                              <span
+                                v-if="form.omsOrderPayRecords[1].payType == 1"
+                                >{{
+                                  form.omsOrderPayRecords[1].transactionNo
+                                }}</span
+                              >
+                            </div>
+                            <div v-else class="cell">
+                              <span>暂无流水号</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr>
                           <td>
                             <div class="cell">期望时间：</div>
                           </td>
@@ -1658,7 +1814,7 @@ export default {
       ],
       rosterDeviceType: 1, // 排班类型 1 排班 2 重新排班
       localRow: {},
-      uploadType:1,// 1排版，2版式
+      uploadType: 1, // 1排版，2版式
     };
   },
   mounted() {
@@ -2670,9 +2826,9 @@ export default {
         } 个文件`
       );
     },
-    selectLocalRow(row,type) {
+    selectLocalRow(row, type) {
       this.localRow = row;
-      this.uploadType = type
+      this.uploadType = type;
     },
     bsHandleChange(file, fileList) {
       //上传文件变化时
@@ -2690,16 +2846,20 @@ export default {
         }
       });
     },
-    delFile(row,type) {
-      this.uploadType = type
-      this.$confirm(`确认删除当前${this.uploadType == 1 ? '排版文件' : '版式文件'}?`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
+    delFile(row, type) {
+      this.uploadType = type;
+      this.$confirm(
+        `确认删除当前${this.uploadType == 1 ? "排版文件" : "版式文件"}?`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        }
+      )
         .then(() => {
-            this.localRow = row;
-            this.editOrder('')
+          this.localRow = row;
+          this.editOrder("");
         })
         .catch(() => {
           this.$message({
@@ -2711,16 +2871,16 @@ export default {
     // 编辑订单
     editOrder(res) {
       let params;
-      if(this.uploadType == 1) {
-         params = {
+      if (this.uploadType == 1) {
+        params = {
           orderAnnexImageUrl: res,
           pkid: this.localRow.pkid,
-        }
+        };
       } else {
-         params = {
+        params = {
           orderStyleAnnexImageUrl: res,
           pkid: this.localRow.pkid,
-        }
+        };
       }
       orderEdit(params).then((res) => {
         if (res.code == 200) {
@@ -2734,18 +2894,22 @@ export default {
       });
     },
     // 下载文件
-    downFile(row,type) {
-       this.uploadType = type
+    downFile(row, type) {
+      this.uploadType = type;
       this.downs(row);
     },
     // 下载图片
     downs(e) {
-       console.log("downs", e);
+      console.log("downs", e);
       var alink = document.createElement("a");
-       alink.href =  this.uploadType == 1 ? e.orderAnnexImageUrl : e.orderStyleAnnexImageUrl;
-       alink.download = this.uploadType == 1 ? `代裁排版-${e.orderNo}` : `代裁版式-${e.orderNo}` ; //图片名
-       // alink.download = '4444' ; //图片名
-       alink.click();
+      alink.href =
+        this.uploadType == 1 ? e.orderAnnexImageUrl : e.orderStyleAnnexImageUrl;
+      alink.download =
+        this.uploadType == 1
+          ? `代裁排版-${e.orderNo}`
+          : `代裁版式-${e.orderNo}`; //图片名
+      // alink.download = '4444' ; //图片名
+      alink.click();
     },
   },
 };

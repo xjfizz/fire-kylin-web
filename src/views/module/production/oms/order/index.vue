@@ -39,7 +39,7 @@
           />
         </el-select>
       </el-form-item>
-       <!-- <el-form-item label="支付方式" prop="orderPayType">
+       <el-form-item label="支付方式" prop="orderPayType">
         <el-select
           v-model="queryParams.orderPayType"
           placeholder="请选择支付方式"
@@ -53,7 +53,7 @@
             :value="dict.dictValue"
           />
         </el-select>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item label="订单编号" prop="orderNo">
         <el-input
           v-model="queryParams.orderNo"
@@ -168,13 +168,13 @@
       <el-table-column align="center" label="手机号码" prop="wmsUser.wxappPhone" width="150" />
       <el-table-column align="center" label="商品名称" prop="pmsServer.serverName" show-overflow-tooltip />
       <el-table-column align="center" label="商品数量" prop="orderQuantity" />
-      <el-table-column align="center" label="商品颜色" prop="orderColor">
+      <el-table-column align="center" label="商品颜色" prop="orderColor" show-overflow-tooltip >
         <template slot-scope="{row}">{{ row.orderColor || '暂无' }}</template>
       </el-table-column>
       <el-table-column align="center" label="商品规格" prop="orderSpecification">
         <template slot-scope="{row}">{{ row.orderSpecification || '暂无' }}</template>
       </el-table-column>
-      <el-table-column align="center" label="订单价格" prop="orderAmount">
+      <el-table-column align="center" label="订单价格" prop="orderAmount" width="100" >
         <template slot-scope="scope">
           <span>￥{{ scope.row.orderAmount | money }}</span>
         </template>
@@ -206,6 +206,11 @@
         prop="orderStatus"
         width="120"
       />
+        <el-table-column align="center" label="下单支付方式" prop="orderPayType" width="200">
+        <template slot-scope="scope">
+          <span> {{formatOrderPayType(scope.row.orderPayType) || '暂未支付'}}</span>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="订单创建时间" prop="orderCreateTime" width="200">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.orderCreateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -538,64 +543,8 @@
                               }}打
                             </div>
                           </td>
-                          <td>
-                            <div class="cell">期望时间：</div>
-                          </td>
-                          <td colspan="3">
-                            <div v-if="form" class="cell">{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
-                          </td>
-
-
                          
-                        </tr>
-                       
-                        <tr>
-                          <td>
-                            <div class="cell">下单支付：</div>
-                          </td>
-                          <td>
-                            <div
-                              v-if="form"
-                              class="cell"
-                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
-                          </td>
-                          <td>
-                            <div class="cell">支付流水号：</div>
-                          </td>
-                          <td>
-                            <div
-                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[0]"
-                              class="cell"
-                            >
-                            <span v-if="form.omsOrderPayRecords[0].payType == 2">{{form.omsOrderPayRecords[0].walletNo}}</span>
-                            <span v-if="form.omsOrderPayRecords[0].payType == 1">{{form.omsOrderPayRecords[0].transactionNo}}</span>
-                            </div>
-                          </td>
-                        </tr>
-                         <tr v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]">
-                          <td>
-                            <div class="cell">补差价支付：</div>
-                          </td>
-                          <td>
-                            <div
-                              v-if="form"
-                              class="cell"
-                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
-                          </td>
-                          <td>
-                            <div class="cell">支付流水号：</div>
-                          </td>
-                          <td>
-                            <div
-                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]"
-                              class="cell"
-                            >
-                            <span v-if="form.omsOrderPayRecords[1].payType == 2">{{form.omsOrderPayRecords[1].walletNo}}</span>
-                            <span v-if="form.omsOrderPayRecords[1].payType == 1">{{form.omsOrderPayRecords[1].transactionNo}}</span>
-                            </div>
-                          </td>
-                        </tr>
-                          <tr v-if="form.fixRecord">
+                         
                            <td v-if="form.fixRecord">
                             <div
                               class="cell"
@@ -627,7 +576,65 @@
                               ￥{{ form.fixRecord.orderOperateAmount || "0" }}
                             </div>
                           </td>
+                       
+
+
+                         
                         </tr>
+                       
+                        <tr>
+                          <td>
+                            <div class="cell">下单支付：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="form"
+                              class="cell"
+                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">支付流水号：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[0]"
+                              class="cell"
+                            >
+                            <span v-if="form.omsOrderPayRecords[0].payType == 2">{{form.omsOrderPayRecords[0].walletNo || '暂无流水号'}}</span>
+                            <span v-if="form.omsOrderPayRecords[0].payType == 1">{{form.omsOrderPayRecords[0].transactionNo || '暂无流水号'}}</span>
+                            </div>
+                            <div v-else class="cell">
+                              <span>暂无流水号</span>
+                            </div>
+                          </td>
+                        </tr>
+                         <tr v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]">
+                          <td>
+                            <div class="cell">补差价支付：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="form"
+                              class="cell"
+                            >{{ formatOrderPayType(form.orderPayType) || '暂未支付' }}</div>
+                          </td>
+                          <td>
+                            <div class="cell">支付流水号：</div>
+                          </td>
+                          <td>
+                            <div
+                              v-if="form.omsOrderPayRecords && form.omsOrderPayRecords[1]"
+                              class="cell"
+                            >
+                            <span v-if="form.omsOrderPayRecords[1].payType == 2">{{form.omsOrderPayRecords[1].walletNo || '暂无流水号'}}</span>
+                            <span v-if="form.omsOrderPayRecords[1].payType == 1">{{form.omsOrderPayRecords[1].transactionNo || '暂无流水号'}}</span>
+                            </div>
+                            <div v-else class="cell">
+                              <span>暂无流水号</span>
+                            </div>
+                          </td>
+                        </tr>
+                         
                          <tr
                           v-if="
                             form.fixRecord &&
@@ -651,6 +658,14 @@
                             <div v-if="form.fixRecord" class="cell">
                               {{ form.fixRecord.createTime || "" }}
                             </div>
+                          </td>
+                        </tr>
+                        <tr>
+                           <td>
+                            <div class="cell">期望时间：</div>
+                          </td>
+                          <td colspan="3">
+                            <div v-if="form" class="cell">{{ parseTime(form.orderExpectTime, '{y}-{m}-{d}') }}</div>
                           </td>
                         </tr>
                       </tbody>
