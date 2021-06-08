@@ -4,6 +4,9 @@
       <el-form-item label="工场名称" prop="workshopName">
         <el-input v-model="workshopInfo.workshopName" />
       </el-form-item>
+      <el-form-item label="工场集群" prop="workshopClusterName">
+        <el-input v-model="workshopInfo.workshopClusterName" />
+      </el-form-item>
       <el-form-item label="工场行业" prop="workshopIndustry">
         <el-select v-model="workshopInfo.workshopIndustry" placeholder="请选择工场行业">
           <el-option
