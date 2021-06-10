@@ -71,7 +71,8 @@ export default {
         color: _this.chartData.length <= 4 ? ["#1990FF", "#FFBD19", "#00D889", "#FFBD19",] : [],
         series: [
           {
-            name: "服务分类",
+            // name: "服务分类",
+             name: _this.activeName == 4 ? '合作状态': "服务分类",
             type: "pie",
             radius: "50%",
             data: _this.chartData,
