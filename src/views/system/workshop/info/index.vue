@@ -16,6 +16,10 @@
                 <div class="pull-right">{{ workshopInfo.workshopAccount }}</div>
               </li>
               <li class="list-group-item">
+                <svg-icon icon-class="github" style="margin-right: 5px"/>工场集群
+                <div class="pull-right">{{ workshopInfo.workshopClusterName }}</div>
+              </li>
+              <li class="list-group-item">
                 <svg-icon icon-class="user" style="margin-right: 5px"/>工场名称
                 <div class="pull-right">{{ workshopInfo.workshopName }}</div>
               </li>
