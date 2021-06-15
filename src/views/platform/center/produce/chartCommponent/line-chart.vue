@@ -91,6 +91,17 @@ export default {
               color: "#999999",
               width: 2
             }
+          },
+          formatter:(itemArr)=> {
+            console.log('itemArr',itemArr)
+            let item = itemArr[0]
+             if (_this.type == 1) {
+                  return `${item.name} <br /> ${item.marker}${item.seriesName}: ${item.value}`
+                } else if(_this.type ==  3) {
+                  return `${item.name} <br /> ${item.marker}${item.seriesName}: ${item.value}`
+                } else {
+                  return `${item.name} <br /> ${item.marker}${item.seriesName}: ${item.value}`
+              }
           }
         },
         legend: {
@@ -192,7 +203,7 @@ export default {
             markLine: {
               data: [{ type: "average", name: "平均值" }]
             }
-          }
+          },
         ]
       });
     }
