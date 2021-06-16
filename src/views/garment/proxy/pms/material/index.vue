@@ -86,8 +86,9 @@
 
     <el-table v-loading="loading" :data="materialList" @selection-change="handleSelectionChange">
       <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" label="材质ID" prop="pkid" />
-      <el-table-column align="center" label="款式ID" prop="stylePkid" />
+      <el-table-column align="center" label="材质编码" prop="pkid" />
+      <el-table-column align="center" label="款式编码" prop="stylePkid" />
+      <el-table-column align="center" label="款式名称" prop="proxyStyleName" />
       <el-table-column align="center" label="材质名称" prop="proxyMaterialName" />
       <el-table-column align="center" label="材质顺序" prop="proxyMaterialSort" />
       <el-table-column key="proxyMaterialStatus" align="center" label="材质状态">
