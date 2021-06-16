@@ -699,6 +699,13 @@
                           {{ form.omsProxyOrder.orderDescribe }}
                         </div>
                       </td>
+
+                        <td>
+                        <div v-if="form.omsProxyOrder" class="cell">
+                          {{ form.omsProxyOrder.orderPrice || 0 }}
+                        </div>
+                      </td>
+                      
                     </tr>
                     <!-- <tr>
                       <td>
@@ -713,21 +720,9 @@
                       <td>
                         <div v-if="form" class="cell">￥{{ form.orderAmount | money}}</div>
                       </td>
-                      <td>
-                        <div class="cell">商品数量：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderQuantity || 0 }}件</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="cell">备注信息：</div>
-                      </td>
-                      <td colspan="7">
-                        <div v-if="form" class="cell">{{ form.orderNote || '暂无备注'}}</div>
-                      </td>
+                     
                     </tr> -->
+                   
                   </tbody>
                 </table>
               </div>
