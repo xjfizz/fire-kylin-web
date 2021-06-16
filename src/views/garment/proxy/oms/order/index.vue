@@ -699,30 +699,17 @@
                           {{ form.omsProxyOrder.orderDescribe }}
                         </div>
                       </td>
-
-                        <td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="cell">下单价格：</div>
+                      </td>
+                      <td>
                         <div v-if="form.omsProxyOrder" class="cell">
-                          {{ form.omsProxyOrder.orderPrice || 0 }}
+                          ￥{{ form.omsProxyOrder.orderPrice || 0 }}
                         </div>
                       </td>
-                      
                     </tr>
-                    <!-- <tr>
-                      <td>
-                        <div class="cell">商品规格：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">{{ form.orderSpecification }}</div>
-                      </td>
-                      <td>
-                        <div class="cell">商品价格：</div>
-                      </td>
-                      <td>
-                        <div v-if="form" class="cell">￥{{ form.orderAmount | money}}</div>
-                      </td>
-                     
-                    </tr> -->
-                   
                   </tbody>
                 </table>
               </div>
@@ -1077,7 +1064,9 @@
                         <el-tag effect="plain">取料</el-tag>
                       </div>
                       <div
-                        class="el-table el-table--enable-row-hover el-table--medium"
+                        class="
+                          el-table el-table--enable-row-hover el-table--medium
+                        "
                       >
                         <table cellspacing="0" style="width: 100%">
                           <tbody>
@@ -1171,7 +1160,9 @@
                         <el-tag effect="plain" type="success">配送</el-tag>
                       </div>
                       <div
-                        class="el-table el-table--enable-row-hover el-table--medium"
+                        class="
+                          el-table el-table--enable-row-hover el-table--medium
+                        "
                       >
                         <table cellspacing="0" style="width: 100%">
                           <tbody>
