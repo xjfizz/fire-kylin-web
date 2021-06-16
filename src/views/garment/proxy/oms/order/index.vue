@@ -706,7 +706,7 @@
                       </td>
                       <td>
                         <div v-if="form.omsProxyOrder" class="cell">
-                          ￥{{ form.omsProxyOrder.orderPrice || 0 }}
+                          ￥{{ form.omsProxyOrder.orderPrice | money }}
                         </div>
                       </td>
                     </tr>
