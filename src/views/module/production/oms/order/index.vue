@@ -545,8 +545,8 @@
                         <div class="cell">商品名称：</div>
                       </td>
                       <td>
-                        <div v-if="form.pmsServer" class="cell">
-                          {{ form.pmsServer.serverName }}
+                        <div  class="cell">
+                          <span v-if="form.pmsServerCategory"> {{ form.pmsServerCategory.categoryName }}</span> - <span v-if="form.pmsServer">{{ form.pmsServer.serverName }}</span>
                         </div>
                       </td>
                       <td>
