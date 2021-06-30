@@ -240,6 +240,16 @@
           row.orderSpecification || "暂无"
         }}</template>
       </el-table-column>
+       <el-table-column
+        align="center"
+        label="是否顺货"
+        prop="orderArrangeMaterialStatus"
+      >
+        <template slot-scope="scope">
+          <span v-if="scope.row.orderArrangeMaterialStatus == 1">是</span>
+          <span v-if="scope.row.orderArrangeMaterialStatus == 0">否</span>
+        </template>
+      </el-table-column>
       <el-table-column
         align="center"
         label="订单价格"
@@ -294,6 +304,7 @@
           >
         </template>
       </el-table-column>
+      
       <el-table-column
         align="center"
         label="订单创建时间"
@@ -889,11 +900,33 @@
                             </div>
                           </td>
                         </tr>
-                        <tr>
+                        <tr v-if="form">
                           <td>
+                            <div class="cell">是否顺货:</div>
+                          </td>
+                          <td >
+                            <div v-if="form" class="cell">
+                              <span v-if="form.orderArrangeMaterialStatus == 1">是</span>
+                              <span v-else>否</span>
+                            </div>
+                          </td>
+                           <td>
+                            <div class="cell">顺货金额：</div>
+                          </td>
+                          <td>
+                            <div v-if="form" class="cell">
+                              {{
+                               form.orderArrangeMaterialAmount || '0.00'
+                              }} ({{ form.orderArrangeMaterialPrice || '0.00'}}/打)
+                            </div>
+                          </td>
+                          
+                        </tr>
+                         <tr>
+                         <td>
                             <div class="cell">期望时间：</div>
                           </td>
-                          <td colspan="3">
+                          <td >
                             <div v-if="form" class="cell">
                               {{
                                 parseTime(form.orderExpectTime, "{y}-{m}-{d}")
