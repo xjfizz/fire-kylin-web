@@ -110,3 +110,11 @@ export function getPlatformPhone() {
     method: 'get'
   })
 }
+
+// 获取产业集群
+export function listIndustrialClusters() {
+  return request({
+    url: '/system/workshop/info/listIndustrialClusters',
+    method: 'get'
+  })
+}

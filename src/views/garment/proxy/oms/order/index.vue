@@ -13,7 +13,6 @@
           clearable
           placeholder="请选择订单状态"
           size="small"
-          style="width: 240px"
         >
           <el-option
             v-for="dict in orderStatusOptions"
@@ -35,7 +34,6 @@
           v-model="queryParams.orderDeliveryType"
           placeholder="请选择配送方式"
           size="small"
-          style="width: 240px"
         >
           <el-option
             v-for="dict in orderDeliveryOptions"
@@ -51,7 +49,6 @@
           v-model="queryParams.orderPayType"
           placeholder="请选择支付方式"
           size="small"
-          style="width: 240px"
         >
           <el-option
             v-for="dict in orderPayTypeOptions"
@@ -250,6 +247,7 @@
         align="center"
         label="商品规格"
         prop="orderSpecification"
+        show-overflow-tooltip
       >
         <template slot-scope="{ row }">{{
           row.orderSpecification || "暂无"
@@ -413,7 +411,7 @@
         align="center"
         label="订单创建时间"
         prop="orderCreateTime"
-        width="200"
+        width="160"
       >
         <template slot-scope="scope">
           <span>{{

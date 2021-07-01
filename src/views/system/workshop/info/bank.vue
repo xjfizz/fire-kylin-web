@@ -1,13 +1,13 @@
 <template>
-  <el-form ref="form" :model="workshopInfo" :rules="rules" label-width="80px">
-    <el-form-item label="账户名称" prop="bankAccountName">
-      <el-input v-model="workshopInfo.bankAccountName" placeholder="请输入账户名称"  />
+  <el-form ref="form" :model="workshopInfo" :rules="rules" label-width="180px">
+    <el-form-item label="工场二级商户账户" prop="bankAccountName">
+      <el-input v-model="workshopInfo.bankAccountName" placeholder="请输入工场二级商户账户"  />
     </el-form-item>
-    <el-form-item label="开户账户" prop="bankAccount">
-      <el-input v-model="workshopInfo.bankAccount" placeholder="请输入开户账户"  />
+    <el-form-item label="工场收款账户名称" prop="bankName">
+      <el-input v-model="workshopInfo.bankName" placeholder="请输入工场收款账户名称"  />
     </el-form-item>
-    <el-form-item label="开户银行" prop="bankName">
-      <el-input v-model="workshopInfo.bankName" placeholder="请输入开户银行"  />
+    <el-form-item label="工场收款账户" prop="bankAccount">
+      <el-input v-model="workshopInfo.bankAccount" placeholder="请输入工场收款账户"  />
     </el-form-item>
     <el-form-item label="预留手机" prop="bankReservePhone">
       <el-input v-model="workshopInfo.bankReservePhone" placeholder="请输入预留手机"  />

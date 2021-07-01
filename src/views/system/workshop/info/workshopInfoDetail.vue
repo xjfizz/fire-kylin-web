@@ -4,8 +4,18 @@
       <el-form-item label="工场名称" prop="workshopName">
         <el-input v-model="workshopInfo.workshopName" />
       </el-form-item>
-      <el-form-item label="工场集群" prop="workshopClusterName">
+      <el-form-item label="工场昵称" prop="workshopClusterName">
         <el-input v-model="workshopInfo.workshopClusterName" />
+      </el-form-item>
+      <el-form-item label="工场产业集群" prop="workshopCluster">
+        <el-select v-model="workshopInfo.workshopCluster" placeholder="请选择工场产业集群">
+          <el-option
+            v-for="dict in industrialClustersList"
+            :key="dict.pkid"
+            :label="dict.clusterName"
+            :value="dict.pkid"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="工场行业" prop="workshopIndustry">
         <el-select v-model="workshopInfo.workshopIndustry" placeholder="请选择工场行业">
@@ -67,7 +77,8 @@ import {
   addWorkshopInfoDetail,
   listAllIndustry,
   listServerTag,
-  updateWorkshopInfoDetail
+  updateWorkshopInfoDetail,
+  listIndustrialClusters
 } from "@/api/system/workshop/info/info";
 
 import workShopMap from "./component/workShopMap";
@@ -87,6 +98,8 @@ export default {
       loading: false,
       // 平台行业
       industryList: [],
+      // 产业集群
+      industrialClustersList: [],
       // 工场服务标签
       serverTagList: [],
       // 表单校验
@@ -126,6 +139,7 @@ export default {
   created() {
     this.getIndustryList();
     this.getServerTagList();
+    this.getIndustrialClustersList();
   },
   methods: {
     /** 查询平台行业列表 */
@@ -133,6 +147,14 @@ export default {
       this.loading = true;
       listAllIndustry().then(response => {
         this.industryList = response.data;
+        this.loading = false;
+      });
+    },
+    /** 查询产业集群列表 */
+    getIndustrialClustersList() {
+      this.loading = true;
+      listIndustrialClusters().then(response => {
+        this.industrialClustersList = response.data;
         this.loading = false;
       });
     },

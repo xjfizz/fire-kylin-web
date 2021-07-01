@@ -16,8 +16,12 @@
                 <div class="pull-right">{{ workshopInfo.workshopAccount }}</div>
               </li>
               <li class="list-group-item">
-                <svg-icon icon-class="github" style="margin-right: 5px"/>工场集群
+                <svg-icon icon-class="github" style="margin-right: 5px"/>工场昵称
                 <div class="pull-right">{{ workshopInfo.workshopClusterName }}</div>
+              </li>
+              <li class="list-group-item">
+                <svg-icon icon-class="github" style="margin-right: 5px"/>工场产业集群
+                <div class="pull-right">{{ this.industrialClustersFormat(workshopInfo.workshopCluster) }}</div>
               </li>
               <li class="list-group-item">
                 <svg-icon icon-class="user" style="margin-right: 5px"/>工场名称
@@ -90,7 +94,7 @@ import userAvatar from "@/views/system/workshop/info/userAvatar";
 import workshopInfoDetail from "@/views/system/workshop/info/workshopInfoDetail";
 import introduction from "@/views/system/workshop/info/introduction";
 import bank from "@/views/system/workshop/info/bank";
-import {getWorkshopInfoDetail, listAllIndustry} from "@/api/system/workshop/info/info";
+import {getWorkshopInfoDetail, listAllIndustry, listIndustrialClusters} from "@/api/system/workshop/info/info";
 
 export default {
   name: "Profile",
@@ -100,6 +104,8 @@ export default {
       loading: false,
       // 平台行业表格数据
       industryList: [],
+      // 产业集群
+      industrialClustersList: [],
       // 工场服务标签
       serverTagList: [],
       // 工场数据信息
@@ -110,6 +116,7 @@ export default {
   created() {
     this.getIndustryList();
     this.getWorkshopInfo();
+    this.getIndustrialClustersList();
     // this.getServerTagList();
   },
   methods: {
@@ -118,6 +125,14 @@ export default {
       this.loading = true;
       listAllIndustry().then(response => {
         this.industryList = response.data;
+        this.loading = false;
+      });
+    },
+    /** 查询产业集群列表 */
+    getIndustrialClustersList() {
+      this.loading = true;
+      listIndustrialClusters().then(response => {
+        this.industrialClustersList = response.data;
         this.loading = false;
       });
     },
@@ -141,6 +156,11 @@ export default {
       return this.formatSupplierIndustry(this.industryList, value);
     },
 
+    // 工场产业集群格式化
+    industrialClustersFormat(value) {
+      return this.formatIndustrialClusters(this.industrialClustersList, value);
+    },
+
     // 客服状态字典翻译
     // serverTagFormat(value) {
     //   return this.formatServerTag(this.serverTagList, value);
@@ -149,8 +169,22 @@ export default {
     formatSupplierIndustry(datas, value) {
       var actions = [];
       Object.keys(datas).some((key) => {
-        if (datas[key].pkid == (value)) {
+        if (datas[key].pkid === (value)) {
           actions.push(datas[key].industryName);
+          return true;
+        }
+      })
+      return actions.join('');
+    },
+
+    formatIndustrialClusters(datas, value) {
+      var actions = [];
+      if (value === null || value === undefined){
+        return actions.join('');
+      }
+      Object.keys(datas).some((key) => {
+        if (datas[key].pkid === (value)) {
+          actions.push(datas[key].clusterName);
           return true;
         }
       })
