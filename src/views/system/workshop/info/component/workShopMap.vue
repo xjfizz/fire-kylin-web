@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-        key:'WWPBZ-G5ZCQ-ATG56-GXL4K-VKDN5-LDFNI',
+        key:'PWYBZ-ZECCO-3WVWT-SB77H-5TTMF-7XBIB',
         position:{ 
                     longitude: 0,//经度
                     latitude:0,//纬度
