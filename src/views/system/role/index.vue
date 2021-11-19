@@ -363,7 +363,7 @@ export default {
         roleSort: [
           { required: true, message: "角色顺序不能为空", trigger: "blur" }
         ]
-      }
+      },
     };
   },
   created() {
@@ -518,7 +518,7 @@ export default {
     },
     // 树权限（全选/全不选）
     handleCheckedTreeNodeAll(value, type) {
-      if (type == 'menu') {
+       if (type == 'menu') {
         this.$refs.menu.setCheckedNodes(value ? this.menuOptions: []);
       } else if (type == 'dept') {
         this.$refs.dept.setCheckedNodes(value ? this.deptOptions: []);

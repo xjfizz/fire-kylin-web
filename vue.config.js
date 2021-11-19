@@ -35,8 +35,9 @@ module.exports = {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       [process.env.VUE_APP_BASE_API]: {
         // 代理本地工程
-        target: `http://localhost:8602`,
+        // target: `http://localhost:8602`,
         // target: `https://testa.qingchuangweb.com:8601/stage-api`,
+        target: `https://testa.qingchuangweb.com:8601/stage-api`,
         changeOrigin: true,
         pathRewrite: {
           ['^' + process.env.VUE_APP_BASE_API]: ''
